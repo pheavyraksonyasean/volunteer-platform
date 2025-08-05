@@ -257,7 +257,7 @@ export default function VolunteerDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className=" bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -279,7 +279,7 @@ export default function VolunteerDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className=" bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -294,7 +294,7 @@ export default function VolunteerDashboard() {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -319,7 +319,7 @@ export default function VolunteerDashboard() {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="grid w-full grid-cols-4 ">
+          <TabsList className="bg-pink-50 border-pink-800 grid w-full grid-cols-4 ">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="opportunities">Find Opportunities</TabsTrigger>
             <TabsTrigger value="applications">My Applications</TabsTrigger>
@@ -331,7 +331,7 @@ export default function VolunteerDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Recent Activity */}
-                <Card>
+                <Card className="border-pink-800 bg-pink-50">
                   <CardHeader>
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
@@ -382,7 +382,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Recommended Opportunities */}
-                <Card>
+                <Card className="bg-pink-50 border-pink-800">
                   <CardHeader>
                     <CardTitle>Recommended for You</CardTitle>
                     <CardDescription>
@@ -415,7 +415,7 @@ export default function VolunteerDashboard() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Upcoming Events */}
-                <Card>
+                <Card className="bg-pink-50 border-pink-800">
                   <CardHeader>
                     <CardTitle>Upcoming Events</CardTitle>
                     <CardDescription>
@@ -427,7 +427,7 @@ export default function VolunteerDashboard() {
                       {mockUpcomingEvents.map((event) => (
                         <div
                           key={event.id}
-                          className="border-l-4 border-indigo-600 pl-4"
+                          className="border-l-4 border-pink-600 pl-4"
                         >
                           <h4 className="font-medium text-gray-900">
                             {event.title}
@@ -455,7 +455,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Application Status */}
-                <Card>
+                <Card className="bg-pink-50 border-pink-800">
                   <CardHeader>
                     <CardTitle>Application Status</CardTitle>
                     <CardDescription>
@@ -509,7 +509,7 @@ export default function VolunteerDashboard() {
 
           <TabsContent value="opportunities" className="space-y-6">
             {/* Search and Filters */}
-            <Card>
+            <Card className="bg-pink-50 border-pink-800">
               <CardHeader>
                 <CardTitle>Find Opportunities</CardTitle>
                 <CardDescription>
@@ -517,10 +517,10 @@ export default function VolunteerDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="flex flex-col md:flex-row gap-4">
+                <div className="border-pink-300 flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Search className=" border-pink-300 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
                         placeholder="Search opportunities..."
                         value={searchTerm}
@@ -550,7 +550,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <Card>
+            <Card className="bg-pink-50 border-pink-800">
               <CardHeader>
                 <CardTitle>My Applications</CardTitle>
                 <CardDescription>
@@ -567,7 +567,7 @@ export default function VolunteerDashboard() {
                             <h4 className="font-semibold text-gray-900">
                               {application.title}
                             </h4>
-                            <p className="text-sm text-indigo-600">
+                            <p className="text-sm text-pink-800">
                               {application.organization}
                             </p>
                             <p className="text-xs text-gray-500 mt-1">
@@ -599,7 +599,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card>
+            <Card className="bg-pink-50 border-pink-800">
               <CardHeader>
                 <CardTitle>My Schedule</CardTitle>
                 <CardDescription>
@@ -613,8 +613,8 @@ export default function VolunteerDashboard() {
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                              <Calendar className="h-6 w-6 text-indigo-600" />
+                            <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
+                              <Calendar className="h-6 w-6 text-pink-900" />
                             </div>
                             <div>
                               <h4 className="font-semibold">{event.title}</h4>

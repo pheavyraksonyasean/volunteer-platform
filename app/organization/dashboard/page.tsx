@@ -1,12 +1,18 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { useState } from "react";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Heart,
   Plus,
@@ -22,24 +28,27 @@ import {
   CheckCircle,
   XCircle,
   Clock,
-} from "lucide-react"
+} from "lucide-react";
 
-import CreateOpportunityModal from "@/components/create-opportunity-modal"
+import CreateOpportunityModal from "@/components/create-opportunity-modal";
 
 export default function OrganizationDashboard() {
-  const [showCreateModal, setShowCreateModal] = useState(false)
-  const [activeTab, setActiveTab] = useState("overview")
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [activeTab, setActiveTab] = useState("overview");
 
   const handleCreateOpportunity = (opportunityData: any) => {
-    console.log("New opportunity created:", opportunityData)
+    console.log("New opportunity created:", opportunityData);
     // Here you would typically send the data to your backend
-    setShowCreateModal(false)
-  }
+    setShowCreateModal(false);
+  };
 
-  const handleApplicationAction = (applicationId: number, action: "approve" | "reject") => {
-    console.log(`${action} application ${applicationId}`)
+  const handleApplicationAction = (
+    applicationId: number,
+    action: "approve" | "reject"
+  ) => {
+    console.log(`${action} application ${applicationId}`);
     // Here you would update the application status
-  }
+  };
 
   // Mock data
   const mockOpportunities = [
@@ -73,7 +82,7 @@ export default function OrganizationDashboard() {
       applications: 35,
       status: "full",
     },
-  ]
+  ];
 
   const mockApplications = [
     {
@@ -103,19 +112,16 @@ export default function OrganizationDashboard() {
       skills: ["Event Planning", "Customer Service"],
       experience: "Event coordinator for 5 years",
     },
-  ]
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-pink-800 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
-              <Link href="/" className="flex items-center">
-                <Heart className="h-8 w-8 text-indigo-600 mr-2" />
-                <span className="text-2xl font-bold text-gray-900">VolunteerMatch</span>
-              </Link>
+              <h1 className="text-2xl font-bold text-white">Sabay Volunteer</h1>
             </div>
 
             <div className="flex items-center space-x-4">
@@ -124,7 +130,10 @@ export default function OrganizationDashboard() {
                 onClose={() => setShowCreateModal(false)}
                 onSubmit={handleCreateOpportunity}
               />
-              <Button onClick={() => setShowCreateModal(true)} className="bg-indigo-600 hover:bg-indigo-700">
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Opportunity
               </Button>
@@ -132,16 +141,11 @@ export default function OrganizationDashboard() {
                 <Bell className="h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
-              <Button variant="ghost" size="sm">
-                <Settings className="h-4 w-4" />
-              </Button>
+
               <Avatar>
                 <AvatarImage src="/placeholder.svg?height=32&width=32" />
                 <AvatarFallback>CF</AvatarFallback>
               </Avatar>
-              <Button variant="ghost" size="sm">
-                <LogOut className="h-4 w-4" />
-              </Button>
             </div>
           </div>
         </div>
@@ -150,62 +154,74 @@ export default function OrganizationDashboard() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Community Food Bank Dashboard</h1>
-          <p className="text-gray-600">Manage your volunteer opportunities and applications</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Community Food Bank Dashboard
+          </h1>
+          <p className="text-gray-600">
+            Manage your volunteer opportunities and applications
+          </p>
         </div>
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card>
+          <Card className="bg-pink-50 border-pink-800">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-indigo-100 rounded-lg">
                   <Users className="h-6 w-6 text-indigo-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Active Volunteers</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Active Volunteers
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">40</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-pink-50 border-pink-800">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-green-100 rounded-lg">
                   <Calendar className="h-6 w-6 text-green-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Active Opportunities</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Active Opportunities
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">3</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-pink-50 border-pink-800">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-yellow-100 rounded-lg">
                   <Clock className="h-6 w-6 text-yellow-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">Pending Applications</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    Pending Applications
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">12</p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="bg-pink-50 border-pink-800">
             <CardContent className="p-6">
               <div className="flex items-center">
                 <div className="p-2 bg-purple-100 rounded-lg">
                   <TrendingUp className="h-6 w-6 text-purple-600" />
                 </div>
                 <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">This Month's Hours</p>
+                  <p className="text-sm font-medium text-gray-600">
+                    This Month's Hours
+                  </p>
                   <p className="text-2xl font-bold text-gray-900">320</p>
                 </div>
               </div>
@@ -214,8 +230,12 @@ export default function OrganizationDashboard() {
         </div>
 
         {/* Main Content */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
+          <TabsList className="bg-pink-50 grid w-full grid-cols-3">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
             <TabsTrigger value="applications">Applications</TabsTrigger>
@@ -224,32 +244,46 @@ export default function OrganizationDashboard() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Activity */}
-              <Card>
+              <Card className="bg-pink-50 border-pink-800">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
-                  <CardDescription>Latest updates on your opportunities</CardDescription>
+                  <CardDescription>
+                    Latest updates on your opportunities
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <div>
-                        <p className="text-sm font-medium">New volunteer application</p>
-                        <p className="text-xs text-gray-500">Sarah Johnson applied for Food Bank Volunteer</p>
+                        <p className="text-sm font-medium">
+                          New volunteer application
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Sarah Johnson applied for Food Bank Volunteer
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
                       <div>
-                        <p className="text-sm font-medium">Opportunity filled</p>
-                        <p className="text-xs text-gray-500">Holiday Gift Wrapping reached maximum capacity</p>
+                        <p className="text-sm font-medium">
+                          Opportunity filled
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Holiday Gift Wrapping reached maximum capacity
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
                       <div>
-                        <p className="text-sm font-medium">Volunteer confirmed</p>
-                        <p className="text-xs text-gray-500">Mike Chen confirmed for Community Garden Helper</p>
+                        <p className="text-sm font-medium">
+                          Volunteer confirmed
+                        </p>
+                        <p className="text-xs text-gray-500">
+                          Mike Chen confirmed for Community Garden Helper
+                        </p>
                       </div>
                     </div>
                   </div>
@@ -257,25 +291,37 @@ export default function OrganizationDashboard() {
               </Card>
 
               {/* Upcoming Events */}
-              <Card>
+              <Card className="bg-pink-50 border-pink-800">
                 <CardHeader>
                   <CardTitle>Upcoming Events</CardTitle>
-                  <CardDescription>Your scheduled volunteer opportunities</CardDescription>
+                  <CardDescription>
+                    Your scheduled volunteer opportunities
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     {mockOpportunities.slice(0, 3).map((opportunity) => (
-                      <div key={opportunity.id} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={opportunity.id}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div>
                           <h4 className="font-medium">{opportunity.title}</h4>
                           <p className="text-sm text-gray-600">
                             {opportunity.date} • {opportunity.time}
                           </p>
                           <p className="text-xs text-gray-500">
-                            {opportunity.volunteers}/{opportunity.maxVolunteers} volunteers
+                            {opportunity.volunteers}/{opportunity.maxVolunteers}{" "}
+                            volunteers
                           </p>
                         </div>
-                        <Badge variant={opportunity.status === "full" ? "default" : "secondary"}>
+                        <Badge
+                          variant={
+                            opportunity.status === "full"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
                           {opportunity.status}
                         </Badge>
                       </div>
@@ -289,9 +335,12 @@ export default function OrganizationDashboard() {
           <TabsContent value="opportunities" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Your Opportunities</h2>
-              <Button>
+              <Button
+                onClick={() => setShowCreateModal(true)}
+                className="bg-indigo-600 hover:bg-indigo-700"
+              >
                 <Plus className="h-4 w-4 mr-2" />
-                Create New Opportunity
+                Create Opportunity
               </Button>
             </div>
 
@@ -301,28 +350,44 @@ export default function OrganizationDashboard() {
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
                       <div>
-                        <h3 className="text-xl font-semibold mb-2">{opportunity.title}</h3>
+                        <h3 className="text-xl font-semibold mb-2">
+                          {opportunity.title}
+                        </h3>
                         <div className="flex items-center space-x-4 text-sm text-gray-600">
                           <span>{opportunity.date}</span>
                           <span>{opportunity.time}</span>
                         </div>
                       </div>
-                      <Badge variant={opportunity.status === "full" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          opportunity.status === "full"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {opportunity.status}
                       </Badge>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-indigo-600">{opportunity.volunteers}</p>
-                        <p className="text-sm text-gray-600">Confirmed Volunteers</p>
+                        <p className="text-2xl font-bold text-indigo-600">
+                          {opportunity.volunteers}
+                        </p>
+                        <p className="text-sm text-gray-600">
+                          Confirmed Volunteers
+                        </p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-green-600">{opportunity.maxVolunteers}</p>
+                        <p className="text-2xl font-bold text-green-600">
+                          {opportunity.maxVolunteers}
+                        </p>
                         <p className="text-sm text-gray-600">Max Volunteers</p>
                       </div>
                       <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-yellow-600">{opportunity.applications}</p>
+                        <p className="text-2xl font-bold text-yellow-600">
+                          {opportunity.applications}
+                        </p>
                         <p className="text-sm text-gray-600">Applications</p>
                       </div>
                     </div>
@@ -363,7 +428,9 @@ export default function OrganizationDashboard() {
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center space-x-4">
                         <Avatar>
-                          <AvatarImage src={`/placeholder.svg?height=40&width=40&query=${application.volunteerName}`} />
+                          <AvatarImage
+                            src={`/placeholder.svg?height=40&width=40&query=${application.volunteerName}`}
+                          />
                           <AvatarFallback>
                             {application.volunteerName
                               .split(" ")
@@ -372,12 +439,24 @@ export default function OrganizationDashboard() {
                           </AvatarFallback>
                         </Avatar>
                         <div>
-                          <h3 className="font-semibold">{application.volunteerName}</h3>
-                          <p className="text-sm text-gray-600">{application.opportunity}</p>
-                          <p className="text-xs text-gray-500">Applied on {application.appliedDate}</p>
+                          <h3 className="font-semibold">
+                            {application.volunteerName}
+                          </h3>
+                          <p className="text-sm text-gray-600">
+                            {application.opportunity}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            Applied on {application.appliedDate}
+                          </p>
                         </div>
                       </div>
-                      <Badge variant={application.status === "approved" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          application.status === "approved"
+                            ? "default"
+                            : "secondary"
+                        }
+                      >
                         {application.status}
                       </Badge>
                     </div>
@@ -395,19 +474,28 @@ export default function OrganizationDashboard() {
 
                     <div className="mb-4">
                       <h4 className="font-medium mb-2">Experience</h4>
-                      <p className="text-sm text-gray-700">{application.experience}</p>
+                      <p className="text-sm text-gray-700">
+                        {application.experience}
+                      </p>
                     </div>
 
                     {application.status === "pending" && (
                       <div className="flex space-x-2">
-                        <Button size="sm" onClick={() => handleApplicationAction(application.id, "approve")}>
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            handleApplicationAction(application.id, "approve")
+                          }
+                        >
                           <CheckCircle className="h-4 w-4 mr-2" />
                           Approve
                         </Button>
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={() => handleApplicationAction(application.id, "reject")}
+                          onClick={() =>
+                            handleApplicationAction(application.id, "reject")
+                          }
                         >
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
@@ -426,5 +514,5 @@ export default function OrganizationDashboard() {
         </Tabs>
       </div>
     </div>
-  )
+  );
 }
