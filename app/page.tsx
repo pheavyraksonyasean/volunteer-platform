@@ -7,7 +7,7 @@ export default function HomePage() {
   return (
     <div className="flex flex-col min-h-screen bg-white">
       {/* Header */}
-      <header className="bg-pink-800 text-white p-4 rounded">
+      <header className="bg-pink-800 text-white ">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center">
@@ -16,9 +16,6 @@ export default function HomePage() {
               </span>
             </div>
             <nav className="hidden md:flex space-x-8">
-              <Link href="#features" className="text-white hover:text-pink-950">
-                Features
-              </Link>
               <Link
                 href="#how-it-works"
                 className="text-white hover:text-pink-950"
@@ -29,10 +26,10 @@ export default function HomePage() {
                 href="#testimonials"
                 className="text-white hover:text-pink-950"
               >
-                Success Stories
+                About
               </Link>
               <Link href="#about" className="text-white hover:text-pink-950">
-                About
+                Contact
               </Link>
             </nav>
             <div className="flex space-x-4">
@@ -45,7 +42,7 @@ export default function HomePage() {
                 </Button>
               </Link>
               <Link href="/register">
-                <Button className=" bg-pink-950 text-white">Get Started</Button>
+                <Button className=" bg-rose-950 text-white">Get Started</Button>
               </Link>
             </div>
           </div>
@@ -66,7 +63,7 @@ export default function HomePage() {
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link href="/register?role=volunteer">
-                <Button size="lg" className="bg-pink-950 text-white">
+                <Button size="lg" className="bg-rose-900 text-white">
                   I'm a Volunteer
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
@@ -85,55 +82,10 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-
-      {/* Features Section */}
-
-      {/* How it Works Section */}
-
-      {/* Testimonials Section */}
-
-      {/* CTA Section
-      <section className="py-20 bg-indigo-600">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Ready to Make a Difference?
-          </h2>
-          <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
-            Join our community today and start connecting with meaningful
-            volunteer opportunities or find dedicated volunteers for your cause.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/register">
-              <Button size="lg" variant="secondary">
-                Get Started Now
-                <ArrowRight className="ml-2 h-4 w-4" />
-              </Button>
-            </Link>
-            <Link href="/opportunities">
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white text-white hover:bg-white hover:text-indigo-600 bg-transparent"
-              >
-                Browse Opportunities
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </section> */}
-
-      <div className="flex-1">
-        {/* Place all your main content here (header, hero, etc.) */}
-        {/* ...existing code up to before <footer>... */}
-      </div>
+      <div className="flex-1"></div>
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="border-t border-gray-800 mt-4 pt-4 text-center">
-            <p>&copy; 2024 VolunteerMatch. All rights reserved.</p>
-          </div>
-        </div>
+      <footer className="bg-pink-800 text-white h-20 flex items-center justify-center">
+        <p>&copy; 2024 VolunteerMatch. All rights reserved.</p>
       </footer>
     </div>
   );
