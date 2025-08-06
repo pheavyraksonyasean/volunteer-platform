@@ -130,13 +130,7 @@ export default function OrganizationDashboard() {
                 onClose={() => setShowCreateModal(false)}
                 onSubmit={handleCreateOpportunity}
               />
-              <Button
-                onClick={() => setShowCreateModal(true)}
-                className="bg-indigo-600 hover:bg-indigo-700"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Opportunity
-              </Button>
+
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
@@ -337,7 +331,7 @@ export default function OrganizationDashboard() {
               <h2 className="text-2xl font-bold">Your Opportunities</h2>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-indigo-600 hover:bg-indigo-700"
+                className="bg-pink-800 hover:bg-pink-"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Opportunity
