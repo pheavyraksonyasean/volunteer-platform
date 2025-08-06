@@ -120,9 +120,9 @@ export default function OrganizationDashboard() {
       <header className="bg-pink-800 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
-            <div className="flex items-center">
+            <Link href="/" className="flex items-center">
               <h1 className="text-2xl font-bold text-white">Sabay Volunteer</h1>
-            </div>
+            </Link>
 
             <div className="flex items-center space-x-4">
               <CreateOpportunityModal

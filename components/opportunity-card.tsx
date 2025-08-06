@@ -102,34 +102,7 @@ export default function OpportunityCard({
                 {opportunity.category}
               </Badge>
             </div>
-            <div className="absolute top-3 right-3 flex gap-2">
-              <Button
-                variant="secondary"
-                size="sm"
-                className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
-                onClick={handleFavorite}
-              >
-                <Heart
-                  className={`h-4 w-4 ${
-                    isFavorited ? "fill-red-500 text-red-500" : "text-gray-600"
-                  }`}
-                />
-              </Button>
-              <Button
-                variant="secondary"
-                size="sm"
-                className="h-8 w-8 p-0 bg-white/90 hover:bg-white"
-                onClick={handleBookmark}
-              >
-                <Bookmark
-                  className={`h-4 w-4 ${
-                    isBookmarked
-                      ? "fill-blue-500 text-blue-500"
-                      : "text-gray-600"
-                  }`}
-                />
-              </Button>
-            </div>
+            <div className="absolute top-3 right-3 flex gap-2"></div>
             {isAlmostFull && !isFull && (
               <div className="absolute bottom-3 left-3">
                 <Badge
@@ -157,7 +130,7 @@ export default function OpportunityCard({
               </Badge>
             </div>
 
-            <p className="text-indigo-600 font-medium mb-3">
+            <p className="text-pink-900 font-medium mb-3">
               {opportunity.organization}
             </p>
 
@@ -203,7 +176,7 @@ export default function OpportunityCard({
 
             <div className="flex gap-2">
               <Button
-                className="flex-1"
+                className="flex-1 bg-pink-800"
                 onClick={handleApply}
                 disabled={isFull}
               >

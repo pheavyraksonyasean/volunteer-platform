@@ -220,7 +220,7 @@ export default function VolunteerDashboard() {
 
             <div className="flex items-center space-x-4">
               <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-4 w-4" />
+                <Bell className="h-8 w-8 text-white" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
               <Avatar>
@@ -245,7 +245,7 @@ export default function VolunteerDashboard() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-          <Card className=" bg-pink-50 border-pink-800 white text-black">
+          <Card className="bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -257,7 +257,7 @@ export default function VolunteerDashboard() {
             </CardContent>
           </Card>
 
-          <Card className=" bg-pink-50 border-pink-800 white text-black">
+          <Card className="bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -279,7 +279,7 @@ export default function VolunteerDashboard() {
             </CardContent>
           </Card>
 
-          <Card className=" bg-pink-50 border-pink-800 white text-black">
+          <Card className="bg-pink-50 border-pink-800 white text-black">
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
@@ -319,7 +319,7 @@ export default function VolunteerDashboard() {
           onValueChange={setActiveTab}
           className="space-y-6"
         >
-          <TabsList className="bg-pink-50 border-pink-800 grid w-full grid-cols-4 ">
+          <TabsList className=" bg-pink-50 grid w-full grid-cols-4 ">
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="opportunities">Find Opportunities</TabsTrigger>
             <TabsTrigger value="applications">My Applications</TabsTrigger>
@@ -331,7 +331,7 @@ export default function VolunteerDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Recent Activity */}
-                <Card className="border-pink-800 bg-pink-50">
+                <Card className="border-pink-800 ">
                   <CardHeader>
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
@@ -382,7 +382,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Recommended Opportunities */}
-                <Card className="bg-pink-50 border-pink-800">
+                <Card className=" border-pink-800">
                   <CardHeader>
                     <CardTitle>Recommended for You</CardTitle>
                     <CardDescription>
@@ -402,7 +402,7 @@ export default function VolunteerDashboard() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className="border-pink-800 w-full bg-transparent bg-pink-50"
+                        className="border-pink-800 w-full bg-transparent "
                         onClick={() => setActiveTab("opportunities")}
                       >
                         View All Opportunities
@@ -415,7 +415,7 @@ export default function VolunteerDashboard() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Upcoming Events */}
-                <Card className="bg-pink-50 border-pink-800">
+                <Card className=" border-pink-800">
                   <CardHeader>
                     <CardTitle>Upcoming Events</CardTitle>
                     <CardDescription>
@@ -455,7 +455,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Application Status */}
-                <Card className="bg-pink-50 border-pink-800">
+                <Card className=" border-pink-800">
                   <CardHeader>
                     <CardTitle>Application Status</CardTitle>
                     <CardDescription>
@@ -509,7 +509,7 @@ export default function VolunteerDashboard() {
 
           <TabsContent value="opportunities" className="space-y-6">
             {/* Search and Filters */}
-            <Card className="bg-pink-50 border-pink-800">
+            <Card className=" border-pink-800">
               <CardHeader>
                 <CardTitle>Find Opportunities</CardTitle>
                 <CardDescription>
@@ -550,7 +550,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <Card className="bg-pink-50 border-pink-800">
+            <Card className=" border-pink-800">
               <CardHeader>
                 <CardTitle>My Applications</CardTitle>
                 <CardDescription>
@@ -599,7 +599,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card className="bg-pink-50 border-pink-800">
+            <Card className=" border-pink-800">
               <CardHeader>
                 <CardTitle>My Schedule</CardTitle>
                 <CardDescription>
