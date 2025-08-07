@@ -38,6 +38,7 @@ import {
   X,
 } from "lucide-react";
 import FileUpload from "./file-upload";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Opportunity {
   id: number;
@@ -578,6 +579,123 @@ export default function ApplicationModal({
             )}
           </div>
         </div>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+// EditProfileModal: Modal for editing user profile
+interface EditProfileModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (profileData: any) => void;
+  initialData: { name: string; email: string; image?: string };
+}
+
+export function EditProfileModal({
+  isOpen,
+  onClose,
+  onSubmit,
+  initialData,
+}: EditProfileModalProps) {
+  const [profileData, setProfileData] = useState({
+    name: initialData.name || "",
+    email: initialData.email || "",
+    password: "",
+    image: initialData.image || "",
+  });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>(profileData.image);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setProfileData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleImageUpload = (files: File[]) => {
+    if (files.length > 0) {
+      setImageFile(files[0]);
+      setImagePreview(URL.createObjectURL(files[0]));
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    await onSubmit({ ...profileData, image: imageFile || profileData.image });
+    setIsSubmitting(false);
+    onClose();
+  };
+
+  return (
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-md w-full">
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="flex flex-col items-center gap-2">
+            <Avatar className="h-20 w-20">
+              <AvatarImage
+                src={imagePreview || "/placeholder.svg?height=80&width=80"}
+              />
+              <AvatarFallback>{profileData.name?.[0] || "U"}</AvatarFallback>
+            </Avatar>
+            <FileUpload
+              onFileUpload={handleImageUpload}
+              acceptedTypes={[".jpg", ".jpeg", ".png"]}
+              maxSize={2}
+              multiple={false}
+              className="w-full"
+            />
+          </div>
+          <div>
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              name="name"
+              value={profileData.name}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              value={profileData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div>
+            <Label htmlFor="password">Password</Label>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              value={profileData.password}
+              onChange={handleChange}
+              placeholder="Leave blank to keep current password"
+            />
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Saving..." : "Save Changes"}
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
