@@ -62,55 +62,17 @@ export default function OrganizationDashboard() {
       applications: 25,
       status: "active",
     },
-    {
-      id: 2,
-      title: "Community Garden Helper",
-      date: "Dec 20, 2024",
-      time: "8:00 AM - 12:00 PM",
-      volunteers: 8,
-      maxVolunteers: 15,
-      applications: 18,
-      status: "active",
-    },
-    {
-      id: 3,
-      title: "Holiday Gift Wrapping",
-      date: "Dec 23, 2024",
-      time: "2:00 PM - 6:00 PM",
-      volunteers: 20,
-      maxVolunteers: 20,
-      applications: 35,
-      status: "full",
-    },
   ];
 
   const mockApplications = [
     {
       id: 1,
-      volunteerName: "Sarah Johnson",
+      volunteerName: "Sean Pheavyraksonya",
       opportunity: "Food Bank Volunteer",
-      appliedDate: "Dec 1, 2024",
+      appliedDate: "Dec 1, 2025",
       status: "pending",
       skills: ["Customer Service", "Physical Work"],
       experience: "2 years volunteering at local shelter",
-    },
-    {
-      id: 2,
-      volunteerName: "Mike Chen",
-      opportunity: "Community Garden Helper",
-      appliedDate: "Dec 3, 2024",
-      status: "approved",
-      skills: ["Gardening", "Environmental"],
-      experience: "Master gardener certification",
-    },
-    {
-      id: 3,
-      volunteerName: "Emily Davis",
-      opportunity: "Holiday Gift Wrapping",
-      appliedDate: "Dec 5, 2024",
-      status: "pending",
-      skills: ["Event Planning", "Customer Service"],
-      experience: "Event coordinator for 5 years",
     },
   ];
 
@@ -238,7 +200,7 @@ export default function OrganizationDashboard() {
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {/* Recent Activity */}
-              <Card className="bg-pink-50 border-pink-800">
+              <Card className="border-pink-800">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>
@@ -254,7 +216,7 @@ export default function OrganizationDashboard() {
                           New volunteer application
                         </p>
                         <p className="text-xs text-gray-500">
-                          Sarah Johnson applied for Food Bank Volunteer
+                          PHEANU applied for Food Bank Volunteer
                         </p>
                       </div>
                     </div>
@@ -276,7 +238,7 @@ export default function OrganizationDashboard() {
                           Volunteer confirmed
                         </p>
                         <p className="text-xs text-gray-500">
-                          Mike Chen confirmed for Community Garden Helper
+                          Nu confirmed for Community Garden Helper
                         </p>
                       </div>
                     </div>
@@ -285,7 +247,7 @@ export default function OrganizationDashboard() {
               </Card>
 
               {/* Upcoming Events */}
-              <Card className="bg-pink-50 border-pink-800">
+              <Card className="border-pink-800">
                 <CardHeader>
                   <CardTitle>Upcoming Events</CardTitle>
                   <CardDescription>
@@ -339,7 +301,7 @@ export default function OrganizationDashboard() {
             </div>
 
             <div className="grid gap-6">
-              {mockOpportunities.map((opportunity) => (
+              {mockOpportunities.slice(0, 1).map((opportunity) => (
                 <Card key={opportunity.id}>
                   <CardContent className="p-6">
                     <div className="flex justify-between items-start mb-4">
@@ -388,10 +350,6 @@ export default function OrganizationDashboard() {
 
                     <div className="flex space-x-2">
                       <Button variant="outline" size="sm">
-                        <Eye className="h-4 w-4 mr-2" />
-                        View
-                      </Button>
-                      <Button variant="outline" size="sm">
                         <Edit className="h-4 w-4 mr-2" />
                         Edit
                       </Button>
@@ -409,13 +367,10 @@ export default function OrganizationDashboard() {
           <TabsContent value="applications" className="space-y-6">
             <div className="flex justify-between items-center">
               <h2 className="text-2xl font-bold">Volunteer Applications</h2>
-              <div className="flex space-x-2">
-                <Button variant="outline">Filter</Button>
-                <Button variant="outline">Export</Button>
-              </div>
+              <div className="flex space-x-2"></div>
             </div>
 
-            <div className="grid gap-6">
+            <div className=" grid gap-6">
               {mockApplications.map((application) => (
                 <Card key={application.id}>
                   <CardContent className="p-6">
@@ -493,10 +448,6 @@ export default function OrganizationDashboard() {
                         >
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
-                        </Button>
-                        <Button variant="outline" size="sm">
-                          <Eye className="h-4 w-4 mr-2" />
-                          View Profile
                         </Button>
                       </div>
                     )}

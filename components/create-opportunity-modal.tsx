@@ -435,21 +435,21 @@ export default function CreateOpportunityModal({
           </div>
           <div
             className={
-              step >= 2 ? "text-indigo-600 font-medium" : "text-gray-500"
+              step >= 2 ? "text-pink-600 font-medium" : "text-gray-500"
             }
           >
             Schedule & Location
           </div>
           <div
             className={
-              step >= 3 ? "text-indigo-600 font-medium" : "text-gray-500"
+              step >= 3 ? "text-pink-600 font-medium" : "text-gray-500"
             }
           >
             Requirements
           </div>
           <div
             className={
-              step >= 4 ? "text-indigo-600 font-medium" : "text-gray-500"
+              step >= 4 ? "text-pink-600 font-medium" : "text-gray-500"
             }
           >
             Review & Publish

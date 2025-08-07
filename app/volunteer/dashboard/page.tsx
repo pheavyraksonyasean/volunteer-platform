@@ -57,7 +57,7 @@ const mockOpportunities = [
     location: "Santa Monica Beach, CA",
     date: "Dec 18, 2024",
     time: "8:00 AM - 12:00 PM",
-    volunteers: 45,
+    volunteers: 50,
     maxVolunteers: 50,
     skills: ["Environmental", "Physical Work"],
     category: "Environment",
@@ -402,7 +402,7 @@ export default function VolunteerDashboard() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className="border-pink-800 w-full bg-transparent "
+                        className=" w-full bg-transparent "
                         onClick={() => setActiveTab("opportunities")}
                       >
                         View All Opportunities
@@ -494,7 +494,7 @@ export default function VolunteerDashboard() {
                     </div>
                     <Button
                       variant="outline"
-                      className="w-full mt-4 bg-transparent"
+                      className="w-full mt-4 bg-transparent bg-pink-800 text-white"
                       onClick={() => setActiveTab("applications")}
                     >
                       View All Applications
@@ -529,10 +529,6 @@ export default function VolunteerDashboard() {
                       />
                     </div>
                   </div>
-                  <Button variant="outline">
-                    <Filter className="h-4 w-4 mr-2" />
-                    Filters
-                  </Button>
                 </div>
               </CardContent>
             </Card>
