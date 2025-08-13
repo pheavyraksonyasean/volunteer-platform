@@ -1,18 +1,40 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Calendar } from "@/components/ui/calendar"
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
-import { Switch } from "@/components/ui/switch"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Calendar } from "@/components/ui/calendar";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Switch } from "@/components/ui/switch";
 import {
   CalendarIcon,
   Clock,
@@ -26,18 +48,22 @@ import {
   AlertCircle,
   Eye,
   Save,
-} from "lucide-react"
-import { format } from "date-fns"
-import FileUpload from "./file-upload"
+} from "lucide-react";
+import { format } from "date-fns";
+import FileUpload from "./file-upload";
 
 interface CreateOpportunityModalProps {
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (opportunityData: any) => void
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (opportunityData: any) => void;
 }
 
-export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: CreateOpportunityModalProps) {
-  const [step, setStep] = useState(1)
+export default function CreateOpportunityModal({
+  isOpen,
+  onClose,
+  onSubmit,
+}: CreateOpportunityModalProps) {
+  const [step, setStep] = useState(1);
   const [opportunityData, setOpportunityData] = useState({
     title: "",
     category: "",
@@ -65,10 +91,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
     customQuestions: [] as string[],
     autoApprove: false,
     sendReminders: true,
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [previewMode, setPreviewMode] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [previewMode, setPreviewMode] = useState(false);
 
   const categories = [
     "Hunger Relief",
@@ -83,7 +109,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
     "Disaster Relief",
     "Youth Development",
     "Homelessness",
-  ]
+  ];
 
   const skillOptions = [
     "Communication",
@@ -104,7 +130,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
     "Childcare",
     "Elder Care",
     "Animal Care",
-  ]
+  ];
 
   const benefitOptions = [
     "Community Service Hours",
@@ -117,14 +143,16 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
     "Skill Development",
     "Free T-shirt",
     "Parking Provided",
-  ]
+  ];
 
   const handleSkillToggle = (skill: string) => {
     setOpportunityData((prev) => ({
       ...prev,
-      skills: prev.skills.includes(skill) ? prev.skills.filter((s) => s !== skill) : [...prev.skills, skill],
-    }))
-  }
+      skills: prev.skills.includes(skill)
+        ? prev.skills.filter((s) => s !== skill)
+        : [...prev.skills, skill],
+    }));
+  };
 
   const handleBenefitToggle = (benefit: string) => {
     setOpportunityData((prev) => ({
@@ -132,85 +160,98 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
       benefits: prev.benefits.includes(benefit)
         ? prev.benefits.filter((b) => b !== benefit)
         : [...prev.benefits, benefit],
-    }))
-  }
+    }));
+  };
 
   const addCustomQuestion = () => {
     setOpportunityData((prev) => ({
       ...prev,
       customQuestions: [...prev.customQuestions, ""],
-    }))
-  }
+    }));
+  };
 
   const updateCustomQuestion = (index: number, question: string) => {
     setOpportunityData((prev) => ({
       ...prev,
-      customQuestions: prev.customQuestions.map((q, i) => (i === index ? question : q)),
-    }))
-  }
+      customQuestions: prev.customQuestions.map((q, i) =>
+        i === index ? question : q
+      ),
+    }));
+  };
 
   const removeCustomQuestion = (index: number) => {
     setOpportunityData((prev) => ({
       ...prev,
       customQuestions: prev.customQuestions.filter((_, i) => i !== index),
-    }))
-  }
+    }));
+  };
 
   const handleImageUpload = (files: File[]) => {
     setOpportunityData((prev) => ({
       ...prev,
       images: [...prev.images, ...files],
-    }))
-  }
+    }));
+  };
 
   const handleDocumentUpload = (files: File[]) => {
     setOpportunityData((prev) => ({
       ...prev,
       documents: [...prev.documents, ...files],
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async (isDraft = false) => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     onSubmit({
       ...opportunityData,
       status: isDraft ? "draft" : "published",
       createdAt: new Date().toISOString(),
-    })
+    });
 
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    setIsSubmitting(false);
+    setIsSubmitted(true);
 
     // Close modal after showing success
     setTimeout(() => {
-      setIsSubmitted(false)
-      setStep(1)
-      setPreviewMode(false)
-      onClose()
-    }, 3000)
-  }
+      setIsSubmitted(false);
+      setStep(1);
+      setPreviewMode(false);
+      onClose();
+    }, 3000);
+  };
 
-  const nextStep = () => setStep(step + 1)
-  const prevStep = () => setStep(step - 1)
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return opportunityData.title && opportunityData.category && opportunityData.description.length > 50
+        return (
+          opportunityData.title &&
+          opportunityData.category &&
+          opportunityData.description.length > 50
+        );
       case 2:
-        return opportunityData.location && opportunityData.date && opportunityData.startTime && opportunityData.endTime
+        return (
+          opportunityData.location &&
+          opportunityData.date &&
+          opportunityData.startTime &&
+          opportunityData.endTime
+        );
       case 3:
-        return opportunityData.maxVolunteers > 0 && opportunityData.contactEmail
+        return (
+          opportunityData.maxVolunteers > 0 && opportunityData.contactEmail
+        );
       case 4:
-        return true
+        return true;
       default:
-        return true
+        return true;
     }
-  }
+  };
 
   if (isSubmitted) {
     return (
@@ -218,17 +259,22 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
         <DialogContent className="max-w-md">
           <div className="text-center py-8">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Opportunity Created!</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              Opportunity Created!
+            </h3>
             <p className="text-gray-600 mb-4">
-              Your volunteer opportunity <strong>{opportunityData.title}</strong> has been successfully created.
+              Your volunteer opportunity{" "}
+              <strong>{opportunityData.title}</strong> has been successfully
+              created.
             </p>
             <p className="text-sm text-gray-500">
-              It will be reviewed and published within 24 hours. You'll receive an email confirmation shortly.
+              It will be reviewed and published within 24 hours. You'll receive
+              an email confirmation shortly.
             </p>
           </div>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   if (previewMode) {
@@ -255,20 +301,28 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                 <div>
                   <div className="flex items-start justify-between mb-4">
                     <div>
-                      <h2 className="text-2xl font-bold text-gray-900">{opportunityData.title}</h2>
+                      <h2 className="text-2xl font-bold text-gray-900">
+                        {opportunityData.title}
+                      </h2>
                       <Badge className="mt-2">{opportunityData.category}</Badge>
-                      {opportunityData.isUrgent && <Badge className="ml-2 bg-red-500">Urgent</Badge>}
+                      {opportunityData.isUrgent && (
+                        <Badge className="ml-2 bg-red-500">Urgent</Badge>
+                      )}
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                     <div className="flex items-center text-gray-600">
                       <MapPin className="h-4 w-4 mr-2" />
-                      {opportunityData.isRemote ? "Remote" : opportunityData.location}
+                      {opportunityData.isRemote
+                        ? "Remote"
+                        : opportunityData.location}
                     </div>
                     <div className="flex items-center text-gray-600">
                       <CalendarIcon className="h-4 w-4 mr-2" />
-                      {opportunityData.date ? format(opportunityData.date, "PPP") : "Date TBD"}
+                      {opportunityData.date
+                        ? format(opportunityData.date, "PPP")
+                        : "Date TBD"}
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Clock className="h-4 w-4 mr-2" />
@@ -283,13 +337,17 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <div className="space-y-4">
                     <div>
                       <h3 className="font-semibold mb-2">Description</h3>
-                      <p className="text-gray-700">{opportunityData.description}</p>
+                      <p className="text-gray-700">
+                        {opportunityData.description}
+                      </p>
                     </div>
 
                     {opportunityData.requirements && (
                       <div>
                         <h3 className="font-semibold mb-2">Requirements</h3>
-                        <p className="text-gray-700">{opportunityData.requirements}</p>
+                        <p className="text-gray-700">
+                          {opportunityData.requirements}
+                        </p>
                       </div>
                     )}
 
@@ -325,7 +383,7 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
           </Card>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -334,11 +392,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Create Volunteer Opportunity
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
           </DialogTitle>
-          <DialogDescription>Create a new volunteer opportunity for your organization</DialogDescription>
+          <DialogDescription>
+            Create a new volunteer opportunity for your organization
+          </DialogDescription>
         </DialogHeader>
 
         {/* Progress Indicator */}
@@ -348,13 +405,19 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               <div key={stepNumber} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step >= stepNumber ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-600"
+                    step >= stepNumber
+                      ? "bg-pink-600 text-white"
+                      : "bg-gray-200 text-gray-600"
                   }`}
                 >
                   {stepNumber}
                 </div>
                 {stepNumber < 4 && (
-                  <div className={`w-12 h-1 mx-2 ${step > stepNumber ? "bg-indigo-600" : "bg-gray-200"}`} />
+                  <div
+                    className={`w-12 h-1 mx-2 ${
+                      step > stepNumber ? "bg-pink-600" : "bg-gray-200"
+                    }`}
+                  />
                 )}
               </div>
             ))}
@@ -363,10 +426,34 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
 
         {/* Step Labels */}
         <div className="grid grid-cols-4 gap-4 mb-6 text-center text-sm">
-          <div className={step >= 1 ? "text-indigo-600 font-medium" : "text-gray-500"}>Basic Info</div>
-          <div className={step >= 2 ? "text-indigo-600 font-medium" : "text-gray-500"}>Schedule & Location</div>
-          <div className={step >= 3 ? "text-indigo-600 font-medium" : "text-gray-500"}>Requirements</div>
-          <div className={step >= 4 ? "text-indigo-600 font-medium" : "text-gray-500"}>Review & Publish</div>
+          <div
+            className={
+              step >= 1 ? "text-pink-600 font-medium" : "text-gray-500"
+            }
+          >
+            Basic Info
+          </div>
+          <div
+            className={
+              step >= 2 ? "text-pink-600 font-medium" : "text-gray-500"
+            }
+          >
+            Schedule & Location
+          </div>
+          <div
+            className={
+              step >= 3 ? "text-pink-600 font-medium" : "text-gray-500"
+            }
+          >
+            Requirements
+          </div>
+          <div
+            className={
+              step >= 4 ? "text-pink-600 font-medium" : "text-gray-500"
+            }
+          >
+            Review & Publish
+          </div>
         </div>
 
         {/* Step Content */}
@@ -375,7 +462,9 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
-                <CardDescription>Tell volunteers about your opportunity</CardDescription>
+                <CardDescription>
+                  Tell volunteers about your opportunity
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
@@ -384,7 +473,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                     id="title"
                     placeholder="e.g., Food Bank Volunteer, Beach Cleanup Helper"
                     value={opportunityData.title}
-                    onChange={(e) => setOpportunityData((prev) => ({ ...prev, title: e.target.value }))}
+                    onChange={(e) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        title: e.target.value,
+                      }))
+                    }
                   />
                 </div>
 
@@ -392,7 +486,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <Label htmlFor="category">Category *</Label>
                   <Select
                     value={opportunityData.category}
-                    onValueChange={(value) => setOpportunityData((prev) => ({ ...prev, category: value }))}
+                    onValueChange={(value) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        category: value,
+                      }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a category" />
@@ -413,7 +512,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                     id="description"
                     placeholder="Describe what volunteers will do, the impact they'll make, and why this opportunity matters..."
                     value={opportunityData.description}
-                    onChange={(e) => setOpportunityData((prev) => ({ ...prev, description: e.target.value }))}
+                    onChange={(e) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        description: e.target.value,
+                      }))
+                    }
                     rows={6}
                   />
                   <p className="text-xs text-gray-500 mt-1">
@@ -422,12 +526,19 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                 </div>
 
                 <div>
-                  <Label htmlFor="requirements">Requirements & Expectations</Label>
+                  <Label htmlFor="requirements">
+                    Requirements & Expectations
+                  </Label>
                   <Textarea
                     id="requirements"
                     placeholder="Any specific requirements, skills needed, or expectations for volunteers..."
                     value={opportunityData.requirements}
-                    onChange={(e) => setOpportunityData((prev) => ({ ...prev, requirements: e.target.value }))}
+                    onChange={(e) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        requirements: e.target.value,
+                      }))
+                    }
                     rows={4}
                   />
                 </div>
@@ -436,7 +547,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <Switch
                     id="urgent"
                     checked={opportunityData.isUrgent}
-                    onCheckedChange={(checked) => setOpportunityData((prev) => ({ ...prev, isUrgent: checked }))}
+                    onCheckedChange={(checked) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        isUrgent: checked,
+                      }))
+                    }
                   />
                   <Label htmlFor="urgent" className="flex items-center">
                     <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
@@ -451,16 +567,25 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
             <Card>
               <CardHeader>
                 <CardTitle>Schedule & Location</CardTitle>
-                <CardDescription>When and where will this opportunity take place?</CardDescription>
+                <CardDescription>
+                  When and where will this opportunity take place?
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div className="flex items-center space-x-2 mb-4">
                   <Switch
                     id="remote"
                     checked={opportunityData.isRemote}
-                    onCheckedChange={(checked) => setOpportunityData((prev) => ({ ...prev, isRemote: checked }))}
+                    onCheckedChange={(checked) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        isRemote: checked,
+                      }))
+                    }
                   />
-                  <Label htmlFor="remote">This is a remote/virtual opportunity</Label>
+                  <Label htmlFor="remote">
+                    This is a remote/virtual opportunity
+                  </Label>
                 </div>
 
                 {!opportunityData.isRemote && (
@@ -471,7 +596,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                         id="location"
                         placeholder="e.g., Downtown, NY"
                         value={opportunityData.location}
-                        onChange={(e) => setOpportunityData((prev) => ({ ...prev, location: e.target.value }))}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            location: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
@@ -480,7 +610,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                         id="address"
                         placeholder="Street address for volunteers"
                         value={opportunityData.address}
-                        onChange={(e) => setOpportunityData((prev) => ({ ...prev, address: e.target.value }))}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            address: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                   </div>
@@ -491,16 +626,23 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                     <Label>Date *</Label>
                     <Popover>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal bg-transparent"
+                        >
                           <CalendarIcon className="mr-2 h-4 w-4" />
-                          {opportunityData.date ? format(opportunityData.date, "PPP") : "Pick a date"}
+                          {opportunityData.date
+                            ? format(opportunityData.date, "PPP")
+                            : "Pick a date"}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0">
                         <Calendar
                           mode="single"
                           selected={opportunityData.date}
-                          onSelect={(date) => setOpportunityData((prev) => ({ ...prev, date }))}
+                          onSelect={(date) =>
+                            setOpportunityData((prev) => ({ ...prev, date }))
+                          }
                           initialFocus
                         />
                       </PopoverContent>
@@ -512,7 +654,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                       id="startTime"
                       type="time"
                       value={opportunityData.startTime}
-                      onChange={(e) => setOpportunityData((prev) => ({ ...prev, startTime: e.target.value }))}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          startTime: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                   <div>
@@ -521,7 +668,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                       id="endTime"
                       type="time"
                       value={opportunityData.endTime}
-                      onChange={(e) => setOpportunityData((prev) => ({ ...prev, endTime: e.target.value }))}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          endTime: e.target.value,
+                        }))
+                      }
                     />
                   </div>
                 </div>
@@ -530,9 +682,16 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <Switch
                     id="recurring"
                     checked={opportunityData.isRecurring}
-                    onCheckedChange={(checked) => setOpportunityData((prev) => ({ ...prev, isRecurring: checked }))}
+                    onCheckedChange={(checked) =>
+                      setOpportunityData((prev) => ({
+                        ...prev,
+                        isRecurring: checked,
+                      }))
+                    }
                   />
-                  <Label htmlFor="recurring">This is a recurring opportunity</Label>
+                  <Label htmlFor="recurring">
+                    This is a recurring opportunity
+                  </Label>
                 </div>
 
                 {opportunityData.isRecurring && (
@@ -540,7 +699,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                     <Label htmlFor="recurringPattern">Recurring Pattern</Label>
                     <Select
                       value={opportunityData.recurringPattern}
-                      onValueChange={(value) => setOpportunityData((prev) => ({ ...prev, recurringPattern: value }))}
+                      onValueChange={(value) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          recurringPattern: value,
+                        }))
+                      }
                     >
                       <SelectTrigger>
                         <SelectValue placeholder="How often does this repeat?" />
@@ -559,7 +723,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <Label>Application Deadline</Label>
                   <Popover>
                     <PopoverTrigger asChild>
-                      <Button variant="outline" className="w-full justify-start text-left font-normal bg-transparent">
+                      <Button
+                        variant="outline"
+                        className="w-full justify-start text-left font-normal bg-transparent"
+                      >
                         <CalendarIcon className="mr-2 h-4 w-4" />
                         {opportunityData.applicationDeadline
                           ? format(opportunityData.applicationDeadline, "PPP")
@@ -570,7 +737,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                       <Calendar
                         mode="single"
                         selected={opportunityData.applicationDeadline}
-                        onSelect={(date) => setOpportunityData((prev) => ({ ...prev, applicationDeadline: date }))}
+                        onSelect={(date) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            applicationDeadline: date,
+                          }))
+                        }
                         initialFocus
                       />
                     </PopoverContent>
@@ -585,12 +757,16 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               <Card>
                 <CardHeader>
                   <CardTitle>Volunteer Requirements</CardTitle>
-                  <CardDescription>Set requirements and preferences for volunteers</CardDescription>
+                  <CardDescription>
+                    Set requirements and preferences for volunteers
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="maxVolunteers">Maximum Volunteers *</Label>
+                      <Label htmlFor="maxVolunteers">
+                        Maximum Volunteers *
+                      </Label>
                       <div className="flex items-center space-x-2">
                         <Button
                           variant="outline"
@@ -598,7 +774,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                           onClick={() =>
                             setOpportunityData((prev) => ({
                               ...prev,
-                              maxVolunteers: Math.max(1, prev.maxVolunteers - 1),
+                              maxVolunteers: Math.max(
+                                1,
+                                prev.maxVolunteers - 1
+                              ),
                             }))
                           }
                         >
@@ -612,7 +791,8 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                           onChange={(e) =>
                             setOpportunityData((prev) => ({
                               ...prev,
-                              maxVolunteers: Number.parseInt(e.target.value) || 1,
+                              maxVolunteers:
+                                Number.parseInt(e.target.value) || 1,
                             }))
                           }
                           className="text-center"
@@ -636,7 +816,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                       <Select
                         value={opportunityData.minAge.toString()}
                         onValueChange={(value) =>
-                          setOpportunityData((prev) => ({ ...prev, minAge: Number.parseInt(value) }))
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            minAge: Number.parseInt(value),
+                          }))
                         }
                       >
                         <SelectTrigger>
@@ -657,17 +840,27 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                       id="backgroundCheck"
                       checked={opportunityData.backgroundCheck}
                       onCheckedChange={(checked) =>
-                        setOpportunityData((prev) => ({ ...prev, backgroundCheck: checked as boolean }))
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          backgroundCheck: checked as boolean,
+                        }))
                       }
                     />
-                    <Label htmlFor="backgroundCheck">Background check required</Label>
+                    <Label htmlFor="backgroundCheck">
+                      Background check required
+                    </Label>
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Preferred Skills</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Preferred Skills
+                    </Label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
                       {skillOptions.map((skill) => (
-                        <div key={skill} className="flex items-center space-x-2">
+                        <div
+                          key={skill}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={skill}
                             checked={opportunityData.skills.includes(skill)}
@@ -682,10 +875,15 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">What Volunteers Get</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      What Volunteers Get
+                    </Label>
                     <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                       {benefitOptions.map((benefit) => (
-                        <div key={benefit} className="flex items-center space-x-2">
+                        <div
+                          key={benefit}
+                          className="flex items-center space-x-2"
+                        >
                           <Checkbox
                             id={benefit}
                             checked={opportunityData.benefits.includes(benefit)}
@@ -704,7 +902,9 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               <Card>
                 <CardHeader>
                   <CardTitle>Contact Information</CardTitle>
-                  <CardDescription>How volunteers can reach you</CardDescription>
+                  <CardDescription>
+                    How volunteers can reach you
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -715,7 +915,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                         type="email"
                         placeholder="volunteer@organization.org"
                         value={opportunityData.contactEmail}
-                        onChange={(e) => setOpportunityData((prev) => ({ ...prev, contactEmail: e.target.value }))}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            contactEmail: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                     <div>
@@ -725,7 +930,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                         type="tel"
                         placeholder="(555) 123-4567"
                         value={opportunityData.contactPhone}
-                        onChange={(e) => setOpportunityData((prev) => ({ ...prev, contactPhone: e.target.value }))}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            contactPhone: e.target.value,
+                          }))
+                        }
                       />
                     </div>
                   </div>
@@ -739,49 +949,85 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               <Card>
                 <CardHeader>
                   <CardTitle>Additional Settings</CardTitle>
-                  <CardDescription>Customize your application process</CardDescription>
+                  <CardDescription>
+                    Customize your application process
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="autoApprove">Auto-approve applications</Label>
-                      <p className="text-sm text-gray-500">Automatically approve volunteers who meet requirements</p>
+                      <Label htmlFor="autoApprove">
+                        Auto-approve applications
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        Automatically approve volunteers who meet requirements
+                      </p>
                     </div>
                     <Switch
                       id="autoApprove"
                       checked={opportunityData.autoApprove}
-                      onCheckedChange={(checked) => setOpportunityData((prev) => ({ ...prev, autoApprove: checked }))}
+                      onCheckedChange={(checked) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          autoApprove: checked,
+                        }))
+                      }
                     />
                   </div>
 
                   <div className="flex items-center justify-between">
                     <div>
                       <Label htmlFor="sendReminders">Send reminders</Label>
-                      <p className="text-sm text-gray-500">Email reminders to confirmed volunteers</p>
+                      <p className="text-sm text-gray-500">
+                        Email reminders to confirmed volunteers
+                      </p>
                     </div>
                     <Switch
                       id="sendReminders"
                       checked={opportunityData.sendReminders}
-                      onCheckedChange={(checked) => setOpportunityData((prev) => ({ ...prev, sendReminders: checked }))}
+                      onCheckedChange={(checked) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          sendReminders: checked,
+                        }))
+                      }
                     />
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Custom Application Questions</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Custom Application Questions
+                    </Label>
                     <div className="space-y-2">
-                      {opportunityData.customQuestions.map((question, index) => (
-                        <div key={index} className="flex items-center space-x-2">
-                          <Input
-                            placeholder="Enter your question..."
-                            value={question}
-                            onChange={(e) => updateCustomQuestion(index, e.target.value)}
-                          />
-                          <Button variant="outline" size="sm" onClick={() => removeCustomQuestion(index)}>
-                            <X className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                      <Button variant="outline" size="sm" onClick={addCustomQuestion} className="bg-transparent">
+                      {opportunityData.customQuestions.map(
+                        (question, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center space-x-2"
+                          >
+                            <Input
+                              placeholder="Enter your question..."
+                              value={question}
+                              onChange={(e) =>
+                                updateCustomQuestion(index, e.target.value)
+                              }
+                            />
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeCustomQuestion(index)}
+                            >
+                              <X className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )
+                      )}
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={addCustomQuestion}
+                        className="bg-transparent"
+                      >
                         <Plus className="h-4 w-4 mr-2" />
                         Add Question
                       </Button>
@@ -793,11 +1039,16 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               <Card>
                 <CardHeader>
                   <CardTitle>Media & Documents</CardTitle>
-                  <CardDescription>Add photos and documents to make your opportunity more appealing</CardDescription>
+                  <CardDescription>
+                    Add photos and documents to make your opportunity more
+                    appealing
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Photos</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Photos
+                    </Label>
                     <FileUpload
                       onFileUpload={handleImageUpload}
                       acceptedTypes={[".jpg", ".jpeg", ".png", ".webp"]}
@@ -807,9 +1058,12 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Documents</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Documents
+                    </Label>
                     <p className="text-sm text-gray-600 mb-3">
-                      Upload any additional documents like flyers, forms, or information sheets
+                      Upload any additional documents like flyers, forms, or
+                      information sheets
                     </p>
                     <FileUpload
                       onFileUpload={handleDocumentUpload}
@@ -840,7 +1094,11 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
               </Button>
             ) : (
               <div className="flex space-x-2">
-                <Button variant="outline" onClick={() => setPreviewMode(true)} className="bg-transparent">
+                <Button
+                  variant="outline"
+                  onClick={() => setPreviewMode(true)}
+                  className="bg-transparent"
+                >
                   <Eye className="h-4 w-4 mr-2" />
                   Preview
                 </Button>
@@ -853,7 +1111,10 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
                   <Save className="h-4 w-4 mr-2" />
                   Save Draft
                 </Button>
-                <Button onClick={() => handleSubmit(false)} disabled={!isStepValid() || isSubmitting}>
+                <Button
+                  onClick={() => handleSubmit(false)}
+                  disabled={!isStepValid() || isSubmitting}
+                >
                   {isSubmitting ? (
                     <>
                       <Upload className="h-4 w-4 mr-2 animate-spin" />
@@ -869,5 +1130,5 @@ export default function CreateOpportunityModal({ isOpen, onClose, onSubmit }: Cr
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

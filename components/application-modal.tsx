@@ -1,44 +1,75 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Calendar, Clock, MapPin, Users, Upload, CheckCircle, X } from "lucide-react"
-import FileUpload from "./file-upload"
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Calendar,
+  Clock,
+  MapPin,
+  Users,
+  Upload,
+  CheckCircle,
+  X,
+} from "lucide-react";
+import FileUpload from "./file-upload";
 
 interface Opportunity {
-  id: number
-  title: string
-  organization: string
-  location: string
-  date: string
-  time: string
-  volunteers: number
-  maxVolunteers: number
-  skills: string[]
-  category: string
-  description: string
-  requirements?: string[]
-  image?: string
-  urgent?: boolean
+  id: number;
+  title: string;
+  organization: string;
+  location: string;
+  date: string;
+  time: string;
+  volunteers: number;
+  maxVolunteers: number;
+  skills: string[];
+  category: string;
+  description: string;
+  requirements?: string[];
+  image?: string;
+  urgent?: boolean;
 }
 
 interface ApplicationModalProps {
-  opportunity: Opportunity
-  isOpen: boolean
-  onClose: () => void
-  onSubmit: (applicationData: any) => void
+  opportunity: Opportunity;
+  isOpen: boolean;
+  onClose: () => void;
+  onSubmit: (applicationData: any) => void;
 }
 
-export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmit }: ApplicationModalProps) {
-  const [step, setStep] = useState(1)
+export default function ApplicationModal({
+  opportunity,
+  isOpen,
+  onClose,
+  onSubmit,
+}: ApplicationModalProps) {
+  const [step, setStep] = useState(1);
   const [applicationData, setApplicationData] = useState({
     motivation: "",
     experience: "",
@@ -51,75 +82,82 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
     agreeToCommitment: false,
     resume: null as File | null,
     additionalDocuments: [] as File[],
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const [isSubmitted, setIsSubmitted] = useState(false)
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleSkillToggle = (skill: string) => {
     setApplicationData((prev) => ({
       ...prev,
-      skills: prev.skills.includes(skill) ? prev.skills.filter((s) => s !== skill) : [...prev.skills, skill],
-    }))
-  }
+      skills: prev.skills.includes(skill)
+        ? prev.skills.filter((s) => s !== skill)
+        : [...prev.skills, skill],
+    }));
+  };
 
   const handleFileUpload = (files: File[]) => {
     if (files.length > 0) {
       setApplicationData((prev) => ({
         ...prev,
         resume: files[0],
-      }))
+      }));
     }
-  }
+  };
 
   const handleAdditionalFilesUpload = (files: File[]) => {
     setApplicationData((prev) => ({
       ...prev,
       additionalDocuments: [...prev.additionalDocuments, ...files],
-    }))
-  }
+    }));
+  };
 
   const handleSubmit = async () => {
-    setIsSubmitting(true)
+    setIsSubmitting(true);
 
     // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000))
+    await new Promise((resolve) => setTimeout(resolve, 2000));
 
     onSubmit({
       opportunityId: opportunity.id,
       ...applicationData,
-    })
+    });
 
-    setIsSubmitting(false)
-    setIsSubmitted(true)
+    setIsSubmitting(false);
+    setIsSubmitted(true);
 
     // Close modal after showing success
     setTimeout(() => {
-      setIsSubmitted(false)
-      setStep(1)
-      onClose()
-    }, 3000)
-  }
+      setIsSubmitted(false);
+      setStep(1);
+      onClose();
+    }, 3000);
+  };
 
-  const nextStep = () => setStep(step + 1)
-  const prevStep = () => setStep(step - 1)
+  const nextStep = () => setStep(step + 1);
+  const prevStep = () => setStep(step - 1);
 
   const isStepValid = () => {
     switch (step) {
       case 1:
-        return applicationData.motivation.length > 50 && applicationData.experience.length > 20
+        return (
+          applicationData.motivation.length > 50 &&
+          applicationData.experience.length > 20
+        );
       case 2:
-        return applicationData.availability && applicationData.skills.length > 0
+        return (
+          applicationData.availability && applicationData.skills.length > 0
+        );
       case 3:
         return (
           applicationData.emergencyContact &&
           applicationData.emergencyPhone &&
           applicationData.agreeToBackground &&
           applicationData.agreeToCommitment
-        )
+        );
       default:
-        return true
+        return true;
     }
-  }
+  };
 
   if (isSubmitted) {
     return (
@@ -127,18 +165,21 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
         <DialogContent className="max-w-md">
           <div className="text-center py-8">
             <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Application Submitted!</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-2">
+              Application Submitted!
+            </h3>
             <p className="text-gray-600 mb-4">
-              Your application for <strong>{opportunity.title}</strong> has been successfully submitted.
+              Your application for <strong>{opportunity.title}</strong> has been
+              successfully submitted.
             </p>
             <p className="text-sm text-gray-500">
-              You'll receive an email confirmation shortly, and the organization will review your application within 2-3
-              business days.
+              You'll receive an email confirmation shortly, and the organization
+              will review your application within 2-3 business days.
             </p>
           </div>
         </DialogContent>
       </Dialog>
-    )
+    );
   }
 
   return (
@@ -147,11 +188,11 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
             Apply for Volunteer Opportunity
-            <Button variant="ghost" size="sm" onClick={onClose}>
-              <X className="h-4 w-4" />
-            </Button>
           </DialogTitle>
-          <DialogDescription>Complete your application to volunteer with {opportunity.organization}</DialogDescription>
+          <DialogDescription>
+            Complete your application to volunteer with{" "}
+            {opportunity.organization}
+          </DialogDescription>
         </DialogHeader>
 
         {/* Opportunity Summary */}
@@ -164,8 +205,12 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                 className="w-20 h-20 object-cover rounded-lg"
               />
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900">{opportunity.title}</h3>
-                <p className="text-indigo-600 font-medium">{opportunity.organization}</p>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  {opportunity.title}
+                </h3>
+                <p className="text-pink-600 font-medium">
+                  {opportunity.organization}
+                </p>
                 <div className="flex flex-wrap gap-3 text-sm text-gray-600 mt-2">
                   <div className="flex items-center">
                     <MapPin className="h-4 w-4 mr-1" />
@@ -181,7 +226,8 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                   </div>
                   <div className="flex items-center">
                     <Users className="h-4 w-4 mr-1" />
-                    {opportunity.volunteers}/{opportunity.maxVolunteers} volunteers
+                    {opportunity.volunteers}/{opportunity.maxVolunteers}{" "}
+                    volunteers
                   </div>
                 </div>
               </div>
@@ -196,13 +242,19 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
               <div key={stepNumber} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step >= stepNumber ? "bg-indigo-600 text-white" : "bg-gray-200 text-gray-600"
+                    step >= stepNumber
+                      ? "bg-pink-600 text-white"
+                      : "bg-gray-200 text-gray-600"
                   }`}
                 >
                   {stepNumber}
                 </div>
                 {stepNumber < 3 && (
-                  <div className={`w-12 h-1 mx-2 ${step > stepNumber ? "bg-indigo-600" : "bg-gray-200"}`} />
+                  <div
+                    className={`w-12 h-1 mx-2 ${
+                      step > stepNumber ? "bg-pink-600" : "bg-gray-200"
+                    }`}
+                  />
                 )}
               </div>
             ))}
@@ -215,16 +267,25 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
             <Card>
               <CardHeader>
                 <CardTitle>Tell Us About Yourself</CardTitle>
-                <CardDescription>Help us understand your motivation and experience</CardDescription>
+                <CardDescription>
+                  Help us understand your motivation and experience
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
-                  <Label htmlFor="motivation">Why do you want to volunteer for this opportunity? *</Label>
+                  <Label htmlFor="motivation">
+                    Why do you want to volunteer for this opportunity? *
+                  </Label>
                   <Textarea
                     id="motivation"
                     placeholder="Share your motivation and what you hope to achieve..."
                     value={applicationData.motivation}
-                    onChange={(e) => setApplicationData((prev) => ({ ...prev, motivation: e.target.value }))}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        motivation: e.target.value,
+                      }))
+                    }
                     rows={4}
                     className="mt-1"
                   />
@@ -239,7 +300,12 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                     id="experience"
                     placeholder="Describe any relevant experience, skills, or previous volunteer work..."
                     value={applicationData.experience}
-                    onChange={(e) => setApplicationData((prev) => ({ ...prev, experience: e.target.value }))}
+                    onChange={(e) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        experience: e.target.value,
+                      }))
+                    }
                     rows={4}
                     className="mt-1"
                   />
@@ -255,12 +321,16 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
             <Card>
               <CardHeader>
                 <CardTitle>Skills & Availability</CardTitle>
-                <CardDescription>Let us know about your skills and when you're available</CardDescription>
+                <CardDescription>
+                  Let us know about your skills and when you're available
+                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
                 <div>
                   <Label>Your Skills *</Label>
-                  <p className="text-sm text-gray-600 mb-3">Select all skills that apply to you</p>
+                  <p className="text-sm text-gray-600 mb-3">
+                    Select all skills that apply to you
+                  </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {[
                       "Communication",
@@ -290,7 +360,9 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                   </div>
                   {applicationData.skills.length > 0 && (
                     <div className="mt-3">
-                      <p className="text-sm font-medium mb-2">Selected Skills:</p>
+                      <p className="text-sm font-medium mb-2">
+                        Selected Skills:
+                      </p>
                       <div className="flex flex-wrap gap-2">
                         {applicationData.skills.map((skill) => (
                           <Badge key={skill} variant="secondary">
@@ -306,7 +378,12 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                   <Label htmlFor="availability">Availability *</Label>
                   <Select
                     value={applicationData.availability}
-                    onValueChange={(value) => setApplicationData((prev) => ({ ...prev, availability: value }))}
+                    onValueChange={(value) =>
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        availability: value,
+                      }))
+                    }
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select your availability" />
@@ -317,7 +394,9 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                       <SelectItem value="evenings">Evenings</SelectItem>
                       <SelectItem value="flexible">Flexible</SelectItem>
                       <SelectItem value="once-week">Once a week</SelectItem>
-                      <SelectItem value="multiple-week">Multiple times a week</SelectItem>
+                      <SelectItem value="multiple-week">
+                        Multiple times a week
+                      </SelectItem>
                       <SelectItem value="monthly">Monthly</SelectItem>
                     </SelectContent>
                   </Select>
@@ -328,7 +407,10 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                     id="transportation"
                     checked={applicationData.hasTransportation}
                     onCheckedChange={(checked) =>
-                      setApplicationData((prev) => ({ ...prev, hasTransportation: checked as boolean }))
+                      setApplicationData((prev) => ({
+                        ...prev,
+                        hasTransportation: checked as boolean,
+                      }))
                     }
                   />
                   <Label htmlFor="transportation" className="text-sm">
@@ -344,33 +426,51 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
               <Card>
                 <CardHeader>
                   <CardTitle>Emergency Contact & Documents</CardTitle>
-                  <CardDescription>Final details to complete your application</CardDescription>
+                  <CardDescription>
+                    Final details to complete your application
+                  </CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <Label htmlFor="emergencyContact">Emergency Contact Name *</Label>
+                      <Label htmlFor="emergencyContact">
+                        Emergency Contact Name *
+                      </Label>
                       <Input
                         id="emergencyContact"
                         value={applicationData.emergencyContact}
-                        onChange={(e) => setApplicationData((prev) => ({ ...prev, emergencyContact: e.target.value }))}
+                        onChange={(e) =>
+                          setApplicationData((prev) => ({
+                            ...prev,
+                            emergencyContact: e.target.value,
+                          }))
+                        }
                         placeholder="Full name"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="emergencyPhone">Emergency Contact Phone *</Label>
+                      <Label htmlFor="emergencyPhone">
+                        Emergency Contact Phone *
+                      </Label>
                       <Input
                         id="emergencyPhone"
                         type="tel"
                         value={applicationData.emergencyPhone}
-                        onChange={(e) => setApplicationData((prev) => ({ ...prev, emergencyPhone: e.target.value }))}
+                        onChange={(e) =>
+                          setApplicationData((prev) => ({
+                            ...prev,
+                            emergencyPhone: e.target.value,
+                          }))
+                        }
                         placeholder="Phone number"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Upload Resume (Optional)</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Upload Resume (Optional)
+                    </Label>
                     <FileUpload
                       onFileUpload={handleFileUpload}
                       acceptedTypes={[".pdf", ".doc", ".docx"]}
@@ -380,9 +480,12 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">Additional Documents (Optional)</Label>
+                    <Label className="text-base font-medium mb-3 block">
+                      Additional Documents (Optional)
+                    </Label>
                     <p className="text-sm text-gray-600 mb-3">
-                      Upload any additional documents like certifications, references, or cover letter
+                      Upload any additional documents like certifications,
+                      references, or cover letter
                     </p>
                     <FileUpload
                       onFileUpload={handleAdditionalFilesUpload}
@@ -404,11 +507,18 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                       id="background"
                       checked={applicationData.agreeToBackground}
                       onCheckedChange={(checked) =>
-                        setApplicationData((prev) => ({ ...prev, agreeToBackground: checked as boolean }))
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          agreeToBackground: checked as boolean,
+                        }))
                       }
                     />
-                    <Label htmlFor="background" className="text-sm leading-relaxed">
-                      I consent to a background check if required by the organization *
+                    <Label
+                      htmlFor="background"
+                      className="text-sm leading-relaxed"
+                    >
+                      I consent to a background check if required by the
+                      organization *
                     </Label>
                   </div>
 
@@ -417,11 +527,18 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                       id="commitment"
                       checked={applicationData.agreeToCommitment}
                       onCheckedChange={(checked) =>
-                        setApplicationData((prev) => ({ ...prev, agreeToCommitment: checked as boolean }))
+                        setApplicationData((prev) => ({
+                          ...prev,
+                          agreeToCommitment: checked as boolean,
+                        }))
                       }
                     />
-                    <Label htmlFor="commitment" className="text-sm leading-relaxed">
-                      I understand the time commitment and agree to fulfill my volunteer responsibilities *
+                    <Label
+                      htmlFor="commitment"
+                      className="text-sm leading-relaxed"
+                    >
+                      I understand the time commitment and agree to fulfill my
+                      volunteer responsibilities *
                     </Label>
                   </div>
                 </CardContent>
@@ -445,7 +562,10 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
                 Next Step
               </Button>
             ) : (
-              <Button onClick={handleSubmit} disabled={!isStepValid() || isSubmitting}>
+              <Button
+                onClick={handleSubmit}
+                disabled={!isStepValid() || isSubmitting}
+              >
                 {isSubmitting ? (
                   <>
                     <Upload className="h-4 w-4 mr-2 animate-spin" />
@@ -460,5 +580,5 @@ export default function ApplicationModal({ opportunity, isOpen, onClose, onSubmi
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
