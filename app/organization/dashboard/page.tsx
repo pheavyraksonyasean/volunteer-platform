@@ -31,10 +31,23 @@ import {
 } from "lucide-react";
 
 import CreateOpportunityModal from "@/components/create-opportunity-modal";
+import { EditProfileModal } from "@/components/application-modal";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
+import { useRouter } from "next/navigation";
 
 export default function OrganizationDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
+  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [profileImage, setProfileImage] = useState(
+    "/placeholder.svg?height=32&width=32"
+  );
+  const mockUser = { name: "Community Food Bank", email: "org@example.com" };
+  const router = useRouter();
 
   const handleCreateOpportunity = (opportunityData: any) => {
     console.log("New opportunity created:", opportunityData);
@@ -92,20 +105,57 @@ export default function OrganizationDashboard() {
                 onClose={() => setShowCreateModal(false)}
                 onSubmit={handleCreateOpportunity}
               />
-
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
-
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback>CF</AvatarFallback>
-              </Avatar>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button
+                    className="focus:outline-none"
+                    aria-label="Open settings menu"
+                  >
+                    <Avatar>
+                      <AvatarImage src={profileImage} />
+                      <AvatarFallback>CF</AvatarFallback>
+                    </Avatar>
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent className="w-48 p-2 flex flex-col gap-1">
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none"
+                    onClick={() => setShowEditProfile(true)}
+                  >
+                    Edit Profile
+                  </button>
+                  <button
+                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none text-red-600"
+                    onClick={() => {
+                      router.push("/");
+                    }}
+                  >
+                    Log Out
+                  </button>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         </div>
       </header>
+      <EditProfileModal
+        isOpen={showEditProfile}
+        onClose={() => setShowEditProfile(false)}
+        onSubmit={(data) => {
+          if (data.image instanceof File) {
+            setProfileImage(URL.createObjectURL(data.image));
+          } else if (typeof data.image === "string") {
+            setProfileImage(data.image);
+          }
+          // TODO: handle profile update
+          console.log("Profile updated:", data);
+        }}
+        initialData={{ ...mockUser, image: profileImage }}
+      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
