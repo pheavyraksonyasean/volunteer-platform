@@ -14,15 +14,11 @@ import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
-  Heart,
   Plus,
   Users,
   Calendar,
   TrendingUp,
   Bell,
-  Settings,
-  LogOut,
-  Eye,
   Edit,
   Trash2,
   CheckCircle,
@@ -31,23 +27,15 @@ import {
 } from "lucide-react";
 
 import CreateOpportunityModal from "@/components/create-opportunity-modal";
-import { EditProfileModal } from "@/components/application-modal";
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { useRouter } from "next/navigation";
+import ProfileMenu from "@/components/ProfileMenu";
 
 export default function OrganizationDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
-  const [showEditProfile, setShowEditProfile] = useState(false);
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=32&width=32"
   );
   const mockUser = { name: "Community Food Bank", email: "org@example.com" };
-  const router = useRouter();
 
   const handleCreateOpportunity = (opportunityData: any) => {
     console.log("New opportunity created:", opportunityData);
@@ -109,53 +97,15 @@ export default function OrganizationDashboard() {
                 <Bell className="h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <button
-                    className="focus:outline-none"
-                    aria-label="Open settings menu"
-                  >
-                    <Avatar>
-                      <AvatarImage src={profileImage} />
-                      <AvatarFallback>CF</AvatarFallback>
-                    </Avatar>
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent className="w-48 p-2 flex flex-col gap-1">
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none"
-                    onClick={() => setShowEditProfile(true)}
-                  >
-                    Edit Profile
-                  </button>
-                  <button
-                    className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none text-red-600"
-                    onClick={() => {
-                      router.push("/");
-                    }}
-                  >
-                    Log Out
-                  </button>
-                </PopoverContent>
-              </Popover>
+              <ProfileMenu
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+                mockUser={mockUser}
+              />
             </div>
           </div>
         </div>
       </header>
-      <EditProfileModal
-        isOpen={showEditProfile}
-        onClose={() => setShowEditProfile(false)}
-        onSubmit={(data) => {
-          if (data.image instanceof File) {
-            setProfileImage(URL.createObjectURL(data.image));
-          } else if (typeof data.image === "string") {
-            setProfileImage(data.image);
-          }
-          // TODO: handle profile update
-          console.log("Profile updated:", data);
-        }}
-        initialData={{ ...mockUser, image: profileImage }}
-      />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
@@ -343,7 +293,7 @@ export default function OrganizationDashboard() {
               <h2 className="text-2xl font-bold">Your Opportunities</h2>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-pink-800 hover:bg-pink-"
+                className="bg-pink-800 hover:bg-pink-700"
               >
                 <Plus className="h-4 w-4 mr-2" />
                 Create Opportunity
@@ -420,7 +370,7 @@ export default function OrganizationDashboard() {
               <div className="flex space-x-2"></div>
             </div>
 
-            <div className=" grid gap-6">
+            <div className="grid gap-6">
               {mockApplications.map((application) => (
                 <Card key={application.id}>
                   <CardContent className="p-6">
