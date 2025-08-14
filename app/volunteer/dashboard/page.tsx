@@ -12,26 +12,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
-  Heart,
   Search,
   Clock,
   Calendar,
   Users,
   Star,
-  Filter,
   Bell,
-  Settings,
-  LogOut,
-  Plus,
-  TrendingUp,
   Award,
   Target,
 } from "lucide-react";
 import OpportunityCard from "@/components/opportunity-card";
+import ProfileMenu from "@/components/ProfileMenu";
 
 // Mock data
 const mockOpportunities = [
@@ -83,36 +77,6 @@ const mockOpportunities = [
   },
   {
     id: 4,
-    title: "Reading Tutor",
-    organization: "City Library",
-    location: "Central Library, NY",
-    date: "Dec 20, 2024",
-    time: "3:00 PM - 5:00 PM",
-    volunteers: 8,
-    maxVolunteers: 15,
-    skills: ["Teaching", "Childcare"],
-    category: "Education",
-    description:
-      "Help children improve their reading skills through one-on-one tutoring.",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 5,
-    title: "Reading Tutor",
-    organization: "City Library",
-    location: "Central Library, NY",
-    date: "Dec 20, 2024",
-    time: "3:00 PM - 5:00 PM",
-    volunteers: 8,
-    maxVolunteers: 15,
-    skills: ["Teaching", "Childcare"],
-    category: "Education",
-    description:
-      "Help children improve their reading skills through one-on-one tutoring.",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-  {
-    id: 6,
     title: "Reading Tutor",
     organization: "City Library",
     location: "Central Library, NY",
@@ -183,6 +147,19 @@ export default function VolunteerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
   const [applications, setApplications] = useState<{ [key: number]: any }>({});
+  const [profileImage, setProfileImage] = useState(
+    "/placeholder.svg?height=32&width=32"
+  );
+  const [mockUser, setMockUser] = useState({
+    name: "John Doe",
+    email: "volunteer@example.com",
+    bio: "Passionate volunteer dedicated to making a positive impact in the community.",
+    phone: "+1 (555) 123-4567",
+    location: "New York, NY",
+    skills: ["Community Outreach", "Event Planning", "Teaching"],
+    experience: "intermediate",
+    availability: "weekends",
+  });
 
   const handleApply = (opportunityId: number, applicationData: any) => {
     setApplications((prev) => ({
@@ -212,7 +189,7 @@ export default function VolunteerDashboard() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-white">
+                <h1 className="text-2xl font-bold text-white font-serif">
                   Sabay Volunteer
                 </h1>
               </Link>
@@ -223,10 +200,12 @@ export default function VolunteerDashboard() {
                 <Bell className="h-8 w-8 text-white" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
-              <Avatar>
-                <AvatarImage src="/placeholder.svg?height=32&width=32" />
-                <AvatarFallback>JD</AvatarFallback>
-              </Avatar>
+              <ProfileMenu
+                profileImage={profileImage}
+                setProfileImage={setProfileImage}
+                mockUser={mockUser}
+                setMockUser={setMockUser}
+              />
             </div>
           </div>
         </div>
