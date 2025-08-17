@@ -53,15 +53,14 @@ export default function OrganizationDashboard() {
   const [editingOpportunity, setEditingOpportunity] =
     useState<Opportunity | null>(null);
   const [mockUser, setMockUser] = useState({
-    name: "Community Food Bank",
-    email: "org@example.com",
-    bio: "Dedicated to fighting hunger in our community through food distribution and education programs.",
-    phone: "+1 (555) 123-4567",
-    location: "San Francisco, CA",
-    skills: ["Community Outreach", "Event Planning", "Volunteer Management"],
-    experience: "Expert",
-    availability: "Weekdays and Weekends",
-    interests: ["Food Security", "Community Development", "Education"],
+    name: "user",
+    email: "user001@gmail.com",
+    bio: "papipapipu",
+    phone: "(+855) 964853340",
+    location: "KIRIROM",
+    skills: ["Teaching", "Environmental"],
+    experience: "2 years of volunteer experience",
+    availability: "Weekends and evenings",
   });
 
   const [opportunities, setOpportunities] = useState<Opportunity[]>([
@@ -165,7 +164,14 @@ export default function OrganizationDashboard() {
     applicationId: number,
     action: "approve" | "reject"
   ) => {
-    console.log(`${action} application ${applicationId}`);
+    setMockApplications((prev) =>
+      prev.map((app) =>
+        app.id === applicationId
+          ? { ...app, status: action === "approve" ? "approved" : "rejected" }
+          : app
+      )
+    );
+    console.log(`${action}d application ${applicationId}`);
   };
 
   const mockOpportunities = [
@@ -185,7 +191,7 @@ export default function OrganizationDashboard() {
     },
   ];
 
-  const mockApplications = [
+  const [mockApplications, setMockApplications] = useState([
     {
       id: 1,
       volunteerName: "Sean Pheavyraksonya",
@@ -195,7 +201,16 @@ export default function OrganizationDashboard() {
       skills: ["Customer Service", "Physical Work"],
       experience: "2 years volunteering at local shelter",
     },
-  ];
+    {
+      id: 2,
+      volunteerName: "John Doe",
+      opportunity: "Food Bank Volunteer",
+      appliedDate: "Dec 2, 2025",
+      status: "pending",
+      skills: ["Organization", "Communication"],
+      experience: "1 year volunteering at community center",
+    },
+  ]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -232,9 +247,7 @@ export default function OrganizationDashboard() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Community Food Bank Dashboard
-          </h1>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome !</h1>
           <p className="text-gray-600">
             Manage your volunteer opportunities and applications
           </p>
@@ -598,6 +611,20 @@ export default function OrganizationDashboard() {
                           <XCircle className="h-4 w-4 mr-2" />
                           Reject
                         </Button>
+                      </div>
+                    )}
+
+                    {application.status === "approved" && (
+                      <div className="flex items-center space-x-2 text-green-600">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="text-sm font-medium">Approved</span>
+                      </div>
+                    )}
+
+                    {application.status === "rejected" && (
+                      <div className="flex items-center space-x-2 text-red-600">
+                        <XCircle className="h-4 w-4" />
+                        <span className="text-sm font-medium">Rejected</span>
                       </div>
                     )}
                   </CardContent>

@@ -63,7 +63,7 @@ export function EditProfileModal({
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogTitle>Your Profile</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           {/* Profile Image */}
@@ -160,7 +160,7 @@ export function EditProfileModal({
             </Button>
             <Button
               onClick={handleSave}
-              className="bg-pink-600 hover:bg-pink-700"
+              className="bg-pink-800 hover:bg-pink-700"
             >
               Save Changes
             </Button>

@@ -138,12 +138,12 @@ export default function VolunteerDashboard() {
     "/placeholder.svg?height=32&width=32"
   );
   const [mockUser, setMockUser] = useState({
-    name: "John Doe",
-    email: "john.doe@example.com",
-    bio: "Passionate volunteer dedicated to making a positive impact in the community.",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    skills: ["Teaching", "Environmental", "Customer Service"],
+    name: "user",
+    email: "user001@gmail.com",
+    bio: "papipapipu",
+    phone: "(+855) 964853340",
+    location: "KIRIROM",
+    skills: ["Teaching", "Environmental"],
     experience: "2 years of volunteer experience",
     availability: "Weekends and evenings",
   });

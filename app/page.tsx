@@ -8,14 +8,14 @@ export default function HomePage() {
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-green-50 to-white">
       {/* Header */}
       <header className="bg-pink-800 text-white shadow-lg">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
               <h1 className="text-2xl font-bold text-white font-serif">
                 Sabay Volunteer
               </h1>
             </div>
-            <nav className="hidden md:flex space-x-8">
+            <nav className="hidden md:flex space-x-20">
               <Link
                 href="#impact"
                 className="text-white hover:text-pink-950 transition-colors font-sans"
