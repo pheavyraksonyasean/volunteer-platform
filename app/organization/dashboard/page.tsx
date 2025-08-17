@@ -200,7 +200,7 @@ export default function OrganizationDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-pink-800 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center">
               <h1 className="text-2xl font-bold text-white font-serif">

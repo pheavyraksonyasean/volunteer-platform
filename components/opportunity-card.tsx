@@ -65,7 +65,7 @@ export default function OpportunityCard({
             className="w-full h-48 object-cover"
           />
 
-          <Badge className="absolute top-2 left-2 bg-pink-600 text-white">
+          <Badge className="absolute top-2 left-2 bg-white text-pink-950">
             {opportunity.category}
           </Badge>
         </div>
@@ -76,7 +76,7 @@ export default function OpportunityCard({
               <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2">
                 {opportunity.title}
               </CardTitle>
-              <CardDescription className="text-pink-700 font-medium">
+              <CardDescription className="text-pink-800 font-medium">
                 {opportunity.organization}
               </CardDescription>
             </div>
@@ -125,7 +125,7 @@ export default function OpportunityCard({
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
               <div
-                className="bg-pink-600 h-2 rounded-full transition-all duration-300"
+                className="bg-pink-800 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${progressPercentage}%` }}
               />
             </div>
@@ -133,7 +133,7 @@ export default function OpportunityCard({
 
           <div className="flex gap-2">
             <Button
-              className="flex-1 bg-pink-600 hover:bg-pink-700 text-white"
+              className="flex-1 bg-pink-800 hover:bg-pink-700 text-white"
               disabled={spotsLeft === 0}
               onClick={() => setIsApplyModalOpen(true)}
             >
