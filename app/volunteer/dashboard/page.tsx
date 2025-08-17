@@ -195,9 +195,14 @@ export default function VolunteerDashboard() {
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-white font-serif">
+                <img
+                  src="/logo.png"
+                  alt="sabay volunteer"
+                  className="h-10 w-10"
+                />
+                <span className="text-2xl font-bold text-white font-serif">
                   Sabay Volunteer
-                </h1>
+                </span>
               </Link>
             </div>
 
@@ -387,7 +392,7 @@ export default function VolunteerDashboard() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className=" w-full bg-transparent "
+                        className=" w-full bg-pink-900 text-white hover:bg-pink-800 "
                         onClick={() => setActiveTab("opportunities")}
                       >
                         View All Opportunities

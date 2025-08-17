@@ -218,9 +218,14 @@ export default function OrganizationDashboard() {
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-white font-serif">
+              <img
+                src="/logo.png"
+                alt="sabay volunteer"
+                className="h-10 w-10"
+              />
+              <span className="text-2xl font-bold text-white font-serif">
                 Sabay Volunteer
-              </h1>
+              </span>
             </Link>
 
             <div className="flex items-center space-x-4">

@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { ArrowRight, Heart, Users, Clock, Quote } from "lucide-react";
+import { ArrowRight, Users, Quote } from "lucide-react";
+import { Facebook, Instagram, Twitter } from "lucide-react";
 
 export default function HomePage() {
   return (
@@ -11,11 +12,16 @@ export default function HomePage() {
         <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-6">
             <div className="flex items-center space-x-2">
-              <h1 className="text-2xl font-bold text-white font-serif">
+              <img
+                src="/logo.png"
+                alt="sabay volunteer"
+                className="h-10 w-10"
+              />
+              <span className="text-2xl font-bold text-white font-serif">
                 Sabay Volunteer
-              </h1>
+              </span>
             </div>
-            <nav className="hidden md:flex space-x-20">
+            <nav className="flex space-x-20">
               <Link
                 href="#impact"
                 className="text-white hover:text-pink-950 transition-colors font-sans"
@@ -212,7 +218,7 @@ export default function HomePage() {
             <div className="relative animate-fade-in-up animate-delay-200">
               <div className="bg-pink-50 rounded-2xl p-8 shadow-lg">
                 <img
-                  src="/placeholder.svg?height=300&width=400"
+                  src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-63c4-622f-9f43-beced68d203b/raw?se=2025-08-17T14%3A24%3A03Z&sp=r&sv=2024-08-04&sr=b&scid=1e05d247-277d-531e-bdef-1ab3823f6082&skoid=60f2aa1f-3685-43ee-be37-d8c8d08d5a64&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-17T00%3A06%3A28Z&ske=2025-08-18T00%3A06%3A28Z&sks=b&skv=2024-08-04&sig=pPOQgWPB85HNFW6TYV9BY6j8NGTlTGmk4qZ5nioHiUw%3D"
                   alt="Volunteers working together"
                   className="w-full h-64 object-cover rounded-xl shadow-md"
                 />
@@ -226,14 +232,46 @@ export default function HomePage() {
       <footer className="bg-pink-950 text-white py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
-            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+            {/* Brand */}
+            <div className="flex items-center space-x-2 mb-6 md:mb-0">
               <span className="text-xl font-bold font-serif">
                 Sabay Volunteer
               </span>
             </div>
-            <p className="text-white font-sans">
-              &copy; 2024 Sabay Volunteer. All rights reserved.
-            </p>
+
+            {/* Right side: Social + Copyright */}
+            <div className="flex flex-col md:flex-row items-center md:space-x-8 space-y-4 md:space-y-0">
+              {/* Social Icons */}
+              <div className="flex space-x-6">
+                <Link
+                  href="https://facebook.com"
+                  target="_blank"
+                  className="hover:text-pink-300 transition"
+                >
+                  <Facebook className="w-6 h-6" />
+                </Link>
+                <Link
+                  href="https://twitter.com"
+                  target="_blank"
+                  className="hover:text-pink-300 transition"
+                >
+                  <Twitter className="w-6 h-6" />
+                </Link>
+                <Link
+                  href="https://instagram.com"
+                  target="_blank"
+                  className="hover:text-pink-300 transition"
+                >
+                  <Instagram className="w-6 h-6" />
+                </Link>
+              </div>
+
+              {/* Copyright */}
+              <p className="text-sm text-gray-300 text-center md:text-left">
+                &copy; {new Date().getFullYear()} Sabay Volunteer. All rights
+                reserved.
+              </p>
+            </div>
           </div>
         </div>
       </footer>
