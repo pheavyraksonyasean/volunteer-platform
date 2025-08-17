@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -56,12 +56,14 @@ interface CreateOpportunityModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (opportunityData: any) => void;
+  editingOpportunity?: any; // Added editingOpportunity prop for edit mode
 }
 
 export default function CreateOpportunityModal({
   isOpen,
   onClose,
   onSubmit,
+  editingOpportunity,
 }: CreateOpportunityModalProps) {
   const [step, setStep] = useState(1);
   const [opportunityData, setOpportunityData] = useState({
@@ -200,28 +202,125 @@ export default function CreateOpportunityModal({
     }));
   };
 
+  useEffect(() => {
+    if (editingOpportunity) {
+      const [startTime, endTime] = editingOpportunity.time
+        ? editingOpportunity.time.split(" - ")
+        : ["", ""];
+
+      setOpportunityData({
+        title: editingOpportunity.title || "",
+        category: editingOpportunity.category || "",
+        description: editingOpportunity.description || "",
+        requirements: editingOpportunity.requirements || "",
+        location: editingOpportunity.location || "",
+        address: editingOpportunity.address || "",
+        isRemote: editingOpportunity.isRemote || false,
+        date: editingOpportunity.date
+          ? new Date(editingOpportunity.date)
+          : undefined,
+        startTime: startTime || "",
+        endTime: endTime || "",
+        isRecurring: editingOpportunity.isRecurring || false,
+        recurringPattern: editingOpportunity.recurringPattern || "",
+        maxVolunteers: editingOpportunity.maxVolunteers || 10,
+        minAge: editingOpportunity.minAge || 16,
+        backgroundCheck: editingOpportunity.backgroundCheck || false,
+        skills: editingOpportunity.skills || [],
+        benefits: editingOpportunity.benefits || [],
+        contactEmail: editingOpportunity.contactEmail || "",
+        contactPhone: editingOpportunity.contactPhone || "",
+        applicationDeadline: editingOpportunity.applicationDeadline
+          ? new Date(editingOpportunity.applicationDeadline)
+          : undefined,
+        isUrgent: editingOpportunity.isUrgent || false,
+        images: [],
+        documents: [],
+        customQuestions: editingOpportunity.customQuestions || [],
+        autoApprove: editingOpportunity.autoApprove || false,
+        sendReminders: editingOpportunity.sendReminders !== false,
+      });
+    } else {
+      setOpportunityData({
+        title: "",
+        category: "",
+        description: "",
+        requirements: "",
+        location: "",
+        address: "",
+        isRemote: false,
+        date: undefined as Date | undefined,
+        startTime: "",
+        endTime: "",
+        isRecurring: false,
+        recurringPattern: "",
+        maxVolunteers: 10,
+        minAge: 16,
+        backgroundCheck: false,
+        skills: [] as string[],
+        benefits: [] as string[],
+        contactEmail: "",
+        contactPhone: "",
+        applicationDeadline: undefined as Date | undefined,
+        isUrgent: false,
+        images: [] as File[],
+        documents: [] as File[],
+        customQuestions: [] as string[],
+        autoApprove: false,
+        sendReminders: true,
+      });
+    }
+    setStep(1);
+  }, [editingOpportunity]);
+
   const handleSubmit = async (isDraft = false) => {
+    if (!isStepValid()) return;
+
     setIsSubmitting(true);
+    try {
+      const finalData = {
+        ...opportunityData,
+        isDraft,
+      };
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+      await onSubmit(finalData);
 
-    onSubmit({
-      ...opportunityData,
-      status: isDraft ? "draft" : "published",
-      createdAt: new Date().toISOString(),
-    });
-
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-
-    // Close modal after showing success
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setStep(1);
-      setPreviewMode(false);
-      onClose();
-    }, 3000);
+      if (!editingOpportunity) {
+        setOpportunityData({
+          title: "",
+          category: "",
+          description: "",
+          requirements: "",
+          location: "",
+          address: "",
+          isRemote: false,
+          date: undefined as Date | undefined,
+          startTime: "",
+          endTime: "",
+          isRecurring: false,
+          recurringPattern: "",
+          maxVolunteers: 10,
+          minAge: 16,
+          backgroundCheck: false,
+          skills: [] as string[],
+          benefits: [] as string[],
+          contactEmail: "",
+          contactPhone: "",
+          applicationDeadline: undefined as Date | undefined,
+          isUrgent: false,
+          images: [] as File[],
+          documents: [] as File[],
+          customQuestions: [] as string[],
+          autoApprove: false,
+          sendReminders: true,
+        });
+        setStep(1);
+      }
+    } catch (error) {
+      console.error("Error creating opportunity:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const nextStep = () => setStep(step + 1);
@@ -294,7 +393,6 @@ export default function CreateOpportunityModal({
             </DialogTitle>
           </DialogHeader>
 
-          {/* Preview Content */}
           <Card>
             <CardContent className="p-6">
               <div className="space-y-6">
@@ -391,14 +489,17 @@ export default function CreateOpportunityModal({
       <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center justify-between">
-            Create Volunteer Opportunity
+            {editingOpportunity
+              ? "Edit Volunteer Opportunity"
+              : "Create Volunteer Opportunity"}
           </DialogTitle>
           <DialogDescription>
-            Create a new volunteer opportunity for your organization
+            {editingOpportunity
+              ? "Update your volunteer opportunity details"
+              : "Create a new volunteer opportunity for your organization"}
           </DialogDescription>
         </DialogHeader>
 
-        {/* Progress Indicator */}
         <div className="flex items-center justify-center mb-6">
           <div className="flex items-center space-x-4">
             {[1, 2, 3, 4].map((stepNumber) => (
@@ -424,7 +525,6 @@ export default function CreateOpportunityModal({
           </div>
         </div>
 
-        {/* Step Labels */}
         <div className="grid grid-cols-4 gap-4 mb-6 text-center text-sm">
           <div
             className={
@@ -456,7 +556,6 @@ export default function CreateOpportunityModal({
           </div>
         </div>
 
-        {/* Step Content */}
         <div className="space-y-6">
           {step === 1 && (
             <Card>
@@ -1078,7 +1177,6 @@ export default function CreateOpportunityModal({
           )}
         </div>
 
-        {/* Navigation Buttons */}
         <div className="flex justify-between pt-6 border-t">
           <div>
             {step > 1 && (
@@ -1118,8 +1216,10 @@ export default function CreateOpportunityModal({
                   {isSubmitting ? (
                     <>
                       <Upload className="h-4 w-4 mr-2 animate-spin" />
-                      Publishing...
+                      {editingOpportunity ? "Updating..." : "Publishing..."}
                     </>
+                  ) : editingOpportunity ? (
+                    "Update Opportunity"
                   ) : (
                     "Publish Opportunity"
                   )}

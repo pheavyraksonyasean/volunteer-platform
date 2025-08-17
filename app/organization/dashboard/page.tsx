@@ -29,12 +29,29 @@ import {
 import CreateOpportunityModal from "@/components/create-opportunity-modal";
 import ProfileMenu from "@/components/ProfileMenu";
 
+interface Opportunity {
+  id: number;
+  title: string;
+  date: string;
+  time: string;
+  volunteers: number;
+  maxVolunteers: number;
+  applications: number;
+  status: string;
+  category?: string;
+  description?: string;
+  location?: string;
+  isPublic?: boolean;
+}
+
 export default function OrganizationDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=32&width=32"
   );
+  const [editingOpportunity, setEditingOpportunity] =
+    useState<Opportunity | null>(null);
   const [mockUser, setMockUser] = useState({
     name: "Community Food Bank",
     email: "org@example.com",
@@ -47,10 +64,101 @@ export default function OrganizationDashboard() {
     interests: ["Food Security", "Community Development", "Education"],
   });
 
+  const [opportunities, setOpportunities] = useState<Opportunity[]>([
+    {
+      id: 1,
+      title: "Food Bank Volunteer",
+      date: "Dec 15, 2024",
+      time: "9:00 AM - 1:00 PM",
+      volunteers: 12,
+      maxVolunteers: 20,
+      applications: 25,
+      status: "active",
+      isPublic: true,
+    },
+  ]);
+
   const handleCreateOpportunity = (opportunityData: any) => {
     console.log("New opportunity created:", opportunityData);
-    // Here you would typically send the data to your backend
+
+    if (editingOpportunity) {
+      const updatedOpportunity: Opportunity = {
+        ...editingOpportunity,
+        title: opportunityData.title,
+        date: opportunityData.date
+          ? new Date(opportunityData.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "TBD",
+        time:
+          opportunityData.startTime && opportunityData.endTime
+            ? `${opportunityData.startTime} - ${opportunityData.endTime}`
+            : "TBD",
+        maxVolunteers: opportunityData.maxVolunteers || 10,
+        category: opportunityData.category,
+        description: opportunityData.description,
+        location: opportunityData.location,
+        isPublic: !opportunityData.isDraft,
+      };
+
+      setOpportunities((prev) =>
+        prev.map((opp) =>
+          opp.id === editingOpportunity.id ? updatedOpportunity : opp
+        )
+      );
+      setEditingOpportunity(null);
+    } else {
+      const newOpportunity: Opportunity = {
+        id: opportunities.length + 1,
+        title: opportunityData.title,
+        date: opportunityData.date
+          ? new Date(opportunityData.date).toLocaleDateString("en-US", {
+              month: "short",
+              day: "numeric",
+              year: "numeric",
+            })
+          : "TBD",
+        time:
+          opportunityData.startTime && opportunityData.endTime
+            ? `${opportunityData.startTime} - ${opportunityData.endTime}`
+            : "TBD",
+        volunteers: 0,
+        maxVolunteers: opportunityData.maxVolunteers || 10,
+        applications: 0,
+        status: "active",
+        category: opportunityData.category,
+        description: opportunityData.description,
+        location: opportunityData.location,
+        isPublic: !opportunityData.isDraft,
+      };
+
+      if (!opportunityData.isDraft) {
+        setOpportunities((prev) => [...prev, newOpportunity]);
+        setActiveTab("opportunities");
+      }
+    }
+
     setShowCreateModal(false);
+  };
+
+  const handleDeleteOpportunity = (opportunityId: number) => {
+    if (confirm("Are you sure you want to delete this opportunity?")) {
+      setOpportunities((prev) =>
+        prev.filter((opp) => opp.id !== opportunityId)
+      );
+    }
+  };
+
+  const handleEditOpportunity = (opportunity: Opportunity) => {
+    setEditingOpportunity(opportunity);
+    setShowCreateModal(true);
+  };
+
+  const handleCloseModal = () => {
+    setShowCreateModal(false);
+    setEditingOpportunity(null);
   };
 
   const handleApplicationAction = (
@@ -58,10 +166,8 @@ export default function OrganizationDashboard() {
     action: "approve" | "reject"
   ) => {
     console.log(`${action} application ${applicationId}`);
-    // Here you would update the application status
   };
 
-  // Mock data
   const mockOpportunities = [
     {
       id: 1,
@@ -72,6 +178,10 @@ export default function OrganizationDashboard() {
       maxVolunteers: 20,
       applications: 25,
       status: "active",
+      category: "Community Outreach",
+      description: "Help distribute food to those in need.",
+      location: "San Francisco, CA",
+      isPublic: true,
     },
   ];
 
@@ -89,7 +199,6 @@ export default function OrganizationDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-pink-800 shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
@@ -102,8 +211,9 @@ export default function OrganizationDashboard() {
             <div className="flex items-center space-x-4">
               <CreateOpportunityModal
                 isOpen={showCreateModal}
-                onClose={() => setShowCreateModal(false)}
+                onClose={handleCloseModal}
                 onSubmit={handleCreateOpportunity}
+                editingOpportunity={editingOpportunity}
               />
               <Button variant="ghost" size="sm" className="relative">
                 <Bell className="text-white h-4 w-4" />
@@ -121,7 +231,6 @@ export default function OrganizationDashboard() {
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Community Food Bank Dashboard
@@ -131,7 +240,6 @@ export default function OrganizationDashboard() {
           </p>
         </div>
 
-        {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <Card className="bg-pink-50 border-pink-800">
             <CardContent className="p-6">
@@ -198,7 +306,6 @@ export default function OrganizationDashboard() {
           </Card>
         </div>
 
-        {/* Main Content */}
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
@@ -212,7 +319,6 @@ export default function OrganizationDashboard() {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              {/* Recent Activity */}
               <Card className="border-pink-800">
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
@@ -259,7 +365,6 @@ export default function OrganizationDashboard() {
                 </CardContent>
               </Card>
 
-              {/* Upcoming Events */}
               <Card className="border-pink-800">
                 <CardHeader>
                   <CardTitle>Upcoming Events</CardTitle>
@@ -269,7 +374,7 @@ export default function OrganizationDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
-                    {mockOpportunities.slice(0, 3).map((opportunity) => (
+                    {opportunities.slice(0, 3).map((opportunity) => (
                       <div
                         key={opportunity.id}
                         className="flex items-center justify-between p-3 border rounded-lg"
@@ -314,66 +419,97 @@ export default function OrganizationDashboard() {
             </div>
 
             <div className="grid gap-6">
-              {mockOpportunities.slice(0, 1).map((opportunity) => (
-                <Card key={opportunity.id}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div>
-                        <h3 className="text-xl font-semibold mb-2">
-                          {opportunity.title}
-                        </h3>
-                        <div className="flex items-center space-x-4 text-sm text-gray-600">
-                          <span>{opportunity.date}</span>
-                          <span>{opportunity.time}</span>
+              {opportunities
+                .filter((opp) => opp.isPublic)
+                .map((opportunity) => (
+                  <Card key={opportunity.id}>
+                    <CardContent className="p-6">
+                      <div className="flex justify-between items-start mb-4">
+                        <div>
+                          <h3 className="text-xl font-semibold mb-2">
+                            {opportunity.title}
+                          </h3>
+                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                            <span>{opportunity.date}</span>
+                            <span>{opportunity.time}</span>
+                          </div>
+                        </div>
+                        <Badge
+                          variant={
+                            opportunity.status === "full"
+                              ? "default"
+                              : "secondary"
+                          }
+                        >
+                          {opportunity.status}
+                        </Badge>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-2xl font-bold text-indigo-600">
+                            {opportunity.volunteers}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Confirmed Volunteers
+                          </p>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-2xl font-bold text-green-600">
+                            {opportunity.maxVolunteers}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Max Volunteers
+                          </p>
+                        </div>
+                        <div className="text-center p-3 bg-gray-50 rounded-lg">
+                          <p className="text-2xl font-bold text-yellow-600">
+                            {opportunity.applications}
+                          </p>
+                          <p className="text-sm text-gray-600">Applications</p>
                         </div>
                       </div>
-                      <Badge
-                        variant={
-                          opportunity.status === "full"
-                            ? "default"
-                            : "secondary"
-                        }
-                      >
-                        {opportunity.status}
-                      </Badge>
-                    </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-indigo-600">
-                          {opportunity.volunteers}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Confirmed Volunteers
-                        </p>
+                      <div className="flex space-x-2">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => handleEditOpportunity(opportunity)}
+                        >
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleDeleteOpportunity(opportunity.id)
+                          }
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          Delete
+                        </Button>
                       </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-green-600">
-                          {opportunity.maxVolunteers}
-                        </p>
-                        <p className="text-sm text-gray-600">Max Volunteers</p>
-                      </div>
-                      <div className="text-center p-3 bg-gray-50 rounded-lg">
-                        <p className="text-2xl font-bold text-yellow-600">
-                          {opportunity.applications}
-                        </p>
-                        <p className="text-sm text-gray-600">Applications</p>
-                      </div>
-                    </div>
+                    </CardContent>
+                  </Card>
+                ))}
 
-                    <div className="flex space-x-2">
-                      <Button variant="outline" size="sm">
-                        <Edit className="h-4 w-4 mr-2" />
-                        Edit
-                      </Button>
-                      <Button variant="outline" size="sm">
-                        <Trash2 className="h-4 w-4 mr-2" />
-                        Delete
-                      </Button>
-                    </div>
+              {opportunities.filter((opp) => opp.isPublic).length === 0 && (
+                <Card>
+                  <CardContent className="p-8 text-center">
+                    <p className="text-gray-500 mb-4">
+                      No public opportunities yet.
+                    </p>
+                    <Button
+                      onClick={() => setShowCreateModal(true)}
+                      className="bg-pink-800 hover:bg-pink-700"
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Create Your First Opportunity
+                    </Button>
                   </CardContent>
                 </Card>
-              ))}
+              )}
             </div>
           </TabsContent>
 
