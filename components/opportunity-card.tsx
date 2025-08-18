@@ -1,19 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
-  MapPin,
-  Clock,
-  Calendar,
-  Users,
-  Heart,
-  Share2,
-  Bookmark,
-  Eye,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { MapPin, Clock, Users, Calendar, Eye } from "lucide-react";
+import DetailedEventModal from "./DetailedEventModal";
 import ApplicationModal from "./application-modal";
 
 interface Opportunity {
@@ -28,194 +26,147 @@ interface Opportunity {
   skills: string[];
   category: string;
   description: string;
-  image?: string;
-  urgent?: boolean;
+  image: string;
 }
 
 interface OpportunityCardProps {
   opportunity: Opportunity;
-  onApply?: (opportunityId: number, applicationData: any) => void;
-  showFullDescription?: boolean;
+  onApply: (opportunityId: number, applicationData: any) => void;
 }
 
 export default function OpportunityCard({
   opportunity,
   onApply,
-  showFullDescription = false,
 }: OpportunityCardProps) {
-  const [showApplicationModal, setShowApplicationModal] = useState(false);
-  const [isFavorited, setIsFavorited] = useState(false);
-  const [isBookmarked, setIsBookmarked] = useState(false);
+  const [isApplyModalOpen, setIsApplyModalOpen] = useState(false);
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
 
-  const handleApply = () => {
-    setShowApplicationModal(true);
+  const handleApply = (applicationData: any) => {
+    onApply(opportunity.id, applicationData);
+    setIsApplyModalOpen(false);
   };
 
-  const handleApplicationSubmit = (applicationData: any) => {
-    if (onApply) {
-      onApply(opportunity.id, applicationData);
-    }
-    setShowApplicationModal(false);
+  const handleViewDetails = () => {
+    setIsDetailModalOpen(true);
   };
 
-  const handleFavorite = () => {
-    setIsFavorited(!isFavorited);
-  };
-
-  const handleBookmark = () => {
-    setIsBookmarked(!isBookmarked);
-  };
-
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: opportunity.title,
-        text: `Check out this volunteer opportunity: ${opportunity.title} with ${opportunity.organization}`,
-        url: window.location.href,
-      });
-    } else {
-      // Fallback to copying to clipboard
-      navigator.clipboard.writeText(window.location.href);
-      alert("Link copied to clipboard!");
-    }
-  };
-
-  const spotsRemaining = opportunity.maxVolunteers - opportunity.volunteers;
-  const isAlmostFull = spotsRemaining <= 3;
-  const isFull = spotsRemaining <= 0;
+  const progressPercentage =
+    (opportunity.volunteers / opportunity.maxVolunteers) * 100;
+  const spotsLeft = opportunity.maxVolunteers - opportunity.volunteers;
 
   return (
     <>
-      <Card className="border-pink-800 hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-        <CardContent className="p-0">
-          <div className="relative">
-            <img
-              src={opportunity.image || "/placeholder.svg?height=200&width=400"}
-              alt={opportunity.title}
-              className="w-full h-48 object-cover rounded-t-lg"
-            />
-            <div className="absolute top-3 left-3 flex gap-2">
-              {opportunity.urgent && (
-                <Badge className="bg-red-500 hover:bg-red-600">Urgent</Badge>
-              )}
-              <Badge className="bg-white text-gray-900 hover:bg-gray-100">
-                {opportunity.category}
-              </Badge>
+      <Card className="overflow-hidden hover:shadow-lg transition-shadow duration-200 border-pink-200">
+        <div className="relative">
+          <img
+            src={opportunity.image || "/placeholder.svg"}
+            alt={opportunity.title}
+            className="w-full h-48 object-cover"
+          />
+
+          <Badge className="absolute top-2 left-2 bg-white text-pink-950">
+            {opportunity.category}
+          </Badge>
+        </div>
+
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <CardTitle className="text-lg font-semibold text-gray-900 line-clamp-2">
+                {opportunity.title}
+              </CardTitle>
+              <CardDescription className="text-pink-800 font-medium">
+                {opportunity.organization}
+              </CardDescription>
             </div>
-            <div className="absolute top-3 right-3 flex gap-2"></div>
-            {isAlmostFull && !isFull && (
-              <div className="absolute bottom-3 left-3">
-                <Badge
-                  variant="secondary"
-                  className="bg-yellow-100 text-yellow-800"
-                >
-                  Only {spotsRemaining} spots left!
-                </Badge>
-              </div>
-            )}
-            {isFull && (
-              <div className="absolute bottom-3 left-3">
-                <Badge className="bg-gray-500">Full</Badge>
-              </div>
-            )}
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-4">
+          {/* Location and Date */}
+          <div className="space-y-2">
+            <div className="flex items-center text-sm text-gray-600">
+              <MapPin className="h-4 w-4 mr-2 text-gray-400" />
+              {opportunity.location}
+            </div>
+            <div className="flex items-center text-sm text-gray-600">
+              <Calendar className="h-4 w-4 mr-2 text-gray-400" />
+              {opportunity.date}
+            </div>
+            <div className="flex items-center text-sm text-gray-600">
+              <Clock className="h-4 w-4 mr-2 text-gray-400" />
+              {opportunity.time}
+            </div>
           </div>
 
-          <div className="p-6">
-            <div className="flex justify-between items-start mb-2">
-              <h3 className="text-xl font-semibold text-gray-900 line-clamp-1">
-                {opportunity.title}
-              </h3>
-              <Badge variant="outline" className="ml-2 shrink-0">
-                {opportunity.volunteers}/{opportunity.maxVolunteers}
+          {/* Description */}
+          <p className="text-sm text-gray-700 line-clamp-2">
+            {opportunity.description}
+          </p>
+
+          {/* Skills */}
+          <div className="flex flex-wrap gap-1">
+            {opportunity.skills.map((skill, index) => (
+              <Badge key={index} variant="secondary" className="text-xs">
+                {skill}
               </Badge>
-            </div>
+            ))}
+          </div>
 
-            <p className="text-pink-900 font-medium mb-3">
-              {opportunity.organization}
-            </p>
-
-            <div className="flex flex-wrap gap-3 text-sm text-gray-600 mb-3">
-              <div className="flex items-center">
-                <MapPin className="h-4 w-4 mr-1" />
-                {opportunity.location}
-              </div>
-              <div className="flex items-center">
-                <Calendar className="h-4 w-4 mr-1" />
-                {opportunity.date}
-              </div>
-              <div className="flex items-center">
-                <Clock className="h-4 w-4 mr-1" />
-                {opportunity.time}
-              </div>
-              <div className="flex items-center">
+          {/* Volunteer Progress */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-sm">
+              <div className="flex items-center text-gray-600">
                 <Users className="h-4 w-4 mr-1" />
-                {spotsRemaining} spots left
+                {opportunity.volunteers}/{opportunity.maxVolunteers} volunteers
               </div>
+              <span className="text-gray-500">{spotsLeft} spots left</span>
             </div>
+            <div className="w-full bg-gray-200 rounded-full h-2">
+              <div
+                className="bg-pink-800 h-2 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          </div>
 
-            <p
-              className={`text-gray-700 mb-4 ${
-                showFullDescription ? "" : "line-clamp-2"
-              }`}
+          <div className="flex gap-2">
+            <Button
+              className="flex-1 bg-pink-800 hover:bg-pink-700 text-white"
+              disabled={spotsLeft === 0}
+              onClick={() => setIsApplyModalOpen(true)}
             >
-              {opportunity.description}
-            </p>
+              {spotsLeft === 0 ? "Fully Booked" : "Apply Now"}
+            </Button>
 
-            <div className="flex flex-wrap gap-2 mb-4">
-              {opportunity.skills.slice(0, 3).map((skill) => (
-                <Badge key={skill} variant="outline" className="text-xs">
-                  {skill}
-                </Badge>
-              ))}
-              {opportunity.skills.length > 3 && (
-                <Badge variant="outline" className="text-xs">
-                  +{opportunity.skills.length - 3} more
-                </Badge>
-              )}
-            </div>
-
-            <div className="flex gap-2">
-              <Button
-                className="flex-1 bg-pink-800"
-                onClick={handleApply}
-                disabled={isFull}
-              >
-                {isFull ? "Full" : "Apply Now"}
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="px-3 bg-transparent"
-              >
-                <Eye className="h-4 w-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                className="px-3 bg-transparent"
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4" />
-              </Button>
-            </div>
-
-            {/* Quick Stats */}
-            <div className="mt-4 pt-4 border-t border-gray-100">
-              <div className="flex justify-between text-xs text-gray-500">
-                <span>Posted 2 days ago</span>
-                <span>142 views</span>
-                <span>8 applications</span>
-              </div>
-            </div>
+            <Button
+              variant="outline"
+              size="default"
+              className="px-4 bg-transparent"
+              onClick={handleViewDetails}
+            >
+              <Eye className="h-4 w-4" />
+            </Button>
           </div>
         </CardContent>
       </Card>
 
       <ApplicationModal
         opportunity={opportunity}
-        isOpen={showApplicationModal}
-        onClose={() => setShowApplicationModal(false)}
-        onSubmit={handleApplicationSubmit}
+        isOpen={isApplyModalOpen}
+        onClose={() => setIsApplyModalOpen(false)}
+        onSubmit={handleApply}
+      />
+
+      <DetailedEventModal
+        opportunity={opportunity}
+        isOpen={isDetailModalOpen}
+        onClose={() => setIsDetailModalOpen(false)}
+        onApply={() => {
+          setIsDetailModalOpen(false);
+          setIsApplyModalOpen(true);
+        }}
       />
     </>
   );

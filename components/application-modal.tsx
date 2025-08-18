@@ -1,5 +1,7 @@
 "use client";
 
+import type React from "react";
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,7 +37,6 @@ import {
   Users,
   Upload,
   CheckCircle,
-  X,
 } from "lucide-react";
 import FileUpload from "./file-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

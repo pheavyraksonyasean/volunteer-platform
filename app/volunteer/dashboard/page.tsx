@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import ProfileMenu from "@/components/ProfileMenu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
@@ -25,100 +26,70 @@ import {
   Target,
 } from "lucide-react";
 import OpportunityCard from "@/components/opportunity-card";
-import ProfileMenu from "@/components/ProfileMenu";
 
 // Mock data
 const mockOpportunities = [
   {
     id: 1,
-    title: "Food Bank Volunteer",
-    organization: "Community Food Bank",
-    location: "Downtown, NY",
-    date: "Dec 15, 2024",
-    time: "9:00 AM - 1:00 PM",
-    volunteers: 12,
-    maxVolunteers: 20,
-    skills: ["Physical Work", "Customer Service"],
-    category: "Hunger Relief",
-    description: "Help sort and distribute food to families in need.",
-    image:
-      "https://www.bigissue.com/wp-content/uploads/2022/09/P1190298-scaled.jpg",
+    title: "Angkor Temple Cleanup Volunteer",
+    organization: "APSARA Authority",
+    location: "Angkor Archaeological Park, Siem Reap, Cambodia",
+    date: "Sep 22, 2025",
+    time: "7:30 AM – 11:30 AM",
+    volunteers: 30,
+    maxVolunteers: 50,
+    skills: ["Environmental", "Teamwork"],
+    category: "Environment",
+    description:
+      "Join local communities and volunteers to help clean up the Angkor temple complex and preserve Cambodia’s cultural heritage.",
+    image: "https://www.khmertimeskh.com/wp-content/uploads/2024/06/250604.jpg",
   },
   {
     id: 2,
-    title: "Tree Planting Volunter",
-    organization: "Green Earth Initiative",
-    location: "Santa Monica Beach, CA",
-    date: "Dec 18, 2024",
-    time: "8:00 AM - 12:00 PM",
-    volunteers: 50,
-    maxVolunteers: 50,
-    skills: ["Environmental", "Physical Work"],
+    title: "Plastic-Free Cambodia Volunteer",
+    organization: "Plastic-Free Cambodia Initiative",
+    location: "Phnom Penh, Cambodia",
+    date: "Oct 05, 2025",
+    time: "8:00 AM – 1:00 PM",
+    volunteers: 20,
+    maxVolunteers: 40,
+    skills: ["Awareness Campaigning", "Environmental"],
     category: "Environment",
-    description: "Help plant trees and restore the local ecosystem.",
+    description:
+      "Support Cambodia’s plastic-free movement by raising awareness, distributing reusable bags, and joining city-wide cleanup activities.",
     image:
-      "https://images.stockcake.com/public/9/8/d/98dc35e9-aa95-4b31-83d8-5dacada8bd1e_large/volunteers-planting-trees-stockcake.jpg",
+      "https://cdn.kiripost.com/static/images/Nisset_Plastic-Watermark-Mon_Sokeo_3.width-960.jpg",
   },
   {
     id: 3,
-    title: "Reading Tutor",
-    organization: "City Library",
-    location: "Central Library, NY",
-    date: "Dec 20, 2024",
-    time: "3:00 PM - 5:00 PM",
-    volunteers: 8,
-    maxVolunteers: 15,
-    skills: ["Teaching", "Childcare"],
-    category: "Education",
+    title: "Blood Donation Drive Volunteer",
+    organization: "Cambodian Red Cross",
+    location: "Phnom Penh, Cambodia",
+    date: "Aug 30, 2025",
+    time: "9:00 AM – 3:00 PM",
+    volunteers: 15,
+    maxVolunteers: 25,
+    skills: ["Health Support", "Organization"],
+    category: "Health",
     description:
-      "Help children improve their reading skills through one-on-one tutoring.",
+      "Assist in organizing a blood donation drive, helping donors through registration, guidance, and post-donation care.",
     image:
-      "https://www.leaderenergy.com/wp-content/uploads/2023/01/Beach-cleaning.jpg",
+      "https://www.khmertimeskh.com/wp-content/uploads/2022/10/46508-750x440.jpg",
   },
   {
     id: 4,
-    title: "Reading Tutor",
-    organization: "City Library",
-    location: "Central Library, NY",
-    date: "Dec 20, 2024",
-    time: "3:00 PM - 5:00 PM",
-    volunteers: 8,
-    maxVolunteers: 15,
-    skills: ["Teaching", "Childcare"],
+    title: "Computer Skills Trainer",
+    organization: "CYA Learning Center",
+    location: "Kampong Cham, Cambodia",
+    date: "Sep 10, 2025",
+    time: "1:00 PM – 5:00 PM",
+    volunteers: 5,
+    maxVolunteers: 10,
+    skills: ["Teaching", "Computer Literacy"],
     category: "Education",
     description:
-      "Help children improve their reading skills through one-on-one tutoring.",
-    image: "/placeholder.svg?height=200&width=300",
-  },
-];
-
-const mockApplications = [
-  {
-    id: 1,
-    title: "Animal Shelter Helper",
-    organization: "Happy Paws Shelter",
-    status: "approved",
-    appliedDate: "Dec 1, 2024",
-    eventDate: "Dec 22, 2024",
-    message: "Welcome! Please arrive 15 minutes early for orientation.",
-  },
-  {
-    id: 2,
-    title: "Homeless Shelter Volunteer",
-    organization: "Hope Center",
-    status: "pending",
-    appliedDate: "Dec 5, 2024",
-    eventDate: "Dec 25, 2024",
-    message: "Application under review. You'll hear back within 2-3 days.",
-  },
-  {
-    id: 3,
-    title: "Community Garden Helper",
-    organization: "Green Spaces Initiative",
-    status: "rejected",
-    appliedDate: "Nov 28, 2024",
-    eventDate: "Dec 10, 2024",
-    message: "Thank you for your interest. This opportunity has been filled.",
+      "Teach basic computer skills such as Word, Excel, and internet use to local youth and community members.",
+    image: "https://www.khmertimeskh.com/wp-content/uploads/2024/04/80642.jpg",
   },
 ];
 
@@ -132,41 +103,76 @@ const mockUpcomingEvents = [
     location: "123 Pet Street, NY",
     status: "confirmed",
   },
-  {
-    id: 2,
-    title: "Holiday Food Drive",
-    organization: "Community Food Bank",
-    date: "Dec 24, 2024",
-    time: "9:00 AM - 1:00 PM",
-    location: "456 Main St, NY",
-    status: "confirmed",
-  },
 ];
 
 export default function VolunteerDashboard() {
   const [searchTerm, setSearchTerm] = useState("");
   const [activeTab, setActiveTab] = useState("overview");
-  const [applications, setApplications] = useState<{ [key: number]: any }>({});
+  const [applications, setApplications] = useState<
+    Array<{
+      id: number;
+      opportunityId: number;
+      title: string;
+      organization: string;
+      status: "pending" | "approved" | "rejected";
+      appliedDate: string;
+      eventDate: string;
+      message: string;
+      applicationData: any;
+    }>
+  >([
+    {
+      id: 1,
+      opportunityId: 999,
+      title: "Homeless Shelter Volunteer",
+      organization: "Hope Center",
+      status: "pending",
+      appliedDate: "Dec 5, 2024",
+      eventDate: "Dec 25, 2024",
+      message: "Application under review. You'll hear back within 2-3 days.",
+      applicationData: {},
+    },
+  ]);
+
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=32&width=32"
   );
   const [mockUser, setMockUser] = useState({
-    name: "John Doe",
-    email: "volunteer@example.com",
-    bio: "Passionate volunteer dedicated to making a positive impact in the community.",
-    phone: "+1 (555) 123-4567",
-    location: "New York, NY",
-    skills: ["Community Outreach", "Event Planning", "Teaching"],
-    experience: "intermediate",
-    availability: "weekends",
+    name: "user",
+    email: "user001@gmail.com",
+    bio: "papipapipu",
+    phone: "(+855) 964853340",
+    location: "KIRIROM",
+    skills: ["Teaching", "Environmental"],
+    experience: "2 years of volunteer experience",
+    availability: "Weekends and evenings",
   });
 
   const handleApply = (opportunityId: number, applicationData: any) => {
-    setApplications((prev) => ({
-      ...prev,
-      [opportunityId]: applicationData,
-    }));
-    console.log("Application submitted:", { opportunityId, applicationData });
+    const opportunity = mockOpportunities.find(
+      (opp) => opp.id === opportunityId
+    );
+    if (!opportunity) return;
+
+    const newApplication = {
+      id: Date.now(), // Simple ID generation
+      opportunityId,
+      title: opportunity.title,
+      organization: opportunity.organization,
+      status: "pending" as const,
+      appliedDate: new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      }),
+      eventDate: opportunity.date,
+      message:
+        "Application submitted successfully. You'll hear back within 2-3 business days.",
+      applicationData,
+    };
+
+    setApplications((prev) => [newApplication, ...prev]);
+    console.log("Application submitted:", newApplication);
   };
 
   const filteredOpportunities = mockOpportunities.filter((opportunity) => {
@@ -185,13 +191,18 @@ export default function VolunteerDashboard() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-pink-800 shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
-                <h1 className="text-2xl font-bold text-white font-serif">
+                <img
+                  src="/logo.png"
+                  alt="sabay volunteer"
+                  className="h-10 w-10"
+                />
+                <span className="text-2xl font-bold text-white font-serif">
                   Sabay Volunteer
-                </h1>
+                </span>
               </Link>
             </div>
 
@@ -310,7 +321,7 @@ export default function VolunteerDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Recent Activity */}
-                <Card className="border-pink-800 ">
+                <Card className="border-pink-200 ">
                   <CardHeader>
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
@@ -361,7 +372,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Recommended Opportunities */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Recommended for You</CardTitle>
                     <CardDescription>
@@ -381,7 +392,7 @@ export default function VolunteerDashboard() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className=" w-full bg-transparent "
+                        className=" w-full bg-pink-900 text-white hover:bg-pink-800 "
                         onClick={() => setActiveTab("opportunities")}
                       >
                         View All Opportunities
@@ -394,7 +405,7 @@ export default function VolunteerDashboard() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Upcoming Events */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Upcoming Events</CardTitle>
                     <CardDescription>
@@ -434,7 +445,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Application Status */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Application Status</CardTitle>
                     <CardDescription>
@@ -443,7 +454,7 @@ export default function VolunteerDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-3">
-                      {mockApplications.slice(0, 3).map((application) => (
+                      {applications.slice(0, 3).map((application) => (
                         <div
                           key={application.id}
                           className="flex items-center justify-between"
@@ -488,7 +499,7 @@ export default function VolunteerDashboard() {
 
           <TabsContent value="opportunities" className="space-y-6">
             {/* Search and Filters */}
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>Find Opportunities</CardTitle>
                 <CardDescription>
@@ -525,7 +536,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>My Applications</CardTitle>
                 <CardDescription>
@@ -533,48 +544,62 @@ export default function VolunteerDashboard() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  {mockApplications.map((application) => (
-                    <Card key={application.id}>
-                      <CardContent className="p-4">
-                        <div className="flex items-start justify-between">
-                          <div className="flex-1">
-                            <h4 className="font-semibold text-gray-900">
-                              {application.title}
-                            </h4>
-                            <p className="text-sm text-pink-800">
-                              {application.organization}
-                            </p>
-                            <p className="text-xs text-gray-500 mt-1">
-                              Applied: {application.appliedDate} • Event:{" "}
-                              {application.eventDate}
-                            </p>
-                            <p className="text-sm text-gray-700 mt-2">
-                              {application.message}
-                            </p>
+                {applications.length === 0 ? (
+                  <div className="text-center py-8">
+                    <p className="text-gray-500 mb-4">No applications yet</p>
+                    <Button
+                      variant="outline"
+                      onClick={() => setActiveTab("opportunities")}
+                    >
+                      Browse Opportunities
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {applications.map((application) => (
+                      <Card key={application.id}>
+                        <CardContent className="p-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex items-center space-x-4">
+                              <div>
+                                <h4 className="font-semibold text-gray-900">
+                                  {application.title}
+                                </h4>
+                                <p className="text-sm text-pink-800">
+                                  {application.organization}
+                                </p>
+                                <p className="text-xs text-gray-500 mt-1">
+                                  Applied: {application.appliedDate} • Event:{" "}
+                                  {application.eventDate}
+                                </p>
+                                <p className="text-sm text-gray-700 mt-2">
+                                  {application.message}
+                                </p>
+                              </div>
+                            </div>
+                            <Badge
+                              variant={
+                                application.status === "approved"
+                                  ? "default"
+                                  : application.status === "pending"
+                                  ? "secondary"
+                                  : "destructive"
+                              }
+                            >
+                              {application.status}
+                            </Badge>
                           </div>
-                          <Badge
-                            variant={
-                              application.status === "approved"
-                                ? "default"
-                                : application.status === "pending"
-                                ? "secondary"
-                                : "destructive"
-                            }
-                          >
-                            {application.status}
-                          </Badge>
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                )}
               </CardContent>
             </Card>
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>My Schedule</CardTitle>
                 <CardDescription>
