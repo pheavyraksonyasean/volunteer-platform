@@ -35,7 +35,17 @@ export default function OrganizationDashboard() {
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=32&width=32"
   );
-  const mockUser = { name: "Community Food Bank", email: "org@example.com" };
+  const [mockUser, setMockUser] = useState({
+    name: "Community Food Bank",
+    email: "org@example.com",
+    bio: "Dedicated to fighting hunger in our community through food distribution and education programs.",
+    phone: "+1 (555) 123-4567",
+    location: "San Francisco, CA",
+    skills: ["Community Outreach", "Event Planning", "Volunteer Management"],
+    experience: "Expert",
+    availability: "Weekdays and Weekends",
+    interests: ["Food Security", "Community Development", "Education"],
+  });
 
   const handleCreateOpportunity = (opportunityData: any) => {
     console.log("New opportunity created:", opportunityData);
@@ -84,7 +94,9 @@ export default function OrganizationDashboard() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <Link href="/" className="flex items-center">
-              <h1 className="text-2xl font-bold text-white">Sabay Volunteer</h1>
+              <h1 className="text-2xl font-bold text-white font-serif">
+                Sabay Volunteer
+              </h1>
             </Link>
 
             <div className="flex items-center space-x-4">
@@ -94,13 +106,14 @@ export default function OrganizationDashboard() {
                 onSubmit={handleCreateOpportunity}
               />
               <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-4 w-4" />
+                <Bell className="text-white h-4 w-4" />
                 <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
               <ProfileMenu
                 profileImage={profileImage}
                 setProfileImage={setProfileImage}
                 mockUser={mockUser}
+                setMockUser={setMockUser}
               />
             </div>
           </div>

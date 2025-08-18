@@ -1,14 +1,18 @@
 "use client";
-
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from "@/components/ui/popover";
-import { EditProfileModal } from "@/components/application-modal";
-import { useRouter } from "next/navigation";
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Edit, LogOut, ChevronDown } from "lucide-react";
+import { EditProfileModal } from "./EditProfileModal";
 
 interface ProfileMenuProps {
   profileImage: string;
@@ -16,62 +20,111 @@ interface ProfileMenuProps {
   mockUser: {
     name: string;
     email: string;
+    bio?: string;
+    phone?: string;
+    location?: string;
+    skills?: string[];
+    experience?: string;
+    availability?: string;
   };
+  setMockUser: (user: any) => void;
 }
 
 export default function ProfileMenu({
   profileImage,
   setProfileImage,
   mockUser,
+  setMockUser,
 }: ProfileMenuProps) {
-  const [showEditProfile, setShowEditProfile] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const router = useRouter();
+
+  const handleEditProfile = () => {
+    setIsEditModalOpen(true);
+  };
+
+  const handleLogout = () => {
+    console.log("Logging out user...");
+
+    // Clear any stored user data/tokens (you can add localStorage.clear() or sessionStorage.clear() if needed)
+    // localStorage.removeItem('userToken')
+    // sessionStorage.clear()
+
+    // Navigate to the home page
+    router.push("/");
+  };
+
+  const handleSaveProfile = (updatedUser: any, newProfileImage?: string) => {
+    console.log("Profile updated:", updatedUser);
+    // Update the user data in the parent component
+    setMockUser(updatedUser);
+    if (newProfileImage) {
+      setProfileImage(newProfileImage);
+    }
+    // Here you would also save the updated user data to your backend
+  };
 
   return (
     <>
-      <Popover>
-        <PopoverTrigger asChild>
-          <button
-            className="focus:outline-none"
-            aria-label="Open settings menu"
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="flex items-center gap-3 px-3 py-2 h-auto rounded-lg hover:bg-pink-900 transition-colors"
           >
-            <Avatar>
-              <AvatarImage src={profileImage} />
-              <AvatarFallback>CF</AvatarFallback>
+            <Avatar className="h-10 w-10 ring-2 ring-blue-100">
+              <AvatarImage
+                src={profileImage || "/placeholder.svg"}
+                alt={mockUser.name}
+              />
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-purple-600 text-white font-semibold">
+                {mockUser.name
+                  .split(" ")
+                  .map((n) => n[0])
+                  .join("")}
+              </AvatarFallback>
             </Avatar>
-          </button>
-        </PopoverTrigger>
-        <PopoverContent className="w-48 p-2 flex flex-col gap-1">
-          <button
-            className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none"
-            onClick={() => setShowEditProfile(true)}
-          >
-            Edit Profile
-          </button>
-          <button
-            className="w-full text-left px-4 py-2 rounded hover:bg-gray-100 focus:outline-none text-red-600"
-            onClick={() => {
-              router.push("/");
-            }}
-          >
-            Log Out
-          </button>
-        </PopoverContent>
-      </Popover>
+            <div className="flex flex-col items-start text-left">
+              <p className="text-sm font-semibold text-white leading-tight">
+                {mockUser.name}
+              </p>
+              <p className="text-xs text-white leading-tight">
+                {mockUser.email}
+              </p>
+            </div>
+            <ChevronDown className="h-4 w-4 text-gray-400 ml-1" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-56" align="end" forceMount>
+          <DropdownMenuLabel className="font-normal">
+            <div className="flex flex-col space-y-1">
+              <p className="text-sm font-medium leading-none">
+                {mockUser.name}
+              </p>
+              <p className="text-xs leading-none text-muted-foreground">
+                {mockUser.email}
+              </p>
+            </div>
+          </DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleEditProfile}>
+            <Edit className="mr-2 h-4 w-4" />
+            <span>Edit Profile</span>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={handleLogout}>
+            <LogOut className="mr-2 h-4 w-4" />
+            <span>Logout</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
 
       <EditProfileModal
-        isOpen={showEditProfile}
-        onClose={() => setShowEditProfile(false)}
-        onSubmit={(data) => {
-          if (data.image instanceof File) {
-            setProfileImage(URL.createObjectURL(data.image));
-          } else if (typeof data.image === "string") {
-            setProfileImage(data.image);
-          }
-          // TODO: handle profile update
-          console.log("Profile updated:", data);
-        }}
-        initialData={{ ...mockUser, image: profileImage }}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        user={mockUser}
+        profileImage={profileImage}
+        onSave={handleSaveProfile}
       />
     </>
   );
