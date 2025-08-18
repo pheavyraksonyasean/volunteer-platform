@@ -337,7 +337,7 @@ export default function OrganizationDashboard() {
 
           <TabsContent value="overview" className="space-y-6">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-              <Card className="border-pink-800">
+              <Card>
                 <CardHeader>
                   <CardTitle>Recent Activity</CardTitle>
                   <CardDescription>
@@ -383,7 +383,7 @@ export default function OrganizationDashboard() {
                 </CardContent>
               </Card>
 
-              <Card className="border-pink-800">
+              <Card>
                 <CardHeader>
                   <CardTitle>Upcoming Events</CardTitle>
                   <CardDescription>

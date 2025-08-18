@@ -321,7 +321,7 @@ export default function VolunteerDashboard() {
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-6">
                 {/* Recent Activity */}
-                <Card className="border-pink-800 ">
+                <Card className="border-pink-200 ">
                   <CardHeader>
                     <CardTitle>Recent Activity</CardTitle>
                     <CardDescription>
@@ -372,7 +372,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Recommended Opportunities */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Recommended for You</CardTitle>
                     <CardDescription>
@@ -405,7 +405,7 @@ export default function VolunteerDashboard() {
               {/* Sidebar */}
               <div className="space-y-6">
                 {/* Upcoming Events */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Upcoming Events</CardTitle>
                     <CardDescription>
@@ -445,7 +445,7 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Application Status */}
-                <Card className=" border-pink-800">
+                <Card className=" border-pink-200">
                   <CardHeader>
                     <CardTitle>Application Status</CardTitle>
                     <CardDescription>
@@ -499,7 +499,7 @@ export default function VolunteerDashboard() {
 
           <TabsContent value="opportunities" className="space-y-6">
             {/* Search and Filters */}
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>Find Opportunities</CardTitle>
                 <CardDescription>
@@ -536,7 +536,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-6">
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>My Applications</CardTitle>
                 <CardDescription>
@@ -599,7 +599,7 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="schedule" className="space-y-6">
-            <Card className=" border-pink-800">
+            <Card className=" border-pink-200">
               <CardHeader>
                 <CardTitle>My Schedule</CardTitle>
                 <CardDescription>

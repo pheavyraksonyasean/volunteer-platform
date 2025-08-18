@@ -218,7 +218,7 @@ export default function HomePage() {
             <div className="relative animate-fade-in-up animate-delay-200">
               <div className="bg-pink-50 rounded-2xl p-8 shadow-lg">
                 <img
-                  src="https://sdmntprnorthcentralus.oaiusercontent.com/files/00000000-63c4-622f-9f43-beced68d203b/raw?se=2025-08-17T14%3A24%3A03Z&sp=r&sv=2024-08-04&sr=b&scid=1e05d247-277d-531e-bdef-1ab3823f6082&skoid=60f2aa1f-3685-43ee-be37-d8c8d08d5a64&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2025-08-17T00%3A06%3A28Z&ske=2025-08-18T00%3A06%3A28Z&sks=b&skv=2024-08-04&sig=pPOQgWPB85HNFW6TYV9BY6j8NGTlTGmk4qZ5nioHiUw%3D"
+                  src="/about.png"
                   alt="Volunteers working together"
                   className="w-full h-64 object-cover rounded-xl shadow-md"
                 />
