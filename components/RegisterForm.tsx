@@ -259,71 +259,7 @@ export default function RegisterForm() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="organizationType">Organization Type</Label>
-                  <Select
-                    value={formData.organizationType}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        organizationType: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="nonprofit">Non-profit</SelectItem>
-                      <SelectItem value="charity">Charity</SelectItem>
-                      <SelectItem value="community">Community Group</SelectItem>
-                      <SelectItem value="religious">
-                        Religious Organization
-                      </SelectItem>
-                      <SelectItem value="educational">
-                        Educational Institution
-                      </SelectItem>
-                      <SelectItem value="healthcare">Healthcare</SelectItem>
-                      <SelectItem value="environmental">
-                        Environmental
-                      </SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label htmlFor="website">Website (Optional)</Label>
-                  <Input
-                    id="website"
-                    type="url"
-                    placeholder="https://example.com"
-                    value={formData.website}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        website: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-              </div>
-
-              <div>
-                <Label htmlFor="description">Organization Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Tell us about your organization and mission..."
-                  value={formData.description}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      description: e.target.value,
-                    }))
-                  }
-                  rows={4}
-                />
-              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
             </>
           )}
 
@@ -351,34 +287,6 @@ export default function RegisterForm() {
                     </div>
                   ))}
                 </div>
-              </div>
-
-              <div>
-                <Label htmlFor="availability">Availability</Label>
-                <Select
-                  value={formData.availability}
-                  onValueChange={(value) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      availability: value,
-                    }))
-                  }
-                >
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your availability" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="weekdays">Weekdays</SelectItem>
-                    <SelectItem value="weekends">Weekends</SelectItem>
-                    <SelectItem value="evenings">Evenings</SelectItem>
-                    <SelectItem value="flexible">Flexible</SelectItem>
-                    <SelectItem value="once-week">Once a week</SelectItem>
-                    <SelectItem value="multiple-week">
-                      Multiple times a week
-                    </SelectItem>
-                    <SelectItem value="monthly">Monthly</SelectItem>
-                  </SelectContent>
-                </Select>
               </div>
             </>
           )}
