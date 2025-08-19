@@ -191,25 +191,25 @@ export default function VolunteerDashboard() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <header className="bg-pink-800 shadow-sm border-b">
-        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-3 md:py-4">
             <div className="flex items-center">
               <Link href="/" className="flex items-center">
                 <img
                   src="/logo.png"
                   alt="sabay volunteer"
-                  className="h-10 w-10"
+                  className="h-8 w-8 md:h-10 md:w-10"
                 />
-                <span className="text-2xl font-bold text-white font-serif">
+                <span className="text-lg md:text-2xl font-bold text-white font-serif ml-2">
                   Sabay Volunteer
                 </span>
               </Link>
             </div>
 
-            <div className="flex items-center space-x-4">
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="h-8 w-8 text-white" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
+            <div className="flex items-center space-x-2 md:space-x-4">
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <Bell className="h-6 w-6 md:h-8 md:w-8 text-white" />
+                <span className="absolute -top-1 -right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
               <ProfileMenu
                 profileImage={profileImage}
@@ -222,82 +222,91 @@ export default function VolunteerDashboard() {
         </div>
       </header>
 
-      <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="bg-white max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         {/* Welcome Section */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
             Welcome back !!
           </h1>
-          <p className="text-gray-600">
+          <p className="text-sm md:text-base text-gray-600">
             Ready to make a difference today? You're doing amazing work!
           </p>
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <Card className="bg-pink-50 border-pink-800 white text-black">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-black">Total Hours</p>
-                  <p className="text-3xl font-bold text-black">{totalHours}</p>
+                  <p className="text-xs md:text-sm text-black">Total Hours</p>
+                  <p className="text-xl md:text-3xl font-bold text-black">
+                    {totalHours}
+                  </p>
                 </div>
-                <Clock className="h-8 w-8 text-black" />
+                <Clock className="h-6 w-6 md:h-8 md:w-8 text-black" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800 white text-black">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     This Month
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
                     {currentMonthHours}h
                   </p>
-                  <div className="mt-2">
-                    <Progress value={progressPercentage} className="h-2" />
+                  <div className="mt-1 md:mt-2">
+                    <Progress
+                      value={progressPercentage}
+                      className="h-1 md:h-2"
+                    />
                     <p className="text-xs text-gray-500 mt-1">
                       {currentMonthHours}/{monthlyGoal} hours goal
                     </p>
                   </div>
                 </div>
-                <Target className="h-6 w-6 text-green-600" />
+                <Target className="h-5 w-5 md:h-6 md:w-6 text-green-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800 white text-black">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     Events Completed
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">12</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    12
+                  </p>
                   <p className="text-xs text-green-600 mt-1">+3 this month</p>
                 </div>
-                <Users className="h-6 w-6 text-blue-600" />
+                <Users className="h-5 w-5 md:h-6 md:w-6 text-blue-600" />
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800 white text-black">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-gray-600">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     Impact Score
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">95</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    95
+                  </p>
                   <div className="flex items-center mt-1">
                     <Star className="h-3 w-3 text-yellow-500 fill-current" />
                     <p className="text-xs text-gray-500 ml-1">Excellent</p>
                   </div>
                 </div>
-                <Award className="h-6 w-6 text-yellow-600" />
+                <Award className="h-5 w-5 md:h-6 md:w-6 text-yellow-600" />
               </div>
             </CardContent>
           </Card>
@@ -307,29 +316,53 @@ export default function VolunteerDashboard() {
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-6"
+          className="space-y-4 md:space-y-6"
         >
-          <TabsList className=" bg-pink-50 grid w-full grid-cols-4 ">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="opportunities">Find Opportunities</TabsTrigger>
-            <TabsTrigger value="applications">My Applications</TabsTrigger>
-            <TabsTrigger value="schedule">My Schedule</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="bg-pink-50 grid w-full grid-cols-4 min-w-max md:min-w-0">
+              <TabsTrigger
+                value="overview"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="opportunities"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                Find Opportunities
+              </TabsTrigger>
+              <TabsTrigger
+                value="applications"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                My Applications
+              </TabsTrigger>
+              <TabsTrigger
+                value="schedule"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                My Schedule
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <TabsContent value="overview" className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
               {/* Main Content */}
-              <div className="lg:col-span-2 space-y-6">
+              <div className="lg:col-span-2 space-y-4 md:space-y-6">
                 {/* Recent Activity */}
-                <Card className="border-pink-200 ">
-                  <CardHeader>
-                    <CardTitle>Recent Activity</CardTitle>
-                    <CardDescription>
+                <Card className="border-pink-200">
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="text-lg md:text-xl">
+                      Recent Activity
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
                       Your latest volunteer activities and updates
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       <div className="flex items-start space-x-3">
                         <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                         <div className="flex-1">
@@ -372,15 +405,17 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Recommended Opportunities */}
-                <Card className=" border-pink-200">
-                  <CardHeader>
-                    <CardTitle>Recommended for You</CardTitle>
-                    <CardDescription>
+                <Card className="border-pink-200">
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="text-lg md:text-xl">
+                      Recommended for You
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
                       Opportunities that match your skills and interests
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="grid gap-4">
+                    <div className="grid gap-3 md:gap-4">
                       {mockOpportunities.slice(0, 3).map((opportunity) => (
                         <OpportunityCard
                           key={opportunity.id}
@@ -392,7 +427,7 @@ export default function VolunteerDashboard() {
                     <div className="mt-4">
                       <Button
                         variant="outline"
-                        className=" w-full bg-pink-900 text-white hover:bg-pink-800 "
+                        className="w-full bg-pink-900 text-white hover:bg-pink-800 text-sm md:text-base"
                         onClick={() => setActiveTab("opportunities")}
                       >
                         View All Opportunities
@@ -403,23 +438,25 @@ export default function VolunteerDashboard() {
               </div>
 
               {/* Sidebar */}
-              <div className="space-y-6">
+              <div className="space-y-4 md:space-y-6">
                 {/* Upcoming Events */}
-                <Card className=" border-pink-200">
-                  <CardHeader>
-                    <CardTitle>Upcoming Events</CardTitle>
-                    <CardDescription>
+                <Card className="border-pink-200">
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="text-lg md:text-xl">
+                      Upcoming Events
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
                       Your confirmed volunteer activities
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <div className="space-y-4">
+                    <div className="space-y-3 md:space-y-4">
                       {mockUpcomingEvents.map((event) => (
                         <div
                           key={event.id}
                           className="border-l-4 border-pink-600 pl-4"
                         >
-                          <h4 className="font-medium text-gray-900">
+                          <h4 className="font-medium text-gray-900 text-sm md:text-base">
                             {event.title}
                           </h4>
                           <p className="text-sm text-gray-600">
@@ -428,7 +465,7 @@ export default function VolunteerDashboard() {
                           <p className="text-xs text-gray-500">
                             {event.date} • {event.time}
                           </p>
-                          <Badge variant="secondary" className="mt-1">
+                          <Badge variant="secondary" className="mt-1 text-xs">
                             {event.status}
                           </Badge>
                         </div>
@@ -436,7 +473,7 @@ export default function VolunteerDashboard() {
                     </div>
                     <Button
                       variant="outline"
-                      className="w-full mt-4 bg-transparent bg-pink-800 text-white"
+                      className="w-full mt-4 bg-transparent bg-pink-800 text-white text-sm md:text-base"
                       onClick={() => setActiveTab("schedule")}
                     >
                       View Full Calendar
@@ -445,10 +482,12 @@ export default function VolunteerDashboard() {
                 </Card>
 
                 {/* Application Status */}
-                <Card className=" border-pink-200">
-                  <CardHeader>
-                    <CardTitle>Application Status</CardTitle>
-                    <CardDescription>
+                <Card className="border-pink-200">
+                  <CardHeader className="pb-3 md:pb-6">
+                    <CardTitle className="text-lg md:text-xl">
+                      Application Status
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
                       Track your recent applications
                     </CardDescription>
                   </CardHeader>
@@ -459,7 +498,7 @@ export default function VolunteerDashboard() {
                           key={application.id}
                           className="flex items-center justify-between"
                         >
-                          <div className="flex-1">
+                          <div className="flex-1 min-w-0">
                             <p className="text-sm font-medium truncate">
                               {application.title}
                             </p>
@@ -475,7 +514,7 @@ export default function VolunteerDashboard() {
                                 ? "secondary"
                                 : "destructive"
                             }
-                            className="ml-2"
+                            className="ml-2 text-xs"
                           >
                             {application.status}
                           </Badge>
@@ -484,25 +523,25 @@ export default function VolunteerDashboard() {
                     </div>
                     <Button
                       variant="outline"
-                      className="w-full mt-4 bg-transparent bg-pink-800 text-white"
+                      className="w-full mt-4 bg-transparent bg-pink-800 text-white text-sm md:text-base"
                       onClick={() => setActiveTab("applications")}
                     >
                       View All Applications
                     </Button>
                   </CardContent>
                 </Card>
-
-                {/* Quick Actions */}
               </div>
             </div>
           </TabsContent>
 
-          <TabsContent value="opportunities" className="space-y-6">
+          <TabsContent value="opportunities" className="space-y-4 md:space-y-6">
             {/* Search and Filters */}
-            <Card className=" border-pink-200">
-              <CardHeader>
-                <CardTitle>Find Opportunities</CardTitle>
-                <CardDescription>
+            <Card className="border-pink-200">
+              <CardHeader className="pb-3 md:pb-6">
+                <CardTitle className="text-lg md:text-xl">
+                  Find Opportunities
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
                   Discover volunteer opportunities that match your interests
                 </CardDescription>
               </CardHeader>
@@ -510,12 +549,12 @@ export default function VolunteerDashboard() {
                 <div className="border-pink-300 flex flex-col md:flex-row gap-4">
                   <div className="flex-1">
                     <div className="relative">
-                      <Search className=" border-pink-300 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                      <Search className="border-pink-300 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
                       <Input
                         placeholder="Search opportunities..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 text-sm md:text-base"
                       />
                     </div>
                   </div>
@@ -524,7 +563,7 @@ export default function VolunteerDashboard() {
             </Card>
 
             {/* Opportunities List */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               {filteredOpportunities.map((opportunity) => (
                 <OpportunityCard
                   key={opportunity.id}
@@ -535,34 +574,39 @@ export default function VolunteerDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="applications" className="space-y-6">
-            <Card className=" border-pink-200">
-              <CardHeader>
-                <CardTitle>My Applications</CardTitle>
-                <CardDescription>
+          <TabsContent value="applications" className="space-y-4 md:space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader className="pb-3 md:pb-6">
+                <CardTitle className="text-lg md:text-xl">
+                  My Applications
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
                   Track all your volunteer applications
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 {applications.length === 0 ? (
-                  <div className="text-center py-8">
-                    <p className="text-gray-500 mb-4">No applications yet</p>
+                  <div className="text-center py-6 md:py-8">
+                    <p className="text-gray-500 mb-4 text-sm md:text-base">
+                      No applications yet
+                    </p>
                     <Button
                       variant="outline"
                       onClick={() => setActiveTab("opportunities")}
+                      className="text-sm md:text-base"
                     >
                       Browse Opportunities
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-4">
+                  <div className="space-y-3 md:space-y-4">
                     {applications.map((application) => (
                       <Card key={application.id}>
-                        <CardContent className="p-4">
+                        <CardContent className="p-3 md:p-4">
                           <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-4">
-                              <div>
-                                <h4 className="font-semibold text-gray-900">
+                            <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-semibold text-gray-900 text-sm md:text-base">
                                   {application.title}
                                 </h4>
                                 <p className="text-sm text-pink-800">
@@ -585,6 +629,7 @@ export default function VolunteerDashboard() {
                                   ? "secondary"
                                   : "destructive"
                               }
+                              className="ml-2 text-xs"
                             >
                               {application.status}
                             </Badge>
@@ -598,26 +643,30 @@ export default function VolunteerDashboard() {
             </Card>
           </TabsContent>
 
-          <TabsContent value="schedule" className="space-y-6">
-            <Card className=" border-pink-200">
-              <CardHeader>
-                <CardTitle>My Schedule</CardTitle>
-                <CardDescription>
+          <TabsContent value="schedule" className="space-y-4 md:space-y-6">
+            <Card className="border-pink-200">
+              <CardHeader className="pb-3 md:pb-6">
+                <CardTitle className="text-lg md:text-xl">
+                  My Schedule
+                </CardTitle>
+                <CardDescription className="text-sm md:text-base">
                   Your upcoming volunteer commitments
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
+                <div className="space-y-3 md:space-y-4">
                   {mockUpcomingEvents.map((event) => (
                     <Card key={event.id}>
-                      <CardContent className="p-4">
+                      <CardContent className="p-3 md:p-4">
                         <div className="flex items-center justify-between">
-                          <div className="flex items-center space-x-4">
-                            <div className="w-12 h-12 bg-pink-100 rounded-lg flex items-center justify-center">
-                              <Calendar className="h-6 w-6 text-pink-900" />
+                          <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
+                            <div className="w-10 h-10 md:w-12 md:h-12 bg-pink-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                              <Calendar className="h-5 w-5 md:h-6 md:w-6 text-pink-900" />
                             </div>
-                            <div>
-                              <h4 className="font-semibold">{event.title}</h4>
+                            <div className="flex-1 min-w-0">
+                              <h4 className="font-semibold text-sm md:text-base">
+                                {event.title}
+                              </h4>
                               <p className="text-sm text-gray-600">
                                 {event.organization}
                               </p>
@@ -629,7 +678,9 @@ export default function VolunteerDashboard() {
                               </p>
                             </div>
                           </div>
-                          <Badge variant="secondary">{event.status}</Badge>
+                          <Badge variant="secondary" className="text-xs">
+                            {event.status}
+                          </Badge>
                         </div>
                       </CardContent>
                     </Card>

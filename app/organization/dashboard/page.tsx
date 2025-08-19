@@ -215,29 +215,29 @@ export default function OrganizationDashboard() {
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-pink-800 shadow-sm border-b">
-        <div className=" mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-3 md:py-4">
             <Link href="/" className="flex items-center">
               <img
                 src="/logo.png"
                 alt="sabay volunteer"
-                className="h-10 w-10"
+                className="h-8 w-8 md:h-10 md:w-10"
               />
-              <span className="text-2xl font-bold text-white font-serif">
+              <span className="text-lg md:text-2xl font-bold text-white font-serif ml-2">
                 Sabay Volunteer
               </span>
             </Link>
 
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 md:space-x-4">
               <CreateOpportunityModal
                 isOpen={showCreateModal}
                 onClose={handleCloseModal}
                 onSubmit={handleCreateOpportunity}
                 editingOpportunity={editingOpportunity}
               />
-              <Button variant="ghost" size="sm" className="relative">
-                <Bell className="text-white h-4 w-4" />
-                <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-xs"></span>
+              <Button variant="ghost" size="sm" className="relative p-2">
+                <Bell className="text-white h-3 w-3 md:h-4 md:w-4" />
+                <span className="absolute -top-1 -right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full text-xs"></span>
               </Button>
               <ProfileMenu
                 profileImage={profileImage}
@@ -250,74 +250,84 @@ export default function OrganizationDashboard() {
         </div>
       </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome !</h1>
-          <p className="text-gray-600">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
+        <div className="mb-6 md:mb-8">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+            Welcome !
+          </h1>
+          <p className="text-sm md:text-base text-gray-600">
             Manage your volunteer opportunities and applications
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
           <Card className="bg-pink-50 border-pink-800">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-indigo-100 rounded-lg">
-                  <Users className="h-6 w-6 text-indigo-600" />
+                <div className="p-1 md:p-2 bg-indigo-100 rounded-lg">
+                  <Users className="h-4 w-4 md:h-6 md:w-6 text-indigo-600" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
+                <div className="ml-2 md:ml-4">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     Active Volunteers
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">40</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    40
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-green-100 rounded-lg">
-                  <Calendar className="h-6 w-6 text-green-600" />
+                <div className="p-1 md:p-2 bg-green-100 rounded-lg">
+                  <Calendar className="h-4 w-4 md:h-6 md:w-6 text-green-600" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
+                <div className="ml-2 md:ml-4">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     Active Opportunities
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">3</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    3
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-yellow-100 rounded-lg">
-                  <Clock className="h-6 w-6 text-yellow-600" />
+                <div className="p-1 md:p-2 bg-yellow-100 rounded-lg">
+                  <Clock className="h-4 w-4 md:h-6 md:w-6 text-yellow-600" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
+                <div className="ml-2 md:ml-4">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     Pending Applications
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">12</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    12
+                  </p>
                 </div>
               </div>
             </CardContent>
           </Card>
 
           <Card className="bg-pink-50 border-pink-800">
-            <CardContent className="p-6">
+            <CardContent className="p-3 md:p-6">
               <div className="flex items-center">
-                <div className="p-2 bg-purple-100 rounded-lg">
-                  <TrendingUp className="h-6 w-6 text-purple-600" />
+                <div className="p-1 md:p-2 bg-purple-100 rounded-lg">
+                  <TrendingUp className="h-4 w-4 md:h-6 md:w-6 text-purple-600" />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-600">
+                <div className="ml-2 md:ml-4">
+                  <p className="text-xs md:text-sm font-medium text-gray-600">
                     This Month's Hours
                   </p>
-                  <p className="text-2xl font-bold text-gray-900">320</p>
+                  <p className="text-lg md:text-2xl font-bold text-gray-900">
+                    320
+                  </p>
                 </div>
               </div>
             </CardContent>
@@ -327,25 +337,44 @@ export default function OrganizationDashboard() {
         <Tabs
           value={activeTab}
           onValueChange={setActiveTab}
-          className="space-y-6"
+          className="space-y-4 md:space-y-6"
         >
-          <TabsList className="bg-pink-50 grid w-full grid-cols-3">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="opportunities">Opportunities</TabsTrigger>
-            <TabsTrigger value="applications">Applications</TabsTrigger>
-          </TabsList>
+          <div className="overflow-x-auto">
+            <TabsList className="bg-pink-50 grid w-full grid-cols-3 min-w-max md:min-w-0">
+              <TabsTrigger
+                value="overview"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                Overview
+              </TabsTrigger>
+              <TabsTrigger
+                value="opportunities"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                Opportunities
+              </TabsTrigger>
+              <TabsTrigger
+                value="applications"
+                className="text-xs md:text-sm px-2 md:px-4"
+              >
+                Applications
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
-          <TabsContent value="overview" className="space-y-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <TabsContent value="overview" className="space-y-4 md:space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
               <Card>
-                <CardHeader>
-                  <CardTitle>Recent Activity</CardTitle>
-                  <CardDescription>
+                <CardHeader className="pb-3 md:pb-6">
+                  <CardTitle className="text-lg md:text-xl">
+                    Recent Activity
+                  </CardTitle>
+                  <CardDescription className="text-sm md:text-base">
                     Latest updates on your opportunities
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3 md:space-y-4">
                     <div className="flex items-center space-x-3">
                       <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                       <div>
@@ -384,21 +413,25 @@ export default function OrganizationDashboard() {
               </Card>
 
               <Card>
-                <CardHeader>
-                  <CardTitle>Upcoming Events</CardTitle>
-                  <CardDescription>
+                <CardHeader className="pb-3 md:pb-6">
+                  <CardTitle className="text-lg md:text-xl">
+                    Upcoming Events
+                  </CardTitle>
+                  <CardDescription className="text-sm md:text-base">
                     Your scheduled volunteer opportunities
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
+                  <div className="space-y-3 md:space-y-4">
                     {opportunities.slice(0, 3).map((opportunity) => (
                       <div
                         key={opportunity.id}
                         className="flex items-center justify-between p-3 border rounded-lg"
                       >
-                        <div>
-                          <h4 className="font-medium">{opportunity.title}</h4>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm md:text-base">
+                            {opportunity.title}
+                          </h4>
                           <p className="text-sm text-gray-600">
                             {opportunity.date} • {opportunity.time}
                           </p>
@@ -413,6 +446,7 @@ export default function OrganizationDashboard() {
                               ? "default"
                               : "secondary"
                           }
+                          className="text-xs"
                         >
                           {opportunity.status}
                         </Badge>
@@ -424,30 +458,32 @@ export default function OrganizationDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="opportunities" className="space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Your Opportunities</h2>
+          <TabsContent value="opportunities" className="space-y-4 md:space-y-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <h2 className="text-xl md:text-2xl font-bold">
+                Your Opportunities
+              </h2>
               <Button
                 onClick={() => setShowCreateModal(true)}
-                className="bg-pink-800 hover:bg-pink-700"
+                className="bg-pink-800 hover:bg-pink-700 w-full sm:w-auto text-sm md:text-base"
               >
-                <Plus className="h-4 w-4 mr-2" />
+                <Plus className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                 Create Opportunity
               </Button>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid gap-4 md:gap-6">
               {opportunities
                 .filter((opp) => opp.isPublic)
                 .map((opportunity) => (
                   <Card key={opportunity.id}>
-                    <CardContent className="p-6">
-                      <div className="flex justify-between items-start mb-4">
-                        <div>
-                          <h3 className="text-xl font-semibold mb-2">
+                    <CardContent className="p-4 md:p-6">
+                      <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                        <div className="flex-1">
+                          <h3 className="text-lg md:text-xl font-semibold mb-2">
                             {opportunity.title}
                           </h3>
-                          <div className="flex items-center space-x-4 text-sm text-gray-600">
+                          <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 text-sm text-gray-600 gap-1 sm:gap-0">
                             <span>{opportunity.date}</span>
                             <span>{opportunity.time}</span>
                           </div>
@@ -458,43 +494,47 @@ export default function OrganizationDashboard() {
                               ? "default"
                               : "secondary"
                           }
+                          className="text-xs"
                         >
                           {opportunity.status}
                         </Badge>
                       </div>
 
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-2xl font-bold text-indigo-600">
+                      <div className="grid grid-cols-3 gap-2 md:gap-4 mb-4">
+                        <div className="text-center p-2 md:p-3 bg-gray-50 rounded-lg">
+                          <p className="text-lg md:text-2xl font-bold text-indigo-600">
                             {opportunity.volunteers}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600">
                             Confirmed Volunteers
                           </p>
                         </div>
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-2xl font-bold text-green-600">
+                        <div className="text-center p-2 md:p-3 bg-gray-50 rounded-lg">
+                          <p className="text-lg md:text-2xl font-bold text-green-600">
                             {opportunity.maxVolunteers}
                           </p>
-                          <p className="text-sm text-gray-600">
+                          <p className="text-xs md:text-sm text-gray-600">
                             Max Volunteers
                           </p>
                         </div>
-                        <div className="text-center p-3 bg-gray-50 rounded-lg">
-                          <p className="text-2xl font-bold text-yellow-600">
+                        <div className="text-center p-2 md:p-3 bg-gray-50 rounded-lg">
+                          <p className="text-lg md:text-2xl font-bold text-yellow-600">
                             {opportunity.applications}
                           </p>
-                          <p className="text-sm text-gray-600">Applications</p>
+                          <p className="text-xs md:text-sm text-gray-600">
+                            Applications
+                          </p>
                         </div>
                       </div>
 
-                      <div className="flex space-x-2">
+                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => handleEditOpportunity(opportunity)}
+                          className="text-xs md:text-sm"
                         >
-                          <Edit className="h-4 w-4 mr-2" />
+                          <Edit className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                           Edit
                         </Button>
                         <Button
@@ -503,8 +543,9 @@ export default function OrganizationDashboard() {
                           onClick={() =>
                             handleDeleteOpportunity(opportunity.id)
                           }
+                          className="text-xs md:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                           Delete
                         </Button>
                       </div>
@@ -514,15 +555,15 @@ export default function OrganizationDashboard() {
 
               {opportunities.filter((opp) => opp.isPublic).length === 0 && (
                 <Card>
-                  <CardContent className="p-8 text-center">
-                    <p className="text-gray-500 mb-4">
+                  <CardContent className="p-6 md:p-8 text-center">
+                    <p className="text-gray-500 mb-4 text-sm md:text-base">
                       No public opportunities yet.
                     </p>
                     <Button
                       onClick={() => setShowCreateModal(true)}
-                      className="bg-pink-800 hover:bg-pink-700"
+                      className="bg-pink-800 hover:bg-pink-700 text-sm md:text-base"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                       Create Your First Opportunity
                     </Button>
                   </CardContent>
@@ -531,31 +572,32 @@ export default function OrganizationDashboard() {
             </div>
           </TabsContent>
 
-          <TabsContent value="applications" className="space-y-6">
+          <TabsContent value="applications" className="space-y-4 md:space-y-6">
             <div className="flex justify-between items-center">
-              <h2 className="text-2xl font-bold">Volunteer Applications</h2>
-              <div className="flex space-x-2"></div>
+              <h2 className="text-xl md:text-2xl font-bold">
+                Volunteer Applications
+              </h2>
             </div>
 
-            <div className="grid gap-6">
+            <div className="grid gap-4 md:gap-6">
               {mockApplications.map((application) => (
                 <Card key={application.id}>
-                  <CardContent className="p-6">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex items-center space-x-4">
-                        <Avatar>
+                  <CardContent className="p-4 md:p-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
+                      <div className="flex items-center space-x-3 md:space-x-4 flex-1">
+                        <Avatar className="h-8 w-8 md:h-10 md:w-10">
                           <AvatarImage
                             src={`/placeholder.svg?height=40&width=40&query=${application.volunteerName}`}
                           />
-                          <AvatarFallback>
+                          <AvatarFallback className="text-xs md:text-sm">
                             {application.volunteerName
                               .split(" ")
                               .map((n) => n[0])
                               .join("")}
                           </AvatarFallback>
                         </Avatar>
-                        <div>
-                          <h3 className="font-semibold">
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-sm md:text-base">
                             {application.volunteerName}
                           </h3>
                           <p className="text-sm text-gray-600">
@@ -572,16 +614,23 @@ export default function OrganizationDashboard() {
                             ? "default"
                             : "secondary"
                         }
+                        className="text-xs"
                       >
                         {application.status}
                       </Badge>
                     </div>
 
                     <div className="mb-4">
-                      <h4 className="font-medium mb-2">Skills</h4>
+                      <h4 className="font-medium mb-2 text-sm md:text-base">
+                        Skills
+                      </h4>
                       <div className="flex flex-wrap gap-2">
                         {application.skills.map((skill) => (
-                          <Badge key={skill} variant="outline">
+                          <Badge
+                            key={skill}
+                            variant="outline"
+                            className="text-xs"
+                          >
                             {skill}
                           </Badge>
                         ))}
@@ -589,21 +638,24 @@ export default function OrganizationDashboard() {
                     </div>
 
                     <div className="mb-4">
-                      <h4 className="font-medium mb-2">Experience</h4>
+                      <h4 className="font-medium mb-2 text-sm md:text-base">
+                        Experience
+                      </h4>
                       <p className="text-sm text-gray-700">
                         {application.experience}
                       </p>
                     </div>
 
                     {application.status === "pending" && (
-                      <div className="flex space-x-2">
+                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
                         <Button
                           size="sm"
                           onClick={() =>
                             handleApplicationAction(application.id, "approve")
                           }
+                          className="text-xs md:text-sm"
                         >
-                          <CheckCircle className="h-4 w-4 mr-2" />
+                          <CheckCircle className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                           Approve
                         </Button>
                         <Button
@@ -612,8 +664,9 @@ export default function OrganizationDashboard() {
                           onClick={() =>
                             handleApplicationAction(application.id, "reject")
                           }
+                          className="text-xs md:text-sm"
                         >
-                          <XCircle className="h-4 w-4 mr-2" />
+                          <XCircle className="h-3 w-3 md:h-4 md:w-4 mr-2" />
                           Reject
                         </Button>
                       </div>
@@ -621,15 +674,19 @@ export default function OrganizationDashboard() {
 
                     {application.status === "approved" && (
                       <div className="flex items-center space-x-2 text-green-600">
-                        <CheckCircle className="h-4 w-4" />
-                        <span className="text-sm font-medium">Approved</span>
+                        <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
+                        <span className="text-xs md:text-sm font-medium">
+                          Approved
+                        </span>
                       </div>
                     )}
 
                     {application.status === "rejected" && (
                       <div className="flex items-center space-x-2 text-red-600">
-                        <XCircle className="h-4 w-4" />
-                        <span className="text-sm font-medium">Rejected</span>
+                        <XCircle className="h-3 w-3 md:h-4 md:w-4" />
+                        <span className="text-xs md:text-sm font-medium">
+                          Rejected
+                        </span>
                       </div>
                     )}
                   </CardContent>
