@@ -217,27 +217,29 @@ export default function OrganizationDashboard() {
       <header className="bg-pink-800 shadow-sm border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 md:py-4">
-            <Link href="/" className="flex items-center">
-              <img
-                src="/logo.png"
-                alt="sabay volunteer"
-                className="h-8 w-8 md:h-10 md:w-10"
-              />
-              <span className="text-lg md:text-2xl font-bold text-white font-serif ml-2">
-                Sabay Volunteer
-              </span>
-            </Link>
+            <div className="flex items-center min-w-0 flex-1">
+              <Link href="/" className="flex items-center min-w-0">
+                <img
+                  src="/logo.png"
+                  alt="sabay volunteer"
+                  className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0"
+                />
+                <span className="text-sm sm:text-lg md:text-2xl font-bold text-white font-serif ml-1 sm:ml-2 truncate">
+                  Sabay Volunteer
+                </span>
+              </Link>
+            </div>
 
-            <div className="flex items-center space-x-2 md:space-x-4">
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 flex-shrink-0">
               <CreateOpportunityModal
                 isOpen={showCreateModal}
                 onClose={handleCloseModal}
                 onSubmit={handleCreateOpportunity}
                 editingOpportunity={editingOpportunity}
               />
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <Bell className="text-white h-3 w-3 md:h-4 md:w-4" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full text-xs"></span>
+              <Button variant="ghost" size="sm" className="relative p-1 sm:p-2">
+                <Bell className="text-white h-3 w-3 sm:h-4 sm:w-4 md:h-5 md:w-5" />
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full"></span>
               </Button>
               <ProfileMenu
                 profileImage={profileImage}
@@ -587,7 +589,7 @@ export default function OrganizationDashboard() {
                       <div className="flex items-center space-x-3 md:space-x-4 flex-1">
                         <Avatar className="h-8 w-8 md:h-10 md:w-10">
                           <AvatarImage
-                            src={`/placeholder.svg?height=40&width=40&query=${application.volunteerName}`}
+                            src={`/abstract-geometric-shapes.png?height=40&width=40&query=${application.volunteerName}`}
                           />
                           <AvatarFallback className="text-xs md:text-sm">
                             {application.volunteerName

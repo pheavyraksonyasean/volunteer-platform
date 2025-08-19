@@ -193,23 +193,23 @@ export default function VolunteerDashboard() {
       <header className="bg-pink-800 shadow-sm border-b">
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 md:py-4">
-            <div className="flex items-center">
-              <Link href="/" className="flex items-center">
+            <div className="flex items-center min-w-0 flex-1">
+              <Link href="/" className="flex items-center min-w-0">
                 <img
                   src="/logo.png"
                   alt="sabay volunteer"
-                  className="h-8 w-8 md:h-10 md:w-10"
+                  className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0"
                 />
-                <span className="text-lg md:text-2xl font-bold text-white font-serif ml-2">
+                <span className="text-sm sm:text-lg md:text-2xl font-bold text-white font-serif ml-1 sm:ml-2 truncate">
                   Sabay Volunteer
                 </span>
               </Link>
             </div>
 
-            <div className="flex items-center space-x-2 md:space-x-4">
-              <Button variant="ghost" size="sm" className="relative p-2">
-                <Bell className="h-6 w-6 md:h-8 md:w-8 text-white" />
-                <span className="absolute -top-1 -right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full text-xs"></span>
+            <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 flex-shrink-0">
+              <Button variant="ghost" size="sm" className="relative p-1 sm:p-2">
+                <Bell className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-white" />
+                <span className="absolute -top-0.5 -right-0.5 sm:-top-1 sm:-right-1 h-2 w-2 md:h-3 md:w-3 bg-red-500 rounded-full"></span>
               </Button>
               <ProfileMenu
                 profileImage={profileImage}
