@@ -12,29 +12,32 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Resend the confirmation email
-    const { error } = await supabase.auth.resend({
+    // Resend the OTP
+    const { data, error } = await supabase.auth.resend({
       type: "signup",
-      email,
-      options: {
-        emailRedirectTo:
-          process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL ||
-          `${request.nextUrl.origin}/dashboard`,
-      },
+      email: email.toLowerCase().trim(),
     });
 
     if (error) {
       console.error("Resend verification error:", error);
-      return NextResponse.json(
-        {
-          error: error.message || "Failed to resend verification code",
-        },
-        { status: 400 }
-      );
+
+      // Handle specific error cases
+      let errorMessage = "Failed to resend verification code";
+      if (error.message.includes("already confirmed")) {
+        errorMessage = "This email is already verified. Please try signing in.";
+      } else if (error.message.includes("rate limit")) {
+        errorMessage =
+          "Too many requests. Please wait before requesting another code.";
+      } else if (error.message.includes("not found")) {
+        errorMessage = "No account found with this email address.";
+      }
+
+      return NextResponse.json({ error: errorMessage }, { status: 400 });
     }
 
     return NextResponse.json({
       message: "Verification code sent successfully",
+      messageId: data?.messageId, // Optional: include if available
     });
   } catch (error) {
     console.error("Resend verification error:", error);
