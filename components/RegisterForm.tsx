@@ -129,14 +129,33 @@ export default function RegisterForm() {
         throw new Error(data.error || "Registration failed");
       }
 
-      toast({
-        title: "Success!",
-        description:
-          "Account created! Please check your email for a verification code.",
-      });
+      const { user, needsEmailConfirmation } = data;
 
-      console.log("[v0] Redirecting to verification page");
-      router.push(`/verify-email?email=${encodeURIComponent(formData.email)}`);
+      if (needsEmailConfirmation) {
+        toast({
+          title: "Success!",
+          description:
+            "Account created! Please check your email for a verification code.",
+        });
+        console.log("[v0] Redirecting to verification page");
+        router.push(
+          `/verify-email?email=${encodeURIComponent(formData.email)}`
+        );
+      } else {
+        toast({
+          title: "Success!",
+          description: "Account created and you are now logged in.",
+        });
+        if (user.role === "volunteer") {
+          console.log("[v0] Redirecting to volunteer dashboard");
+          router.push("/volunteer/dashboard");
+        } else if (user.role === "organizer") {
+          console.log("[v0] Redirecting to organization dashboard");
+          router.push("/organization/dashboard");
+        } else {
+          router.push("/");
+        }
+      }
     } catch (error) {
       console.error("[v0] Registration error:", error);
       toast({

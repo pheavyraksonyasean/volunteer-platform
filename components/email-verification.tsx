@@ -58,7 +58,7 @@ export default function EmailVerification() {
     setIsLoading(true);
 
     try {
-      const response = await fetch("/api/auth/verify-email", {
+      const response = await fetch("/api/auth/email-verify", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,13 +75,25 @@ export default function EmailVerification() {
         throw new Error(data.error || "Verification failed");
       }
 
-      toast({
-        title: "Success!",
-        description: "Email verified successfully! You can now sign in.",
-      });
-
-      // Redirect to login page
-      router.push("/login?verified=true");
+      if (data.loggedIn) {
+        toast({
+          title: "Success!",
+          description: "Email verified and you are now logged in.",
+        });
+        if (data.user.role === "volunteer") {
+          router.push("/volunteer/dashboard");
+        } else if (data.user.role === "organizer") {
+          router.push("/organization/dashboard");
+        } else {
+          router.push("/"); // Fallback
+        }
+      } else {
+        toast({
+          title: "Success!",
+          description: "Email verified successfully! You can now sign in.",
+        });
+        router.push("/login");
+      }
     } catch (error) {
       console.error("Verification error:", error);
       toast({

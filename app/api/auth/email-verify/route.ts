@@ -15,7 +15,6 @@ export async function POST(request: NextRequest) {
 
     const supabase = await createClient();
 
-    // Verify the OTP token
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token,
@@ -32,19 +31,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (!data.user) {
+    if (!data.user || !data.session) {
+      // User is verified but not logged in.
+      return NextResponse.json({
+        message: "Email verified successfully. Please log in.",
+        loggedIn: false,
+      });
+    }
+
+    // User is logged in, get their role.
+    const { data: userData, error: userError } = await supabase
+      .from("users")
+      .select("role")
+      .eq("id", data.user.id)
+      .single();
+
+    if (userError) {
+      // This is a problem, user is authenticated but we can't get their role.
+      // Forcing a logout might be safest.
+      await supabase.auth.signOut();
       return NextResponse.json(
-        { error: "Verification failed" },
-        { status: 400 }
+        { error: "Could not retrieve user role after verification." },
+        { status: 500 }
       );
     }
 
     return NextResponse.json({
-      message: "Email verified successfully",
+      message: "Email verified successfully. You are now logged in.",
+      loggedIn: true,
       user: {
         id: data.user.id,
         email: data.user.email,
-        email_confirmed_at: data.user.email_confirmed_at,
+        role: userData.role,
       },
     });
   } catch (error) {
