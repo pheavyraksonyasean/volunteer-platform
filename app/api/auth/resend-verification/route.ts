@@ -20,19 +20,7 @@ export async function POST(request: NextRequest) {
 
     if (error) {
       console.error("Resend verification error:", error);
-
-      // Handle specific error cases
-      let errorMessage = "Failed to resend verification code";
-      if (error.message.includes("already confirmed")) {
-        errorMessage = "This email is already verified. Please try signing in.";
-      } else if (error.message.includes("rate limit")) {
-        errorMessage =
-          "Too many requests. Please wait before requesting another code.";
-      } else if (error.message.includes("not found")) {
-        errorMessage = "No account found with this email address.";
-      }
-
-      return NextResponse.json({ error: errorMessage }, { status: 400 });
+      return NextResponse.json({ error: error.message }, { status: 400 });
     }
 
     return NextResponse.json({

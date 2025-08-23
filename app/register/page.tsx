@@ -2,19 +2,25 @@ import RegisterForm from "@/components/RegisterForm";
 
 export default function RegisterPage() {
   return (
-    <div className="min-h-screen bg-pink-50 py-12">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Create Your Account
-          </h1>
-          <p className="text-gray-600">
-            Join our community and start making a difference
-          </p>
+    <div className="min-h-screen flex">
+      {/* Left side - Register Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto">
+        <div className="w-full max-w-md">
+          <RegisterForm />
         </div>
+      </div>
 
-        <RegisterForm />
+      {/* Right side - Branding */}
+      <div className="flex-1 bg-pink-800 relative overflow-hidden flex items-center justify-center">
+        {/* Content */}
+        <div className="flex flex-col items-center justify-center text-white z-10">
+          <img
+            src="/logo.png"
+            alt="Sabay Volunteer Logo"
+            className="h-40 w-40 md:h-64 md:w-64 mb-6" // Bigger logo
+          />
+          <h1 className="text-4xl md:text-6xl font-bold">Sabay Volunteer</h1>
+        </div>
       </div>
     </div>
   );

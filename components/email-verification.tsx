@@ -14,6 +14,12 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp";
 import { Mail, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -27,6 +33,17 @@ export default function EmailVerification() {
   const [isLoading, setIsLoading] = useState(false);
   const [isResending, setIsResending] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  useEffect(() => {
+    const storedEndTime = localStorage.getItem("resendCooldownEndTime");
+    if (storedEndTime) {
+      const endTime = parseInt(storedEndTime, 10);
+      const remainingTime = Math.ceil((endTime - Date.now()) / 1000);
+      if (remainingTime > 0) {
+        setCountdown(remainingTime);
+      }
+    }
+  }, []);
 
   // Countdown timer for resend button
   useEffect(() => {
@@ -134,7 +151,9 @@ export default function EmailVerification() {
         description: "A new verification code has been sent to your email.",
       });
 
-      setCountdown(60); // 60 second cooldown
+      const cooldownEndTime = Date.now() + 65000;
+      localStorage.setItem("resendCooldownEndTime", cooldownEndTime.toString());
+      setCountdown(65); // 65 second cooldown
     } catch (error) {
       console.error("Resend error:", error);
       toast({
@@ -155,7 +174,7 @@ export default function EmailVerification() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <Card>
           <CardHeader className="text-center">
@@ -169,21 +188,27 @@ export default function EmailVerification() {
           </CardHeader>
           <CardContent>
             <form onSubmit={handleVerifyOtp} className="space-y-6">
-              <div>
+              <div className="flex flex-col items-center space-y-2">
                 <Label htmlFor="otp">Verification Code</Label>
-                <Input
+                <InputOTP
                   id="otp"
-                  type="text"
-                  placeholder="Enter 6-digit code"
-                  value={otp}
-                  onChange={(e) =>
-                    setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
-                  }
                   maxLength={6}
-                  className="text-center text-lg tracking-widest"
-                  required
+                  value={otp}
+                  onChange={(value) => setOtp(value)}
                   disabled={isLoading}
-                />
+                >
+                  <InputOTPGroup>
+                    <InputOTPSlot index={0} />
+                    <InputOTPSlot index={1} />
+                    <InputOTPSlot index={2} />
+                  </InputOTPGroup>
+
+                  <InputOTPGroup>
+                    <InputOTPSlot index={3} />
+                    <InputOTPSlot index={4} />
+                    <InputOTPSlot index={5} />
+                  </InputOTPGroup>
+                </InputOTP>
               </div>
 
               <Button

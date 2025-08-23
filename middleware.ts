@@ -43,7 +43,8 @@ export async function middleware(request: NextRequest) {
     !request.nextUrl.pathname.startsWith("/register") &&
     !request.nextUrl.pathname.startsWith("/auth") &&
     !request.nextUrl.pathname.startsWith("/api") &&
-    !request.nextUrl.pathname.startsWith("/verify-email")
+    !request.nextUrl.pathname.startsWith("/verify-email") &&
+    !request.nextUrl.pathname.startsWith("/reset-password")
   ) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone();
