@@ -4,26 +4,77 @@ import { Suspense } from "react";
 
 export default function VerifyEmailPage() {
   return (
-    <div className="min-h-screen flex">
-      {/* Left side - Register Form */}
-      <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto">
-        <div className="w-full max-w-md">
-          <Suspense fallback={<div>Loading...</div>}>
-            <EmailVerification />
-          </Suspense>
+    <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-pink-100">
+      {/* Mobile Layout */}
+      <div className="lg:hidden">
+        {/* Mobile Header */}
+        <div className="bg-pink-800 px-6 py-8 text-center">
+          <div className="flex flex-col items-center space-y-4">
+            <div className="w-20 h-20  rounded-full flex items-center justify-center backdrop-blur-sm">
+              <img
+                src="/logo.png"
+                alt="Sabay Volunteer Logo"
+                className="h-12 w-12"
+              />
+            </div>
+            <div className="text-white">
+              <h1 className="text-2xl font-bold">Sabay Volunteer</h1>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Form */}
+        <div className="px-4 py-6 -mt-4">
+          <div className="bg-white rounded-t-3xl shadow-xl p-6 min-h-[calc(100vh-200px)]">
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-pink-600"></div>
+                </div>
+              }
+            >
+              <EmailVerification />
+            </Suspense>
+          </div>
         </div>
       </div>
 
-      {/* Right side - Branding */}
-      <div className="flex-1 bg-pink-800 relative overflow-hidden flex items-center justify-center">
-        {/* Content */}
-        <div className="flex flex-col items-center justify-center text-white z-10">
-          <img
-            src="/logo.png"
-            alt="Sabay Volunteer Logo"
-            className="h-40 w-40 md:h-64 md:w-64 mb-6" // Bigger logo
-          />
-          <h1 className="text-4xl md:text-6xl font-bold">Sabay Volunteer</h1>
+      {/* Desktop Layout */}
+      <div className="hidden lg:flex min-h-screen">
+        {/* Left side - Verification Form */}
+        <div className="flex-1 flex items-center justify-center p-8  backdrop-blur-sm overflow-y-auto">
+          <div className="w-full max-w-lg">
+            <Suspense
+              fallback={
+                <div className="flex items-center justify-center py-12">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+                </div>
+              }
+            >
+              <EmailVerification />
+            </Suspense>
+          </div>
+        </div>
+
+        {/* Right side - Branding */}
+        <div className="flex-1 bg-pink-800 relative overflow-hidden flex items-center justify-center">
+          {/* Content */}
+          <div className="flex flex-col items-center justify-center text-white z-10 text-center space-y-8">
+            <div className="relative">
+              <div className="absolute inset-0  rounded-full blur-xl scale-110"></div>
+              <img
+                src="/logo.png"
+                alt="Sabay Volunteer Logo"
+                className="h-32 w-32 xl:h-48 xl:w-48 relative z-10 drop-shadow-2xl"
+              />
+            </div>
+
+            <div className="space-y-4">
+              <h1 className="text-4xl xl:text-6xl font-bold tracking-tight">
+                Sabay Volunteer
+              </h1>
+            </div>
+          </div>
         </div>
       </div>
     </div>
