@@ -1,5 +1,6 @@
 "use client";
 import EmailVerification from "@/components/email-verification";
+import { Suspense } from "react";
 
 export default function VerifyEmailPage() {
   return (
@@ -7,7 +8,9 @@ export default function VerifyEmailPage() {
       {/* Left side - Register Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white overflow-y-auto">
         <div className="w-full max-w-md">
-          <EmailVerification />
+          <Suspense fallback={<div>Loading...</div>}>
+            <EmailVerification />
+          </Suspense>
         </div>
       </div>
 
