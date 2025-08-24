@@ -1,12 +1,12 @@
-import LoginForm from "@/components/LoginForm";
+import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 
-export default function LoginPage() {
+export default function ForgotPasswordPage() {
   return (
     <div className="min-h-screen flex">
       {/* Left side - Login Form */}
       <div className="flex-1 flex items-center justify-center p-8 bg-white">
         <div className="w-full max-w-md">
-          <LoginForm />
+          <ForgotPasswordForm />
         </div>
       </div>
 
