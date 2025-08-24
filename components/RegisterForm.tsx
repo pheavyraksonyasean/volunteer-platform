@@ -14,25 +14,20 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { User, Building2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { toast } = useToast();
   const initialRole = searchParams.get("role") || "volunteer";
 
-  const [role, setRole] = useState<"volunteer" | "organization">(
-    initialRole as "volunteer" | "organization"
+  const [role, setRole] = useState<"volunteer" | "organizer">(
+    initialRole as "volunteer" | "organizer"
   );
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -42,11 +37,7 @@ export default function RegisterForm() {
     phone: "",
     location: "",
     organizationName: "",
-    organizationType: "",
-    website: "",
-    description: "",
     skills: [] as string[],
-    availability: "",
     agreeToTerms: false,
   });
 
@@ -68,16 +59,115 @@ export default function RegisterForm() {
     "Environmental",
   ];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the data to your backend
-    console.log("Registration data:", { role, ...formData });
 
-    // Redirect to appropriate dashboard
-    if (role === "volunteer") {
-      router.push("/volunteer/dashboard");
-    } else {
-      router.push("/organization/dashboard");
+    console.log("[v0] Form submission started");
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      toast({
+        title: "Error",
+        description: "Passwords do not match",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Validate terms agreement
+    if (!formData.agreeToTerms) {
+      toast({
+        title: "Error",
+        description: "Please agree to the terms and conditions",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsLoading(true);
+
+    try {
+      console.log("[v0] Making API request to /api/auth/register");
+
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          email: formData.email,
+          password: formData.password,
+          phone: formData.phone,
+          location: formData.location,
+          organizationName: formData.organizationName,
+          role: role === "organizer" ? "organizer" : "volunteer",
+          skills: formData.skills,
+        }),
+      });
+
+      console.log("[v0] Response status:", response.status);
+      console.log(
+        "[v0] Response headers:",
+        Object.fromEntries(response.headers.entries())
+      );
+
+      // Check if response is JSON
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        console.error("[v0] Response is not JSON, content-type:", contentType);
+        const textResponse = await response.text();
+        console.error("[v0] Response text:", textResponse);
+        throw new Error("Server returned invalid response format");
+      }
+
+      const data = await response.json();
+      console.log("[v0] Response data:", data);
+
+      if (!response.ok) {
+        throw new Error(data.error || "Registration failed");
+      }
+
+      const { user, needsEmailConfirmation } = data;
+
+      if (needsEmailConfirmation) {
+        toast({
+          title: "Success!",
+          description:
+            "Account created! Please check your email for a verification code.",
+        });
+        console.log("[v0] Redirecting to verification page");
+        router.push(
+          `/verify-email?email=${encodeURIComponent(formData.email)}`
+        );
+      } else {
+        toast({
+          title: "Success!",
+          description: "Account created and you are now logged in.",
+        });
+        if (user.role === "volunteer") {
+          console.log("[v0] Redirecting to volunteer dashboard");
+          router.push("/volunteer/dashboard");
+        } else if (user.role === "organizer") {
+          console.log("[v0] Redirecting to organization dashboard");
+          router.push("/organization/dashboard");
+        } else {
+          router.push("/");
+        }
+      }
+    } catch (error) {
+      console.error("[v0] Registration error:", error);
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Registration failed. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -117,9 +207,9 @@ export default function RegisterForm() {
             </button>
             <button
               type="button"
-              onClick={() => setRole("organization")}
+              onClick={() => setRole("organizer")}
               className={`p-4 border-2 rounded-lg flex flex-col items-center space-y-2 transition-colors ${
-                role === "organization"
+                role === "organizer"
                   ? "border-pink-800 bg-pink-50 text-pink-800"
                   : "border-gray-200 hover:border-pink-800"
               }`}
@@ -145,6 +235,7 @@ export default function RegisterForm() {
                   }))
                 }
                 required
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -159,6 +250,7 @@ export default function RegisterForm() {
                   }))
                 }
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -173,6 +265,7 @@ export default function RegisterForm() {
                 setFormData((prev) => ({ ...prev, email: e.target.value }))
               }
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -190,6 +283,7 @@ export default function RegisterForm() {
                   }))
                 }
                 required
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -205,6 +299,7 @@ export default function RegisterForm() {
                   }))
                 }
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
@@ -222,6 +317,7 @@ export default function RegisterForm() {
                     phone: e.target.value,
                   }))
                 }
+                disabled={isLoading}
               />
             </div>
             <div>
@@ -237,58 +333,55 @@ export default function RegisterForm() {
                   }))
                 }
                 required
+                disabled={isLoading}
               />
             </div>
           </div>
 
           {/* Organization-specific fields */}
-          {role === "organization" && (
-            <>
-              <div>
-                <Label htmlFor="organizationName">Organization Name</Label>
-                <Input
-                  id="organizationName"
-                  value={formData.organizationName}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      organizationName: e.target.value,
-                    }))
-                  }
-                  required
-                />
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
-            </>
+          {role === "organizer" && (
+            <div>
+              <Label htmlFor="organizationName">Organization Name</Label>
+              <Input
+                id="organizationName"
+                value={formData.organizationName}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    organizationName: e.target.value,
+                  }))
+                }
+                required
+                disabled={isLoading}
+              />
+            </div>
           )}
 
           {/* Volunteer-specific fields */}
           {role === "volunteer" && (
-            <>
-              <div>
-                <Label className="text-base font-medium">
-                  Skills & Interests
-                </Label>
-                <p className="text-sm text-gray-600 mb-3">
-                  Select all that apply
-                </p>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                  {skillOptions.map((skill) => (
-                    <div key={skill} className="flex items-center space-x-2">
-                      <Checkbox
-                        id={skill}
-                        checked={formData.skills.includes(skill)}
-                        onCheckedChange={() => handleSkillToggle(skill)}
-                      />
-                      <Label htmlFor={skill} className="text-sm">
-                        {skill}
-                      </Label>
-                    </div>
-                  ))}
-                </div>
+            <div>
+              <Label className="text-base font-medium">
+                Skills & Interests
+              </Label>
+              <p className="text-sm text-gray-600 mb-3">
+                Select all that apply
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                {skillOptions.map((skill) => (
+                  <div key={skill} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={skill}
+                      checked={formData.skills.includes(skill)}
+                      onCheckedChange={() => handleSkillToggle(skill)}
+                      disabled={isLoading}
+                    />
+                    <Label htmlFor={skill} className="text-sm">
+                      {skill}
+                    </Label>
+                  </div>
+                ))}
               </div>
-            </>
+            </div>
           )}
 
           {/* Terms and Conditions */}
@@ -303,6 +396,7 @@ export default function RegisterForm() {
                 }))
               }
               required
+              disabled={isLoading}
             />
             <Label htmlFor="terms" className="text-sm">
               I agree to the{" "}
@@ -318,10 +412,11 @@ export default function RegisterForm() {
 
           <Button
             type="submit"
-            className="w-full bg-pink-800 hover:bg-pink-950 "
+            className="w-full bg-pink-800 hover:bg-pink-950"
             size="lg"
+            disabled={isLoading}
           >
-            Create Account
+            {isLoading ? "Creating Account..." : "Create Account"}
           </Button>
         </form>
 

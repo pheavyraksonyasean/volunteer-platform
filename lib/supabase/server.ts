@@ -1,8 +1,7 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-// Server-side Supabase client
-export const createServerComponentClient = async () => {
+export async function createClient() {
   const cookieStore = await cookies();
 
   return createServerClient(
@@ -27,4 +26,4 @@ export const createServerComponentClient = async () => {
       },
     }
   );
-};
+}
