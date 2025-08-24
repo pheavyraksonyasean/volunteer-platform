@@ -1,3 +1,4 @@
+"use client";
 import EmailVerification from "@/components/email-verification";
 
 export default function VerifyEmailPage() {
