@@ -2,9 +2,25 @@ import ForgotPasswordForm from "@/components/ForgotPasswordForm";
 
 export default function ForgotPasswordPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <ForgotPasswordForm />
+    <div className="min-h-screen flex">
+      {/* Left side - Login Form */}
+      <div className="flex-1 flex items-center justify-center p-8 bg-white">
+        <div className="w-full max-w-md">
+          <ForgotPasswordForm />
+        </div>
+      </div>
+
+      {/* Right side - Branding */}
+      <div className="flex-1 bg-pink-800 relative overflow-hidden flex items-center justify-center">
+        {/* Content */}
+        <div className="flex flex-col items-center justify-center text-white z-10">
+          <img
+            src="/logo.png"
+            alt="Sabay Volunteer Logo"
+            className="h-40 w-40 md:h-64 md:w-64 mb-6" // Bigger logo
+          />
+          <h1 className="text-4xl md:text-6xl font-bold">Sabay Volunteer</h1>
+        </div>
       </div>
     </div>
   );

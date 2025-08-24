@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -137,16 +137,41 @@ export default function VolunteerDashboard() {
   const [profileImage, setProfileImage] = useState(
     "/placeholder.svg?height=32&width=32"
   );
-  const [mockUser, setMockUser] = useState({
-    name: "user",
-    email: "user001@gmail.com",
-    bio: "papipapipu",
-    phone: "(+855) 964853340",
-    location: "KIRIROM",
-    skills: ["Teaching", "Environmental"],
-    experience: "2 years of volunteer experience",
-    availability: "Weekends and evenings",
-  });
+  const [user, setUser] = useState<any>(null);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const response = await fetch("/api/profile");
+        if (!response.ok) {
+          throw new Error("Failed to fetch user profile");
+        }
+        const data = await response.json();
+        if (data.user) {
+          const userData = data.user;
+          const transformedUser = {
+            ...userData,
+            name: `${userData.first_name || ""} ${
+              userData.last_name || ""
+            }`.trim(),
+            phone: userData.phone_number,
+          };
+          setUser(transformedUser);
+          if (userData.profile_image_url) {
+            setProfileImage(userData.profile_image_url);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+        // Optionally, redirect to login or show an error message
+      } finally {
+        setIsLoadingProfile(false);
+      }
+    };
+
+    fetchUserProfile();
+  }, []);
 
   const handleApply = (opportunityId: number, applicationData: any) => {
     const opportunity = mockOpportunities.find(
@@ -187,6 +212,25 @@ export default function VolunteerDashboard() {
   const currentMonthHours = 24;
   const progressPercentage = (currentMonthHours / monthlyGoal) * 100;
 
+  if (isLoadingProfile) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        Loading profile...
+      </div>
+    );
+  }
+
+  if (!user) {
+    return (
+      <div className="flex h-screen flex-col items-center justify-center">
+        <p>Could not load user profile.</p>
+        <Link href="/login">
+          <Button>Go to Login</Button>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-white">
       {/* Header */}
@@ -194,16 +238,14 @@ export default function VolunteerDashboard() {
         <div className="mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-3 md:py-4">
             <div className="flex items-center min-w-0 flex-1">
-              <Link href="/" className="flex items-center min-w-0">
-                <img
-                  src="/logo.png"
-                  alt="sabay volunteer"
-                  className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0"
-                />
-                <span className="text-sm sm:text-lg md:text-2xl font-bold text-white font-serif ml-1 sm:ml-2 truncate">
-                  Sabay Volunteer
-                </span>
-              </Link>
+              <img
+                src="/logo.png"
+                alt="sabay volunteer"
+                className="h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex-shrink-0"
+              />
+              <span className="text-sm sm:text-lg md:text-2xl font-bold text-white font-serif ml-1 sm:ml-2 truncate">
+                Sabay Volunteer
+              </span>
             </div>
 
             <div className="flex items-center space-x-1 sm:space-x-2 md:space-x-4 flex-shrink-0">
@@ -214,8 +256,8 @@ export default function VolunteerDashboard() {
               <ProfileMenu
                 profileImage={profileImage}
                 setProfileImage={setProfileImage}
-                mockUser={mockUser}
-                setMockUser={setMockUser}
+                mockUser={user}
+                setMockUser={setUser}
               />
             </div>
           </div>
@@ -226,7 +268,7 @@ export default function VolunteerDashboard() {
         {/* Welcome Section */}
         <div className="mb-6 md:mb-8">
           <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
-            Welcome back !!
+            Welcome back, {user.name}!!
           </h1>
           <p className="text-sm md:text-base text-gray-600">
             Ready to make a difference today? You're doing amazing work!

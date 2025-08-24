@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Edit, LogOut, ChevronDown } from "lucide-react";
-import { EditProfileModal } from "./EditProfileModal";
+import EditProfileModal from "./EditProfileModal";
 
 interface ProfileMenuProps {
   profileImage: string;
@@ -54,14 +54,13 @@ export default function ProfileMenu({
     router.push("/");
   };
 
-  const handleSaveProfile = (updatedUser: any, newProfileImage?: string) => {
+  const handleSaveProfile = (updatedUser: any) => {
     console.log("Profile updated:", updatedUser);
     // Update the user data in the parent component
     setMockUser(updatedUser);
-    if (newProfileImage) {
-      setProfileImage(newProfileImage);
+    if (updatedUser.profile_image_url) {
+      setProfileImage(updatedUser.profile_image_url);
     }
-    // Here you would also save the updated user data to your backend
   };
 
   return (
@@ -122,7 +121,7 @@ export default function ProfileMenu({
       <EditProfileModal
         isOpen={isEditModalOpen}
         onClose={() => setIsEditModalOpen(false)}
-        user={mockUser}
+        initialData={mockUser}
         profileImage={profileImage}
         onSave={handleSaveProfile}
       />

@@ -15,25 +15,62 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { User, Building2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 export default function LoginForm() {
   const router = useRouter();
-  const [role, setRole] = useState<"volunteer" | "organization">("volunteer");
+  const { toast } = useToast();
+  const [role, setRole] = useState<"volunteer" | "organizer">("volunteer");
+  const [isLoading, setIsLoading] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // Here you would typically authenticate with your backend
-    console.log("Login data:", { role, ...formData });
+    setIsLoading(true);
 
-    // Redirect to appropriate dashboard
-    if (role === "volunteer") {
-      router.push("/volunteer/dashboard");
-    } else {
-      router.push("/organization/dashboard");
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          role,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || "Login failed");
+      }
+
+      toast({
+        title: "Success!",
+        description: "Logged in successfully.",
+      });
+
+      if (role === "volunteer") {
+        router.push("/volunteer/dashboard");
+      } else {
+        router.push("/organization/dashboard");
+      }
+    } catch (error) {
+      toast({
+        title: "Error",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Login failed. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -58,18 +95,20 @@ export default function LoginForm() {
                   ? "border-pink-800 bg-pink-50 text-pink-800"
                   : "border-gray-200 hover:border-pink-800"
               }`}
+              disabled={isLoading}
             >
               <User className="h-6 w-6" />
               <span className="font-medium text-sm">Volunteer</span>
             </button>
             <button
               type="button"
-              onClick={() => setRole("organization")}
+              onClick={() => setRole("organizer")}
               className={`p-4 border-2 rounded-lg flex flex-col items-center space-y-2 transition-colors ${
-                role === "organization"
+                role === "organizer"
                   ? "border-pink-800 bg-pink-50 text-pink-800"
                   : "border-gray-200 hover:border-pink-800"
               }`}
+              disabled={isLoading}
             >
               <Building2 className="h-6 w-6" />
               <span className="font-medium text-sm">Organization</span>
@@ -77,7 +116,7 @@ export default function LoginForm() {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form className="space-y-6">
           <div>
             <Label htmlFor="email">Email Address</Label>
             <Input
@@ -88,6 +127,7 @@ export default function LoginForm() {
                 setFormData((prev) => ({ ...prev, email: e.target.value }))
               }
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -104,6 +144,7 @@ export default function LoginForm() {
                 }))
               }
               required
+              disabled={isLoading}
             />
           </div>
 
@@ -117,11 +158,12 @@ export default function LoginForm() {
           </div>
 
           <Button
-            type="submit"
+            onClick={handleSubmit}
             className="w-full bg-pink-800 hover:bg-pink-950"
             size="lg"
+            disabled={isLoading}
           >
-            Sign In
+            {isLoading ? "Signing In..." : "Sign In"}
           </Button>
         </form>
 
