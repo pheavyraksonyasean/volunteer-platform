@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -34,29 +32,25 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { Switch } from "@/components/ui/switch";
 import {
   CalendarIcon,
   Clock,
   MapPin,
   Users,
-  Upload,
   CheckCircle,
-  X,
-  Plus,
-  Minus,
-  AlertCircle,
   Eye,
-  Save,
+  Building,
+  Upload,
+  X,
+  Image as ImageIcon,
 } from "lucide-react";
 import { format } from "date-fns";
-import FileUpload from "./file-upload";
 
 interface CreateOpportunityModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (opportunityData: any) => void;
-  editingOpportunity?: any; // Added editingOpportunity prop for edit mode
+  editingOpportunity?: any;
 }
 
 export default function CreateOpportunityModal({
@@ -67,138 +61,109 @@ export default function CreateOpportunityModal({
 }: CreateOpportunityModalProps) {
   const [step, setStep] = useState(1);
   const [opportunityData, setOpportunityData] = useState({
+    // Basic Information
     title: "",
+    organizationName: "",
+    isVerifiedOrg: false,
     category: "",
     description: "",
-    requirements: "",
-    location: "",
-    address: "",
-    isRemote: false,
+
+    // Event Details
     date: undefined as Date | undefined,
     startTime: "",
     endTime: "",
-    isRecurring: false,
-    recurringPattern: "",
-    maxVolunteers: 10,
-    minAge: 16,
-    backgroundCheck: false,
-    skills: [] as string[],
-    benefits: [] as string[],
+    location: "",
+    maxVolunteers: 50,
+
+    // Requirements
+    skillsNeeded: [] as string[],
+
+    // What to Expect
+    whatToExpected: [] as string[],
+
+    // Contact & Media
     contactEmail: "",
-    contactPhone: "",
-    applicationDeadline: undefined as Date | undefined,
-    isUrgent: false,
-    images: [] as File[],
-    documents: [] as File[],
-    customQuestions: [] as string[],
-    autoApprove: false,
-    sendReminders: true,
+    images: [] as string[], // Store image URLs/base64
   });
+
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [previewMode, setPreviewMode] = useState(false);
 
   const categories = [
-    "Hunger Relief",
-    "Environment",
-    "Education",
-    "Senior Care",
-    "Animal Welfare",
-    "Healthcare",
+    "Environmental Conservation",
+    "Cultural Heritage",
     "Community Development",
-    "Arts & Culture",
-    "Sports & Recreation",
-    "Disaster Relief",
+    "Education",
+    "Healthcare",
     "Youth Development",
-    "Homelessness",
+    "Arts & Culture",
   ];
 
   const skillOptions = [
+    "Environmental",
+    "Teamwork",
     "Communication",
     "Leadership",
-    "Teaching",
-    "Customer Service",
     "Physical Work",
+    "Customer Service",
+    "Teaching",
     "Technology",
-    "Event Planning",
-    "Fundraising",
-    "Social Media",
     "Photography",
-    "Writing",
-    "Translation",
-    "First Aid",
-    "Driving",
-    "Cooking",
-    "Childcare",
-    "Elder Care",
-    "Animal Care",
   ];
 
-  const benefitOptions = [
-    "Community Service Hours",
-    "Training Provided",
-    "Meals Included",
-    "Transportation Provided",
-    "Certificate of Completion",
-    "Reference Letter",
-    "Networking Opportunities",
-    "Skill Development",
-    "Free T-shirt",
-    "Parking Provided",
+  const expectationOptions = [
+    "Orientation and training provided",
+    "Community service hours certificate available",
+    "Refreshments and meals included",
+    "Transportation assistance if needed",
+    "Professional networking opportunities",
   ];
 
   const handleSkillToggle = (skill: string) => {
     setOpportunityData((prev) => ({
       ...prev,
-      skills: prev.skills.includes(skill)
-        ? prev.skills.filter((s) => s !== skill)
-        : [...prev.skills, skill],
+      skillsNeeded: prev.skillsNeeded.includes(skill)
+        ? prev.skillsNeeded.filter((s) => s !== skill)
+        : [...prev.skillsNeeded, skill],
     }));
   };
 
-  const handleBenefitToggle = (benefit: string) => {
+  const handleExpectationToggle = (expectation: string) => {
     setOpportunityData((prev) => ({
       ...prev,
-      benefits: prev.benefits.includes(benefit)
-        ? prev.benefits.filter((b) => b !== benefit)
-        : [...prev.benefits, benefit],
+      whatToExpected: prev.whatToExpected.includes(expectation)
+        ? prev.whatToExpected.filter((e) => e !== expectation)
+        : [...prev.whatToExpected, expectation],
     }));
   };
 
-  const addCustomQuestion = () => {
-    setOpportunityData((prev) => ({
-      ...prev,
-      customQuestions: [...prev.customQuestions, ""],
-    }));
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files) {
+      Array.from(files).forEach((file) => {
+        if (file.size > 5 * 1024 * 1024) {
+          // 5MB limit
+          alert("Image size should be less than 5MB");
+          return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const imageUrl = e.target?.result as string;
+          setOpportunityData((prev) => ({
+            ...prev,
+            images: [...prev.images, imageUrl],
+          }));
+        };
+        reader.readAsDataURL(file);
+      });
+    }
   };
 
-  const updateCustomQuestion = (index: number, question: string) => {
+  const removeImage = (index: number) => {
     setOpportunityData((prev) => ({
       ...prev,
-      customQuestions: prev.customQuestions.map((q, i) =>
-        i === index ? question : q
-      ),
-    }));
-  };
-
-  const removeCustomQuestion = (index: number) => {
-    setOpportunityData((prev) => ({
-      ...prev,
-      customQuestions: prev.customQuestions.filter((_, i) => i !== index),
-    }));
-  };
-
-  const handleImageUpload = (files: File[]) => {
-    setOpportunityData((prev) => ({
-      ...prev,
-      images: [...prev.images, ...files],
-    }));
-  };
-
-  const handleDocumentUpload = (files: File[]) => {
-    setOpportunityData((prev) => ({
-      ...prev,
-      documents: [...prev.documents, ...files],
+      images: prev.images.filter((_, i) => i !== index),
     }));
   };
 
@@ -210,112 +175,41 @@ export default function CreateOpportunityModal({
 
       setOpportunityData({
         title: editingOpportunity.title || "",
+        organizationName: editingOpportunity.organizationName || "",
+        isVerifiedOrg: editingOpportunity.isVerifiedOrg || false,
         category: editingOpportunity.category || "",
         description: editingOpportunity.description || "",
-        requirements: editingOpportunity.requirements || "",
-        location: editingOpportunity.location || "",
-        address: editingOpportunity.address || "",
-        isRemote: editingOpportunity.isRemote || false,
         date: editingOpportunity.date
           ? new Date(editingOpportunity.date)
           : undefined,
         startTime: startTime || "",
         endTime: endTime || "",
-        isRecurring: editingOpportunity.isRecurring || false,
-        recurringPattern: editingOpportunity.recurringPattern || "",
-        maxVolunteers: editingOpportunity.maxVolunteers || 10,
-        minAge: editingOpportunity.minAge || 16,
-        backgroundCheck: editingOpportunity.backgroundCheck || false,
-        skills: editingOpportunity.skills || [],
-        benefits: editingOpportunity.benefits || [],
+        location: editingOpportunity.location || "",
+        maxVolunteers: editingOpportunity.maxVolunteers || 50,
+        skillsNeeded: editingOpportunity.skillsNeeded || [],
+        whatToExpected: editingOpportunity.whatToExpected || [],
         contactEmail: editingOpportunity.contactEmail || "",
-        contactPhone: editingOpportunity.contactPhone || "",
-        applicationDeadline: editingOpportunity.applicationDeadline
-          ? new Date(editingOpportunity.applicationDeadline)
-          : undefined,
-        isUrgent: editingOpportunity.isUrgent || false,
-        images: [],
-        documents: [],
-        customQuestions: editingOpportunity.customQuestions || [],
-        autoApprove: editingOpportunity.autoApprove || false,
-        sendReminders: editingOpportunity.sendReminders !== false,
-      });
-    } else {
-      setOpportunityData({
-        title: "",
-        category: "",
-        description: "",
-        requirements: "",
-        location: "",
-        address: "",
-        isRemote: false,
-        date: undefined as Date | undefined,
-        startTime: "",
-        endTime: "",
-        isRecurring: false,
-        recurringPattern: "",
-        maxVolunteers: 10,
-        minAge: 16,
-        backgroundCheck: false,
-        skills: [] as string[],
-        benefits: [] as string[],
-        contactEmail: "",
-        contactPhone: "",
-        applicationDeadline: undefined as Date | undefined,
-        isUrgent: false,
-        images: [] as File[],
-        documents: [] as File[],
-        customQuestions: [] as string[],
-        autoApprove: false,
-        sendReminders: true,
+        images: editingOpportunity.images || [],
       });
     }
     setStep(1);
   }, [editingOpportunity]);
 
-  const handleSubmit = async (isDraft = false) => {
+  const handleSubmit = async () => {
     if (!isStepValid()) return;
 
     setIsSubmitting(true);
     try {
       const finalData = {
         ...opportunityData,
-        isDraft,
+        postedDate: new Date(),
+        views: 0,
+        applications: 0,
+        currentRegistered: 0,
       };
 
       await onSubmit(finalData);
-
-      if (!editingOpportunity) {
-        setOpportunityData({
-          title: "",
-          category: "",
-          description: "",
-          requirements: "",
-          location: "",
-          address: "",
-          isRemote: false,
-          date: undefined as Date | undefined,
-          startTime: "",
-          endTime: "",
-          isRecurring: false,
-          recurringPattern: "",
-          maxVolunteers: 10,
-          minAge: 16,
-          backgroundCheck: false,
-          skills: [] as string[],
-          benefits: [] as string[],
-          contactEmail: "",
-          contactPhone: "",
-          applicationDeadline: undefined as Date | undefined,
-          isUrgent: false,
-          images: [] as File[],
-          documents: [] as File[],
-          customQuestions: [] as string[],
-          autoApprove: false,
-          sendReminders: true,
-        });
-        setStep(1);
-      }
+      onClose();
     } catch (error) {
       console.error("Error creating opportunity:", error);
     } finally {
@@ -331,50 +225,22 @@ export default function CreateOpportunityModal({
       case 1:
         return (
           opportunityData.title &&
+          opportunityData.organizationName &&
           opportunityData.category &&
-          opportunityData.description.length > 50
+          opportunityData.description.length > 20
         );
       case 2:
         return (
           opportunityData.location &&
           opportunityData.date &&
           opportunityData.startTime &&
-          opportunityData.endTime
+          opportunityData.endTime &&
+          opportunityData.contactEmail
         );
-      case 3:
-        return (
-          opportunityData.maxVolunteers > 0 && opportunityData.contactEmail
-        );
-      case 4:
-        return true;
       default:
         return true;
     }
   };
-
-  if (isSubmitted) {
-    return (
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-md">
-          <div className="text-center py-8">
-            <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-              Opportunity Created!
-            </h3>
-            <p className="text-gray-600 mb-4">
-              Your volunteer opportunity{" "}
-              <strong>{opportunityData.title}</strong> has been successfully
-              created.
-            </p>
-            <p className="text-sm text-gray-500">
-              It will be reviewed and published within 24 hours. You'll receive
-              an email confirmation shortly.
-            </p>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  }
 
   if (previewMode) {
     return (
@@ -385,100 +251,210 @@ export default function CreateOpportunityModal({
               Preview Opportunity
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setPreviewMode(false)}>
-                  <X className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
-                <Button onClick={() => handleSubmit(false)}>Publish</Button>
+                <Button onClick={handleSubmit}>
+                  {editingOpportunity ? "Update" : "Publish"}
+                </Button>
               </div>
             </DialogTitle>
           </DialogHeader>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="space-y-6">
-                <div>
-                  <div className="flex items-start justify-between mb-4">
-                    <div>
-                      <h2 className="text-2xl font-bold text-gray-900">
-                        {opportunityData.title}
-                      </h2>
-                      <Badge className="mt-2">{opportunityData.category}</Badge>
-                      {opportunityData.isUrgent && (
-                        <Badge className="ml-2 bg-red-500">Urgent</Badge>
-                      )}
-                    </div>
-                  </div>
+          <div className="space-y-6 mt-6">
+            {/* Hero Image */}
+            {opportunityData.images.length > 0 && (
+              <div className="relative">
+                <img
+                  src={opportunityData.images[0]}
+                  alt="Opportunity banner"
+                  className="w-full h-48 object-cover rounded-lg"
+                />
+                <div className="absolute top-4 left-4">
+                  <Badge className="bg-gray-800 text-white px-3 py-1">
+                    {opportunityData.category}
+                  </Badge>
+                </div>
+              </div>
+            )}
 
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                    <div className="flex items-center text-gray-600">
-                      <MapPin className="h-4 w-4 mr-2" />
-                      {opportunityData.isRemote
-                        ? "Remote"
-                        : opportunityData.location}
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <CalendarIcon className="h-4 w-4 mr-2" />
-                      {opportunityData.date
-                        ? format(opportunityData.date, "PPP")
-                        : "Date TBD"}
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="h-4 w-4 mr-2" />
-                      {opportunityData.startTime} - {opportunityData.endTime}
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Users className="h-4 w-4 mr-2" />
-                      Up to {opportunityData.maxVolunteers} volunteers
-                    </div>
+            {/* Organization Header */}
+            <div className="flex items-center gap-3">
+              <Building className="h-8 w-8 text-pink-600" />
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  {opportunityData.organizationName}
+                </h2>
+                {opportunityData.isVerifiedOrg && (
+                  <div className="flex items-center gap-1 text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    <span className="text-sm">Verified Organization</span>
                   </div>
+                )}
+              </div>
+            </div>
+
+            {/* Two Column Layout */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Left Column - Main Content */}
+              <div className="lg:col-span-2 space-y-8">
+                {/* Event Details */}
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    Event Details
+                  </h3>
 
                   <div className="space-y-4">
-                    <div>
-                      <h3 className="font-semibold mb-2">Description</h3>
-                      <p className="text-gray-700">
-                        {opportunityData.description}
-                      </p>
-                    </div>
-
-                    {opportunityData.requirements && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <CalendarIcon className="h-4 w-4 text-gray-600" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold mb-2">Requirements</h3>
-                        <p className="text-gray-700">
-                          {opportunityData.requirements}
+                        <p className="font-medium text-gray-900">Date</p>
+                        <p className="text-gray-600">
+                          {opportunityData.date
+                            ? format(opportunityData.date, "MMM dd, yyyy")
+                            : "Date TBD"}
                         </p>
                       </div>
-                    )}
+                    </div>
 
-                    {opportunityData.skills.length > 0 && (
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <Clock className="h-4 w-4 text-gray-600" />
+                      </div>
                       <div>
-                        <h3 className="font-semibold mb-2">Skills Needed</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {opportunityData.skills.map((skill) => (
-                            <Badge key={skill} variant="outline">
-                              {skill}
-                            </Badge>
-                          ))}
+                        <p className="font-medium text-gray-900">Time</p>
+                        <p className="text-gray-600">
+                          {opportunityData.startTime} -{" "}
+                          {opportunityData.endTime}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <MapPin className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div>
+                        <p className="font-medium text-gray-900">Location</p>
+                        <p className="text-gray-600">
+                          {opportunityData.location}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center gap-3">
+                      <div className="w-6 h-6 bg-gray-100 rounded-full flex items-center justify-center">
+                        <Users className="h-4 w-4 text-gray-600" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-medium text-gray-900">Volunteers</p>
+                        <p className="text-gray-600 mb-2">
+                          30 of {opportunityData.maxVolunteers} registered
+                        </p>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div
+                            className="bg-pink-600 h-2 rounded-full"
+                            style={{
+                              width: `${
+                                (30 / opportunityData.maxVolunteers) * 100
+                              }%`,
+                            }}
+                          />
                         </div>
                       </div>
-                    )}
+                    </div>
+                  </div>
+                </div>
 
-                    {opportunityData.benefits.length > 0 && (
-                      <div>
-                        <h3 className="font-semibold mb-2">What You'll Get</h3>
-                        <div className="flex flex-wrap gap-2">
-                          {opportunityData.benefits.map((benefit) => (
-                            <Badge key={benefit} variant="secondary">
-                              {benefit}
-                            </Badge>
-                          ))}
-                        </div>
+                {/* About This Opportunity */}
+                <div>
+                  <h3 className="text-xl font-bold text-gray-900 mb-4">
+                    About This Opportunity
+                  </h3>
+                  <p className="text-gray-700 leading-relaxed">
+                    {opportunityData.description}
+                  </p>
+                </div>
+
+                {/* What to Expect */}
+                {opportunityData.whatToExpected.length > 0 && (
+                  <div className="bg-blue-50 rounded-lg p-6">
+                    <h3 className="text-lg font-bold text-blue-900 mb-4">
+                      What to Expect
+                    </h3>
+                    <ul className="space-y-3">
+                      {opportunityData.whatToExpected.map((item, index) => (
+                        <li
+                          key={index}
+                          className="flex items-start gap-3 text-blue-800"
+                        >
+                          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column - Requirements & Stats */}
+              <div className="space-y-6">
+                {/* Requirements */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Requirements
+                  </h3>
+
+                  {opportunityData.skillsNeeded.length > 0 && (
+                    <div>
+                      <h4 className="font-medium text-gray-900 mb-3">
+                        Skills Needed
+                      </h4>
+                      <div className="flex flex-wrap gap-2">
+                        {opportunityData.skillsNeeded.map((skill) => (
+                          <Badge
+                            key={skill}
+                            variant="secondary"
+                            className="text-sm"
+                          >
+                            {skill}
+                          </Badge>
+                        ))}
                       </div>
-                    )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Quick Stats */}
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-4">
+                    Quick Stats
+                  </h3>
+                  <div className="space-y-3">
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Posted:</span>
+                      <span className="font-medium">2 days ago</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Views:</span>
+                      <div className="flex items-center gap-1">
+                        <Eye className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">142</span>
+                      </div>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span className="text-gray-600">Applications:</span>
+                      <div className="flex items-center gap-1">
+                        <Users className="h-4 w-4 text-gray-500" />
+                        <span className="font-medium">8</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </DialogContent>
       </Dialog>
     );
@@ -486,23 +462,20 @@ export default function CreateOpportunityModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            {editingOpportunity
-              ? "Edit Volunteer Opportunity"
-              : "Create Volunteer Opportunity"}
+          <DialogTitle>
+            {editingOpportunity ? "Edit Opportunity" : "Create Opportunity"}
           </DialogTitle>
           <DialogDescription>
-            {editingOpportunity
-              ? "Update your volunteer opportunity details"
-              : "Create a new volunteer opportunity for your organization"}
+            Create a volunteer opportunity for your organization
           </DialogDescription>
         </DialogHeader>
 
+        {/* Simple 2-step progress */}
         <div className="flex items-center justify-center mb-6">
           <div className="flex items-center space-x-4">
-            {[1, 2, 3, 4].map((stepNumber) => (
+            {[1, 2].map((stepNumber) => (
               <div key={stepNumber} className="flex items-center">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -513,7 +486,7 @@ export default function CreateOpportunityModal({
                 >
                   {stepNumber}
                 </div>
-                {stepNumber < 4 && (
+                {stepNumber < 2 && (
                   <div
                     className={`w-12 h-1 mx-2 ${
                       step > stepNumber ? "bg-pink-600" : "bg-gray-200"
@@ -525,52 +498,74 @@ export default function CreateOpportunityModal({
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-6 text-center text-sm">
+        <div className="grid grid-cols-2 gap-4 mb-6 text-center text-sm">
           <div
             className={
               step >= 1 ? "text-pink-600 font-medium" : "text-gray-500"
             }
           >
-            Basic Info
+            Basic Information
           </div>
           <div
             className={
               step >= 2 ? "text-pink-600 font-medium" : "text-gray-500"
             }
           >
-            Schedule & Location
-          </div>
-          <div
-            className={
-              step >= 3 ? "text-pink-600 font-medium" : "text-gray-500"
-            }
-          >
-            Requirements
-          </div>
-          <div
-            className={
-              step >= 4 ? "text-pink-600 font-medium" : "text-gray-500"
-            }
-          >
-            Review & Publish
+            Event Details & Requirements
           </div>
         </div>
 
         <div className="space-y-6">
+          {/* Step 1: Basic Information */}
           {step === 1 && (
             <Card>
               <CardHeader>
                 <CardTitle>Basic Information</CardTitle>
-                <CardDescription>
-                  Tell volunteers about your opportunity
-                </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="organizationName">
+                      Organization Name *
+                    </Label>
+                    <Input
+                      id="organizationName"
+                      placeholder="e.g., APSARA Authority"
+                      value={opportunityData.organizationName}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          organizationName: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2 pt-8">
+                    <Checkbox
+                      id="verifiedOrg"
+                      checked={opportunityData.isVerifiedOrg}
+                      onCheckedChange={(checked) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          isVerifiedOrg: checked as boolean,
+                        }))
+                      }
+                    />
+                    <Label
+                      htmlFor="verifiedOrg"
+                      className="flex items-center text-sm"
+                    >
+                      <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
+                      Verified Organization
+                    </Label>
+                  </div>
+                </div>
+
                 <div>
                   <Label htmlFor="title">Opportunity Title *</Label>
                   <Input
                     id="title"
-                    placeholder="e.g., Food Bank Volunteer, Beach Cleanup Helper"
+                    placeholder="e.g., Temple Conservation Volunteer"
                     value={opportunityData.title}
                     onChange={(e) =>
                       setOpportunityData((prev) => ({
@@ -609,7 +604,7 @@ export default function CreateOpportunityModal({
                   <Label htmlFor="description">Description *</Label>
                   <Textarea
                     id="description"
-                    placeholder="Describe what volunteers will do, the impact they'll make, and why this opportunity matters..."
+                    placeholder="Describe what volunteers will do and the impact they'll make..."
                     value={opportunityData.description}
                     onChange={(e) =>
                       setOpportunityData((prev) => ({
@@ -617,344 +612,199 @@ export default function CreateOpportunityModal({
                         description: e.target.value,
                       }))
                     }
-                    rows={6}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {opportunityData.description.length}/50 characters minimum
-                  </p>
-                </div>
-
-                <div>
-                  <Label htmlFor="requirements">
-                    Requirements & Expectations
-                  </Label>
-                  <Textarea
-                    id="requirements"
-                    placeholder="Any specific requirements, skills needed, or expectations for volunteers..."
-                    value={opportunityData.requirements}
-                    onChange={(e) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        requirements: e.target.value,
-                      }))
-                    }
                     rows={4}
                   />
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="urgent"
-                    checked={opportunityData.isUrgent}
-                    onCheckedChange={(checked) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        isUrgent: checked,
-                      }))
-                    }
-                  />
-                  <Label htmlFor="urgent" className="flex items-center">
-                    <AlertCircle className="h-4 w-4 mr-2 text-red-500" />
-                    Mark as urgent (needs volunteers immediately)
-                  </Label>
+                  <p className="text-xs text-gray-500 mt-1">
+                    {opportunityData.description.length}/20 characters minimum
+                  </p>
                 </div>
               </CardContent>
             </Card>
           )}
 
+          {/* Step 2: Event Details & Requirements */}
           {step === 2 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Schedule & Location</CardTitle>
-                <CardDescription>
-                  When and where will this opportunity take place?
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="flex items-center space-x-2 mb-4">
-                  <Switch
-                    id="remote"
-                    checked={opportunityData.isRemote}
-                    onCheckedChange={(checked) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        isRemote: checked,
-                      }))
-                    }
-                  />
-                  <Label htmlFor="remote">
-                    This is a remote/virtual opportunity
-                  </Label>
-                </div>
-
-                {!opportunityData.isRemote && (
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="location">Location/City *</Label>
-                      <Input
-                        id="location"
-                        placeholder="e.g., Downtown, NY"
-                        value={opportunityData.location}
-                        onChange={(e) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            location: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="address">Full Address</Label>
-                      <Input
-                        id="address"
-                        placeholder="Street address for volunteers"
-                        value={opportunityData.address}
-                        onChange={(e) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            address: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <div>
-                    <Label>Date *</Label>
-                    <Popover>
-                      <PopoverTrigger asChild>
-                        <Button
-                          variant="outline"
-                          className="w-full justify-start text-left font-normal bg-transparent"
-                        >
-                          <CalendarIcon className="mr-2 h-4 w-4" />
-                          {opportunityData.date
-                            ? format(opportunityData.date, "PPP")
-                            : "Pick a date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent className="w-auto p-0">
-                        <Calendar
-                          mode="single"
-                          selected={opportunityData.date}
-                          onSelect={(date) =>
-                            setOpportunityData((prev) => ({ ...prev, date }))
-                          }
-                          initialFocus
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </div>
-                  <div>
-                    <Label htmlFor="startTime">Start Time *</Label>
-                    <Input
-                      id="startTime"
-                      type="time"
-                      value={opportunityData.startTime}
-                      onChange={(e) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          startTime: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="endTime">End Time *</Label>
-                    <Input
-                      id="endTime"
-                      type="time"
-                      value={opportunityData.endTime}
-                      onChange={(e) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          endTime: e.target.value,
-                        }))
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center space-x-2">
-                  <Switch
-                    id="recurring"
-                    checked={opportunityData.isRecurring}
-                    onCheckedChange={(checked) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        isRecurring: checked,
-                      }))
-                    }
-                  />
-                  <Label htmlFor="recurring">
-                    This is a recurring opportunity
-                  </Label>
-                </div>
-
-                {opportunityData.isRecurring && (
-                  <div>
-                    <Label htmlFor="recurringPattern">Recurring Pattern</Label>
-                    <Select
-                      value={opportunityData.recurringPattern}
-                      onValueChange={(value) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          recurringPattern: value,
-                        }))
-                      }
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="How often does this repeat?" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="weekly">Weekly</SelectItem>
-                        <SelectItem value="biweekly">Every 2 weeks</SelectItem>
-                        <SelectItem value="monthly">Monthly</SelectItem>
-                        <SelectItem value="custom">Custom schedule</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                )}
-
-                <div>
-                  <Label>Application Deadline</Label>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant="outline"
-                        className="w-full justify-start text-left font-normal bg-transparent"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {opportunityData.applicationDeadline
-                          ? format(opportunityData.applicationDeadline, "PPP")
-                          : "No deadline (optional)"}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0">
-                      <Calendar
-                        mode="single"
-                        selected={opportunityData.applicationDeadline}
-                        onSelect={(date) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            applicationDeadline: date,
-                          }))
-                        }
-                        initialFocus
-                      />
-                    </PopoverContent>
-                  </Popover>
-                </div>
-              </CardContent>
-            </Card>
-          )}
-
-          {step === 3 && (
             <div className="space-y-6">
               <Card>
                 <CardHeader>
-                  <CardTitle>Volunteer Requirements</CardTitle>
-                  <CardDescription>
-                    Set requirements and preferences for volunteers
-                  </CardDescription>
+                  <CardTitle>Event Details</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="maxVolunteers">
-                        Maximum Volunteers *
-                      </Label>
-                      <div className="flex items-center space-x-2">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setOpportunityData((prev) => ({
-                              ...prev,
-                              maxVolunteers: Math.max(
-                                1,
-                                prev.maxVolunteers - 1
-                              ),
-                            }))
-                          }
-                        >
-                          <Minus className="h-4 w-4" />
-                        </Button>
-                        <Input
-                          id="maxVolunteers"
-                          type="number"
-                          min="1"
-                          value={opportunityData.maxVolunteers}
-                          onChange={(e) =>
-                            setOpportunityData((prev) => ({
-                              ...prev,
-                              maxVolunteers:
-                                Number.parseInt(e.target.value) || 1,
-                            }))
-                          }
-                          className="text-center"
-                        />
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            setOpportunityData((prev) => ({
-                              ...prev,
-                              maxVolunteers: prev.maxVolunteers + 1,
-                            }))
-                          }
-                        >
-                          <Plus className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                    <div>
-                      <Label htmlFor="minAge">Minimum Age</Label>
-                      <Select
-                        value={opportunityData.minAge.toString()}
-                        onValueChange={(value) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            minAge: Number.parseInt(value),
-                          }))
-                        }
-                      >
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="13">13+</SelectItem>
-                          <SelectItem value="16">16+</SelectItem>
-                          <SelectItem value="18">18+</SelectItem>
-                          <SelectItem value="21">21+</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="backgroundCheck"
-                      checked={opportunityData.backgroundCheck}
-                      onCheckedChange={(checked) =>
+                  <div>
+                    <Label htmlFor="location">Location *</Label>
+                    <Input
+                      id="location"
+                      placeholder="e.g., Angkor Archaeological Park, Siem Reap"
+                      value={opportunityData.location}
+                      onChange={(e) =>
                         setOpportunityData((prev) => ({
                           ...prev,
-                          backgroundCheck: checked as boolean,
+                          location: e.target.value,
                         }))
                       }
                     />
-                    <Label htmlFor="backgroundCheck">
-                      Background check required
-                    </Label>
+                  </div>
+
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <Label>Date *</Label>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant="outline"
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {opportunityData.date
+                              ? format(opportunityData.date, "MMM dd")
+                              : "Select date"}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={opportunityData.date}
+                            onSelect={(date) =>
+                              setOpportunityData((prev) => ({ ...prev, date }))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                    </div>
+                    <div>
+                      <Label htmlFor="startTime">Start Time *</Label>
+                      <Input
+                        id="startTime"
+                        type="time"
+                        value={opportunityData.startTime}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            startTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="endTime">End Time *</Label>
+                      <Input
+                        id="endTime"
+                        type="time"
+                        value={opportunityData.endTime}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            endTime: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">
-                      Preferred Skills
+                    <Label htmlFor="maxVolunteers">Maximum Volunteers</Label>
+                    <Input
+                      id="maxVolunteers"
+                      type="number"
+                      min="1"
+                      value={opportunityData.maxVolunteers}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          maxVolunteers: parseInt(e.target.value) || 50,
+                        }))
+                      }
+                    />
+                  </div>
+
+                  <div>
+                    <Label htmlFor="contactEmail">Contact Email *</Label>
+                    <Input
+                      id="contactEmail"
+                      type="email"
+                      placeholder="volunteer@organization.org"
+                      value={opportunityData.contactEmail}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          contactEmail: e.target.value,
+                        }))
+                      }
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Photos</CardTitle>
+                  <CardDescription>
+                    Add photos to make your opportunity more appealing
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="imageUpload" className="cursor-pointer">
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
+                        <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
+                        <p className="text-gray-600 mb-1">
+                          Click to upload photos
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          PNG, JPG up to 5MB each
+                        </p>
+                      </div>
                     </Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2 max-h-40 overflow-y-auto">
+                    <input
+                      id="imageUpload"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      className="hidden"
+                    />
+                  </div>
+
+                  {/* Display uploaded images */}
+                  {opportunityData.images.length > 0 && (
+                    <div className="space-y-3">
+                      <Label className="text-sm font-medium">
+                        Uploaded Photos ({opportunityData.images.length})
+                      </Label>
+                      <div className="grid grid-cols-2 gap-3">
+                        {opportunityData.images.map((image, index) => (
+                          <div key={index} className="relative group">
+                            <img
+                              src={image}
+                              alt={`Upload ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg border"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeImage(index)}
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle>Skills & Expectations</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-3 block">
+                      Skills Needed (optional)
+                    </Label>
+                    <div className="grid grid-cols-3 gap-2">
                       {skillOptions.map((skill) => (
                         <div
                           key={skill}
@@ -962,7 +812,9 @@ export default function CreateOpportunityModal({
                         >
                           <Checkbox
                             id={skill}
-                            checked={opportunityData.skills.includes(skill)}
+                            checked={opportunityData.skillsNeeded.includes(
+                              skill
+                            )}
                             onCheckedChange={() => handleSkillToggle(skill)}
                           />
                           <Label htmlFor={skill} className="text-sm">
@@ -974,22 +826,26 @@ export default function CreateOpportunityModal({
                   </div>
 
                   <div>
-                    <Label className="text-base font-medium mb-3 block">
-                      What Volunteers Get
+                    <Label className="text-sm font-medium mb-3 block">
+                      What to Expect (optional)
                     </Label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                      {benefitOptions.map((benefit) => (
+                    <div className="space-y-2">
+                      {expectationOptions.map((expectation) => (
                         <div
-                          key={benefit}
+                          key={expectation}
                           className="flex items-center space-x-2"
                         >
                           <Checkbox
-                            id={benefit}
-                            checked={opportunityData.benefits.includes(benefit)}
-                            onCheckedChange={() => handleBenefitToggle(benefit)}
+                            id={expectation}
+                            checked={opportunityData.whatToExpected.includes(
+                              expectation
+                            )}
+                            onCheckedChange={() =>
+                              handleExpectationToggle(expectation)
+                            }
                           />
-                          <Label htmlFor={benefit} className="text-sm">
-                            {benefit}
+                          <Label htmlFor={expectation} className="text-sm">
+                            {expectation}
                           </Label>
                         </div>
                       ))}
@@ -997,186 +853,11 @@ export default function CreateOpportunityModal({
                   </div>
                 </CardContent>
               </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Contact Information</CardTitle>
-                  <CardDescription>
-                    How volunteers can reach you
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="contactEmail">Contact Email *</Label>
-                      <Input
-                        id="contactEmail"
-                        type="email"
-                        placeholder="volunteer@organization.org"
-                        value={opportunityData.contactEmail}
-                        onChange={(e) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            contactEmail: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="contactPhone">Contact Phone</Label>
-                      <Input
-                        id="contactPhone"
-                        type="tel"
-                        placeholder="(555) 123-4567"
-                        value={opportunityData.contactPhone}
-                        onChange={(e) =>
-                          setOpportunityData((prev) => ({
-                            ...prev,
-                            contactPhone: e.target.value,
-                          }))
-                        }
-                      />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          )}
-
-          {step === 4 && (
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Additional Settings</CardTitle>
-                  <CardDescription>
-                    Customize your application process
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="autoApprove">
-                        Auto-approve applications
-                      </Label>
-                      <p className="text-sm text-gray-500">
-                        Automatically approve volunteers who meet requirements
-                      </p>
-                    </div>
-                    <Switch
-                      id="autoApprove"
-                      checked={opportunityData.autoApprove}
-                      onCheckedChange={(checked) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          autoApprove: checked,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <Label htmlFor="sendReminders">Send reminders</Label>
-                      <p className="text-sm text-gray-500">
-                        Email reminders to confirmed volunteers
-                      </p>
-                    </div>
-                    <Switch
-                      id="sendReminders"
-                      checked={opportunityData.sendReminders}
-                      onCheckedChange={(checked) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          sendReminders: checked,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-base font-medium mb-3 block">
-                      Custom Application Questions
-                    </Label>
-                    <div className="space-y-2">
-                      {opportunityData.customQuestions.map(
-                        (question, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center space-x-2"
-                          >
-                            <Input
-                              placeholder="Enter your question..."
-                              value={question}
-                              onChange={(e) =>
-                                updateCustomQuestion(index, e.target.value)
-                              }
-                            />
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeCustomQuestion(index)}
-                            >
-                              <X className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        )
-                      )}
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={addCustomQuestion}
-                        className="bg-transparent"
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Question
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle>Media & Documents</CardTitle>
-                  <CardDescription>
-                    Add photos and documents to make your opportunity more
-                    appealing
-                  </CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label className="text-base font-medium mb-3 block">
-                      Photos
-                    </Label>
-                    <FileUpload
-                      onFileUpload={handleImageUpload}
-                      acceptedTypes={[".jpg", ".jpeg", ".png", ".webp"]}
-                      maxSize={5}
-                      multiple={true}
-                    />
-                  </div>
-
-                  <div>
-                    <Label className="text-base font-medium mb-3 block">
-                      Documents
-                    </Label>
-                    <p className="text-sm text-gray-600 mb-3">
-                      Upload any additional documents like flyers, forms, or
-                      information sheets
-                    </p>
-                    <FileUpload
-                      onFileUpload={handleDocumentUpload}
-                      acceptedTypes={[".pdf", ".doc", ".docx"]}
-                      maxSize={10}
-                      multiple={true}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
             </div>
           )}
         </div>
 
+        {/* Navigation */}
         <div className="flex justify-between pt-6 border-t">
           <div>
             {step > 1 && (
@@ -1186,45 +867,27 @@ export default function CreateOpportunityModal({
             )}
           </div>
           <div className="flex space-x-2">
-            {step < 4 ? (
+            {step < 2 ? (
               <Button onClick={nextStep} disabled={!isStepValid()}>
-                Next Step
+                Next
               </Button>
             ) : (
-              <div className="flex space-x-2">
-                <Button
-                  variant="outline"
-                  onClick={() => setPreviewMode(true)}
-                  className="bg-transparent"
-                >
+              <>
+                <Button variant="outline" onClick={() => setPreviewMode(true)}>
                   <Eye className="h-4 w-4 mr-2" />
                   Preview
                 </Button>
                 <Button
-                  variant="outline"
-                  onClick={() => handleSubmit(true)}
-                  disabled={isSubmitting}
-                  className="bg-transparent"
-                >
-                  <Save className="h-4 w-4 mr-2" />
-                  Save Draft
-                </Button>
-                <Button
-                  onClick={() => handleSubmit(false)}
+                  onClick={handleSubmit}
                   disabled={!isStepValid() || isSubmitting}
                 >
-                  {isSubmitting ? (
-                    <>
-                      <Upload className="h-4 w-4 mr-2 animate-spin" />
-                      {editingOpportunity ? "Updating..." : "Publishing..."}
-                    </>
-                  ) : editingOpportunity ? (
-                    "Update Opportunity"
-                  ) : (
-                    "Publish Opportunity"
-                  )}
+                  {isSubmitting
+                    ? "Publishing..."
+                    : editingOpportunity
+                    ? "Update"
+                    : "Publish"}
                 </Button>
-              </div>
+              </>
             )}
           </div>
         </div>

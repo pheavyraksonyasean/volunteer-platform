@@ -20,7 +20,7 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { Mail, ArrowLeft } from "lucide-react";
+import { Mail, ArrowLeft, CheckCircle, Clock } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 export default function EmailVerification() {
@@ -35,12 +35,15 @@ export default function EmailVerification() {
   const [countdown, setCountdown] = useState(0);
 
   useEffect(() => {
-    const storedEndTime = localStorage.getItem("resendCooldownEndTime");
-    if (storedEndTime) {
-      const endTime = parseInt(storedEndTime, 10);
-      const remainingTime = Math.ceil((endTime - Date.now()) / 1000);
-      if (remainingTime > 0) {
-        setCountdown(remainingTime);
+    // Check for localStorage in client-side only
+    if (typeof window !== "undefined") {
+      const storedEndTime = localStorage.getItem("resendCooldownEndTime");
+      if (storedEndTime) {
+        const endTime = parseInt(storedEndTime, 10);
+        const remainingTime = Math.ceil((endTime - Date.now()) / 1000);
+        if (remainingTime > 0) {
+          setCountdown(remainingTime);
+        }
       }
     }
   }, []);
@@ -152,7 +155,12 @@ export default function EmailVerification() {
       });
 
       const cooldownEndTime = Date.now() + 65000;
-      localStorage.setItem("resendCooldownEndTime", cooldownEndTime.toString());
+      if (typeof window !== "undefined") {
+        localStorage.setItem(
+          "resendCooldownEndTime",
+          cooldownEndTime.toString()
+        );
+      }
       setCountdown(65); // 65 second cooldown
     } catch (error) {
       console.error("Resend error:", error);
@@ -174,82 +182,145 @@ export default function EmailVerification() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-white py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8">
-        <Card>
-          <CardHeader className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-pink-100">
-              <Mail className="h-6 w-6 text-pink-800" />
-            </div>
-            <CardTitle className="mt-4">Verify Your Email</CardTitle>
-            <CardDescription>
-              We've sent a 6-digit verification code to <strong>{email}</strong>
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleVerifyOtp} className="space-y-6">
-              <div className="flex flex-col items-center space-y-2">
-                <Label htmlFor="otp">Verification Code</Label>
+    <div className="w-full">
+      <Card className="shadow-lg border-0 sm:shadow-xl">
+        <CardHeader className="text-center space-y-4 pb-6">
+          <div className="mx-auto flex items-center justify-center h-16 w-16 sm:h-20 sm:w-20 rounded-full bg-gradient-to-br from-pink-100 to-pink-200 shadow-lg">
+            <Mail className="h-8 w-8 sm:h-10 sm:w-10 text-pink-600" />
+          </div>
+          <CardTitle className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-pink-600 to-pink-800 bg-clip-text text-transparent">
+            Verify Your Email
+          </CardTitle>
+          <CardDescription className="text-base sm:text-lg text-gray-600 max-w-sm mx-auto">
+            <p className=" font-semibold text-pink-600 break-all">{email}</p>
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <form onSubmit={handleVerifyOtp} className="space-y-6">
+            <div className="flex flex-col items-center space-y-4">
+              <Label
+                htmlFor="otp"
+                className="text-lg font-semibold text-gray-800"
+              >
+                Verification Code
+              </Label>
+              <div className="w-full flex justify-center">
                 <InputOTP
                   id="otp"
                   maxLength={6}
                   value={otp}
                   onChange={(value) => setOtp(value)}
                   disabled={isLoading}
+                  className="gap-2 sm:gap-3"
                 >
-                  <InputOTPGroup>
-                    <InputOTPSlot index={0} />
-                    <InputOTPSlot index={1} />
-                    <InputOTPSlot index={2} />
-                  </InputOTPGroup>
+                  <InputOTPGroup className="gap-2 sm:gap-3">
+                    <InputOTPSlot
+                      index={0}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
+                    <InputOTPSlot
+                      index={1}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
+                    <InputOTPSlot
+                      index={2}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
 
-                  <InputOTPGroup>
-                    <InputOTPSlot index={3} />
-                    <InputOTPSlot index={4} />
-                    <InputOTPSlot index={5} />
+                    <InputOTPSlot
+                      index={3}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
+                    <InputOTPSlot
+                      index={4}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
+                    <InputOTPSlot
+                      index={5}
+                      className="w-9 h-9 sm:w-14 sm:h-14 text-lg font-semibold border-2 border-gray-300 focus:border-pink-500 rounded-lg"
+                    />
                   </InputOTPGroup>
                 </InputOTP>
               </div>
+              <p className="text-sm text-gray-500 text-center">
+                Enter the 6-digit code from your email
+              </p>
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-pink-800 hover:bg-pink-950"
-                size="lg"
-                disabled={isLoading || otp.length !== 6}
-              >
-                {isLoading ? "Verifying..." : "Verify Email"}
-              </Button>
-            </form>
+            <Button
+              type="submit"
+              className="w-full h-12 bg-gradient-to-r from-pink-600 to-pink-700 hover:from-pink-700 hover:to-pink-800 text-white font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all duration-200 transform hover:scale-105"
+              size="lg"
+              disabled={isLoading || otp.length !== 6}
+            >
+              {isLoading ? (
+                <span className="flex items-center">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                  Verifying...
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  <CheckCircle className="h-5 w-5 mr-2" />
+                  Verify Email
+                </span>
+              )}
+            </Button>
+          </form>
 
-            <div className="mt-6 text-center space-y-4">
-              <p className="text-sm text-gray-600">Didn't receive the code?</p>
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-gray-300" />
+            </div>
+            <div className="relative flex justify-center text-xs uppercase">
+              <span className="bg-white px-2 text-gray-500">Need Help?</span>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="space-y-3">
+            <div className="text-center">
+              <p className="text-sm text-gray-600 mb-3">
+                Didn't receive the code?
+              </p>
               <Button
                 type="button"
                 variant="outline"
                 onClick={handleResendCode}
                 disabled={isResending || countdown > 0}
-                className="w-full"
+                className="w-full h-12 border-pink-200 text-pink-600 hover:bg-pink-50 hover:border-pink-300 font-medium"
               >
-                {isResending
-                  ? "Sending..."
-                  : countdown > 0
-                  ? `Resend in ${countdown}s`
-                  : "Resend Code"}
-              </Button>
-
-              <Button
-                type="button"
-                variant="ghost"
-                onClick={() => router.push("/register")}
-                className="w-full text-pink-800 hover:text-pink-950"
-              >
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back to Registration
+                {isResending ? (
+                  <span className="flex items-center">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-pink-600 mr-2"></div>
+                    Sending...
+                  </span>
+                ) : countdown > 0 ? (
+                  <span className="flex items-center">
+                    <Clock className="h-4 w-4 mr-2" />
+                    Resend in {countdown}s
+                  </span>
+                ) : (
+                  <span className="flex items-center">
+                    <Mail className="h-4 w-4 mr-2" />
+                    Resend Code
+                  </span>
+                )}
               </Button>
             </div>
-          </CardContent>
-        </Card>
-      </div>
+
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => router.push("/register")}
+              className="w-full h-12 text-gray-600 hover:text-pink-600 hover:bg-pink-50 font-medium"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back to Registration
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
