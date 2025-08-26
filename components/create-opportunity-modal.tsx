@@ -43,6 +43,13 @@ import {
   Upload,
   X,
   Image as ImageIcon,
+  FileText,
+  Camera,
+  Settings,
+  ArrowRight,
+  ArrowLeft,
+  Sparkles,
+  Info,
 } from "lucide-react";
 import { format } from "date-fns";
 
@@ -117,6 +124,30 @@ export default function CreateOpportunityModal({
     "Refreshments and meals included",
     "Transportation assistance if needed",
     "Professional networking opportunities",
+  ];
+
+  const stepConfig = [
+    {
+      number: 1,
+      title: "Basic Info",
+      description: "Tell us about your opportunity",
+      icon: FileText,
+      color: "from-blue-500 to-blue-600",
+    },
+    {
+      number: 2,
+      title: "Event Details",
+      description: "When and where will it happen",
+      icon: CalendarIcon,
+      color: "from-purple-500 to-purple-600",
+    },
+    {
+      number: 3,
+      title: "Media & Skills",
+      description: "Add photos and requirements",
+      icon: Camera,
+      color: "from-pink-500 to-pink-600",
+    },
   ];
 
   const handleSkillToggle = (skill: string) => {
@@ -202,13 +233,25 @@ export default function CreateOpportunityModal({
     try {
       const finalData = {
         ...opportunityData,
+        date: opportunityData.date
+          ? opportunityData.date.toISOString().split("T")[0]
+          : undefined,
         postedDate: new Date(),
         views: 0,
         applications: 0,
         currentRegistered: 0,
       };
 
-      await onSubmit(finalData);
+      // Call your API route
+      const res = await fetch("/api/opportunities", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(finalData),
+      });
+
+      if (!res.ok) throw new Error("Failed to create opportunity");
+
+      await onSubmit(finalData); // Optionally update local state/UI
       onClose();
     } catch (error) {
       console.error("Error creating opportunity:", error);
@@ -245,29 +288,32 @@ export default function CreateOpportunityModal({
   if (previewMode) {
     return (
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle className="flex items-center justify-between">
-              Preview Opportunity
+        <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0">
+          <div className="sticky top-0 z-10 bg-white border-b px-6 py-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">Preview Opportunity</h2>
+                <p className="text-sm text-gray-600">How your opportunity will appear to volunteers</p>
+              </div>
               <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setPreviewMode(false)}>
+                <Button variant="outline" onClick={() => setPreviewMode(false)} size="sm">
                   Edit
                 </Button>
-                <Button onClick={handleSubmit}>
+                <Button onClick={handleSubmit} size="sm" className="bg-pink-600 hover:bg-pink-700">
                   {editingOpportunity ? "Update" : "Publish"}
                 </Button>
               </div>
-            </DialogTitle>
-          </DialogHeader>
+            </div>
+          </div>
 
-          <div className="space-y-6 mt-6">
+          <div className="px-6 pb-6 space-y-6">
             {/* Hero Image */}
             {opportunityData.images.length > 0 && (
               <div className="relative">
                 <img
                   src={opportunityData.images[0]}
                   alt="Opportunity banner"
-                  className="w-full h-48 object-cover rounded-lg"
+                  className="w-full h-48 sm:h-64 object-cover rounded-lg"
                 />
                 <div className="absolute top-4 left-4">
                   <Badge className="bg-gray-800 text-white px-3 py-1">
@@ -294,9 +340,9 @@ export default function CreateOpportunityModal({
             </div>
 
             {/* Two Column Layout */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
               {/* Left Column - Main Content */}
-              <div className="lg:col-span-2 space-y-8">
+              <div className="lg:col-span-2 space-y-6 lg:space-y-8">
                 {/* Event Details */}
                 <div>
                   <h3 className="text-xl font-bold text-gray-900 mb-4">
@@ -312,8 +358,8 @@ export default function CreateOpportunityModal({
                         <p className="font-medium text-gray-900">Date</p>
                         <p className="text-gray-600">
                           {opportunityData.date
-                            ? format(opportunityData.date, "MMM dd, yyyy")
-                            : "Date TBD"}
+                            ? format(opportunityData.date, "MMM dd, yyyy") // <-- Shows month, day, and year
+                            : "Select date"}
                         </p>
                       </div>
                     </div>
@@ -350,16 +396,12 @@ export default function CreateOpportunityModal({
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">Volunteers</p>
                         <p className="text-gray-600 mb-2">
-                          30 of {opportunityData.maxVolunteers} registered
+                          0 of {opportunityData.maxVolunteers} registered
                         </p>
                         <div className="w-full bg-gray-200 rounded-full h-2">
                           <div
                             className="bg-pink-600 h-2 rounded-full"
-                            style={{
-                              width: `${
-                                (30 / opportunityData.maxVolunteers) * 100
-                              }%`,
-                            }}
+                            style={{ width: "0%" }}
                           />
                         </div>
                       </div>
@@ -434,20 +476,20 @@ export default function CreateOpportunityModal({
                   <div className="space-y-3">
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Posted:</span>
-                      <span className="font-medium">2 days ago</span>
+                      <span className="font-medium">Now</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Views:</span>
                       <div className="flex items-center gap-1">
                         <Eye className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">142</span>
+                        <span className="font-medium">0</span>
                       </div>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-gray-600">Applications:</span>
                       <div className="flex items-center gap-1">
                         <Users className="h-4 w-4 text-gray-500" />
-                        <span className="font-medium">8</span>
+                        <span className="font-medium">0</span>
                       </div>
                     </div>
                   </div>
@@ -462,176 +504,223 @@ export default function CreateOpportunityModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>
-            {editingOpportunity ? "Edit Opportunity" : "Create Opportunity"}
-          </DialogTitle>
-          <DialogDescription>
-            Create a volunteer opportunity for your organization
-          </DialogDescription>
-        </DialogHeader>
+      <DialogContent className="max-w-4xl max-h-[95vh] overflow-y-auto p-0">
+        <div className="sticky top-0 z-10 bg-white border-b px-4 sm:px-6 py-4">
+          <DialogHeader>
+            <DialogTitle className="text-xl sm:text-2xl font-bold bg-pink-800 bg-clip-text text-transparent">
+              {editingOpportunity ? "Edit Opportunity" : "Create New Opportunity"}
+            </DialogTitle>
+            <DialogDescription className="text-gray-600">
+              Share your volunteer opportunity with the community in 3 easy steps
+            </DialogDescription>
+          </DialogHeader>
 
-        {/* Simple 2-step progress */}
-        <div className="flex items-center justify-center mb-6">
-          <div className="flex items-center space-x-4">
-            {[1, 2].map((stepNumber) => (
-              <div key={stepNumber} className="flex items-center">
-                <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
-                    step >= stepNumber
-                      ? "bg-pink-600 text-white"
-                      : "bg-gray-200 text-gray-600"
-                  }`}
-                >
-                  {stepNumber}
-                </div>
-                {stepNumber < 2 && (
-                  <div
-                    className={`w-12 h-1 mx-2 ${
-                      step > stepNumber ? "bg-pink-600" : "bg-gray-200"
-                    }`}
-                  />
-                )}
-              </div>
-            ))}
+          {/* Enhanced Progress Bar */}
+          <div className="mt-6">
+            <div className="flex items-center justify-between mb-4">
+              {stepConfig.map((stepInfo, index) => {
+                const StepIcon = stepInfo.icon;
+                const isActive = step >= stepInfo.number;
+                const isCurrent = step === stepInfo.number;
+                
+                return (
+                  <div key={stepInfo.number} className="flex items-center flex-1">
+                    <div className="flex flex-col items-center">
+                      <div
+                        className={`relative w-10 h-10 sm:w-12 sm:h-12 rounded-full flex items-center justify-center transition-all duration-300 ${
+                          isActive
+                            ? `bg-black text-white shadow-lg`
+                            : "bg-gray-200 text-gray-400"
+                        } ${isCurrent ? "scale-110 ring-4 ring-white shadow-xl" : ""}`}
+                      >
+                        <StepIcon className="h-5 w-5 sm:h-6 sm:w-6" />
+                        {isCurrent && (
+                          <div className="absolute -inset-1 bg-gradient-to-r from-pink-400 to-purple-400 rounded-full opacity-30 animate-pulse"></div>
+                        )}
+                      </div>
+                      <div className="mt-2 text-center">
+                        <p className={`text-xs sm:text-sm font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
+                          {stepInfo.title}
+                        </p>
+                        <p className="text-xs text-gray-500 hidden sm:block">
+                          {stepInfo.description}
+                        </p>
+                      </div>
+                    </div>
+                    {index < stepConfig.length - 1 && (
+                      <div
+                        className={`flex-1 h-1 mx-2 sm:mx-4 rounded-full transition-all duration-300 ${
+                          step > stepInfo.number
+                            ? `bg-gradient-to-r ${stepInfo.color}`
+                            : "bg-gray-200"
+                        }`}
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-6 text-center text-sm">
-          <div
-            className={
-              step >= 1 ? "text-pink-600 font-medium" : "text-gray-500"
-            }
-          >
-            Basic Information
-          </div>
-          <div
-            className={
-              step >= 2 ? "text-pink-600 font-medium" : "text-gray-500"
-            }
-          >
-            Event Details & Requirements
-          </div>
-        </div>
-
-        <div className="space-y-6">
+        <div className="px-4 sm:px-6 py-6">
           {/* Step 1: Basic Information */}
           {step === 1 && (
-            <Card>
-              <CardHeader>
-                <CardTitle>Basic Information</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-6 animate-in slide-in-from-right duration-300">
+              <div className="text-center mb-6">
+
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Tell us about your opportunity</h3>
+                <p className="text-gray-600">Help volunteers understand what makes your opportunity special</p>
+              </div>
+
+              <Card className="shadow-sm border-pink-200">
+                <CardHeader className="bg-white">
+                  <CardTitle className="flex items-center gap-2 text-pink-800">
+                    <Building className="h-5 w-5" />
+                    Organization Details
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4 pt-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="organizationName" className="text-sm font-medium text-gray-700">
+                        Organization Name *
+                      </Label>
+                      <Input
+                        id="organizationName"
+                        placeholder="e.g., APSARA Authority"
+                        value={opportunityData.organizationName}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            organizationName: e.target.value,
+                          }))
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+                    <div className="flex items-center space-x-2 pt-6 sm:pt-8">
+                      <Checkbox
+                        id="verifiedOrg"
+                        checked={opportunityData.isVerifiedOrg}
+                        onCheckedChange={(checked) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            isVerifiedOrg: checked as boolean,
+                          }))
+                        }
+                      />
+                      <Label
+                        htmlFor="verifiedOrg"
+                        className="flex items-center text-sm font-medium text-gray-700"
+                      >
+                        <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
+                        Verified Organization
+                      </Label>
+                    </div>
+                  </div>
+
                   <div>
-                    <Label htmlFor="organizationName">
-                      Organization Name *
+                    <Label htmlFor="title" className="text-sm font-medium text-gray-700">
+                      Opportunity Title *
                     </Label>
                     <Input
-                      id="organizationName"
-                      placeholder="e.g., APSARA Authority"
-                      value={opportunityData.organizationName}
+                      id="title"
+                      placeholder="e.g., Temple Conservation Volunteer"
+                      value={opportunityData.title}
                       onChange={(e) =>
                         setOpportunityData((prev) => ({
                           ...prev,
-                          organizationName: e.target.value,
+                          title: e.target.value,
                         }))
                       }
+                      className="mt-1"
                     />
                   </div>
-                  <div className="flex items-center space-x-2 pt-8">
-                    <Checkbox
-                      id="verifiedOrg"
-                      checked={opportunityData.isVerifiedOrg}
-                      onCheckedChange={(checked) =>
+
+                  <div>
+                    <Label htmlFor="category" className="text-sm font-medium text-gray-700">
+                      Category *
+                    </Label>
+                    <Select
+                      value={opportunityData.category}
+                      onValueChange={(value) =>
                         setOpportunityData((prev) => ({
                           ...prev,
-                          isVerifiedOrg: checked as boolean,
+                          category: value,
                         }))
                       }
-                    />
-                    <Label
-                      htmlFor="verifiedOrg"
-                      className="flex items-center text-sm"
                     >
-                      <CheckCircle className="h-4 w-4 mr-1 text-green-500" />
-                      Verified Organization
-                    </Label>
+                      <SelectTrigger className="mt-1">
+                        <SelectValue placeholder="Select a category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {categories.map((category) => (
+                          <SelectItem key={category} value={category}>
+                            {category}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
-                </div>
 
-                <div>
-                  <Label htmlFor="title">Opportunity Title *</Label>
-                  <Input
-                    id="title"
-                    placeholder="e.g., Temple Conservation Volunteer"
-                    value={opportunityData.title}
-                    onChange={(e) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        title: e.target.value,
-                      }))
-                    }
-                  />
-                </div>
-
-                <div>
-                  <Label htmlFor="category">Category *</Label>
-                  <Select
-                    value={opportunityData.category}
-                    onValueChange={(value) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        category: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>
-                          {category}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div>
-                  <Label htmlFor="description">Description *</Label>
-                  <Textarea
-                    id="description"
-                    placeholder="Describe what volunteers will do and the impact they'll make..."
-                    value={opportunityData.description}
-                    onChange={(e) =>
-                      setOpportunityData((prev) => ({
-                        ...prev,
-                        description: e.target.value,
-                      }))
-                    }
-                    rows={4}
-                  />
-                  <p className="text-xs text-gray-500 mt-1">
-                    {opportunityData.description.length}/20 characters minimum
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+                  <div>
+                    <Label htmlFor="description" className="text-sm font-medium text-gray-700">
+                      Description *
+                    </Label>
+                    <Textarea
+                      id="description"
+                      placeholder="Describe what volunteers will do, the impact they'll make, and why this opportunity matters..."
+                      value={opportunityData.description}
+                      onChange={(e) =>
+                        setOpportunityData((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      rows={4}
+                      className="mt-1"
+                    />
+                    <div className="flex items-center justify-between mt-2">
+                      <p className={`text-xs ${
+                        opportunityData.description.length < 20 ? 'text-red-500' : 'text-green-600'
+                      }`}>
+                        {opportunityData.description.length}/20 characters minimum
+                      </p>
+                      {opportunityData.description.length >= 20 && (
+                        <div className="flex items-center gap-1 text-green-600">
+                          <CheckCircle className="h-3 w-3" />
+                          <span className="text-xs">Good!</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
           )}
 
-          {/* Step 2: Event Details & Requirements */}
+          {/* Step 2: Event Details */}
           {step === 2 && (
-            <div className="space-y-6">
-              <Card>
-                <CardHeader>
-                  <CardTitle>Event Details</CardTitle>
+            <div className="space-y-6 animate-in slide-in-from-right duration-300">
+              <div className="text-center mb-6">
+
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">When and where will it happen?</h3>
+                <p className="text-gray-600">Set the time, date, and location for your volunteer event</p>
+              </div>
+
+              <Card className="shadow-sm border-pink-200">
+                <CardHeader className="bg-ehite0">
+                  <CardTitle className="flex items-center gap-2 text-pink-800">
+                    <MapPin className="h-5 w-5" />
+                    Event Information
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
                   <div>
-                    <Label htmlFor="location">Location *</Label>
+                    <Label htmlFor="location" className="text-sm font-medium text-gray-700">
+                      Location *
+                    </Label>
                     <Input
                       id="location"
                       placeholder="e.g., Angkor Archaeological Park, Siem Reap"
@@ -642,21 +731,22 @@ export default function CreateOpportunityModal({
                           location: e.target.value,
                         }))
                       }
+                      className="mt-1"
                     />
                   </div>
 
-                  <div className="grid grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                     <div>
-                      <Label>Date *</Label>
+                      <Label className="text-sm font-medium text-gray-700">Date *</Label>
                       <Popover>
                         <PopoverTrigger asChild>
                           <Button
                             variant="outline"
-                            className="w-full justify-start text-left font-normal"
+                            className="w-full justify-start text-left font-normal mt-1"
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {opportunityData.date
-                              ? format(opportunityData.date, "MMM dd")
+                              ? format(opportunityData.date, "MMM dd, yyyy")
                               : "Select date"}
                           </Button>
                         </PopoverTrigger>
@@ -673,7 +763,7 @@ export default function CreateOpportunityModal({
                       </Popover>
                     </div>
                     <div>
-                      <Label htmlFor="startTime">Start Time *</Label>
+                      <Label htmlFor="startTime" className="text-sm font-medium text-gray-700">Start Time *</Label>
                       <Input
                         id="startTime"
                         type="time"
@@ -684,10 +774,11 @@ export default function CreateOpportunityModal({
                             startTime: e.target.value,
                           }))
                         }
+                        className="mt-1"
                       />
                     </div>
                     <div>
-                      <Label htmlFor="endTime">End Time *</Label>
+                      <Label htmlFor="endTime" className="text-sm font-medium text-gray-700">End Time *</Label>
                       <Input
                         id="endTime"
                         type="time"
@@ -698,61 +789,79 @@ export default function CreateOpportunityModal({
                             endTime: e.target.value,
                           }))
                         }
+                        className="mt-1"
                       />
                     </div>
                   </div>
 
-                  <div>
-                    <Label htmlFor="maxVolunteers">Maximum Volunteers</Label>
-                    <Input
-                      id="maxVolunteers"
-                      type="number"
-                      min="1"
-                      value={opportunityData.maxVolunteers}
-                      onChange={(e) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          maxVolunteers: parseInt(e.target.value) || 50,
-                        }))
-                      }
-                    />
-                  </div>
-
-                  <div>
-                    <Label htmlFor="contactEmail">Contact Email *</Label>
-                    <Input
-                      id="contactEmail"
-                      type="email"
-                      placeholder="volunteer@organization.org"
-                      value={opportunityData.contactEmail}
-                      onChange={(e) =>
-                        setOpportunityData((prev) => ({
-                          ...prev,
-                          contactEmail: e.target.value,
-                        }))
-                      }
-                    />
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <Label htmlFor="maxVolunteers" className="text-sm font-medium text-gray-700">Maximum Volunteers</Label>
+                      <Input
+                        id="maxVolunteers"
+                        type="number"
+                        min="1"
+                        value={opportunityData.maxVolunteers}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            maxVolunteers: parseInt(e.target.value) || 50,
+                          }))
+                        }
+                        className="mt-1"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="contactEmail" className="text-sm font-medium text-gray-700">Contact Email *</Label>
+                      <Input
+                        id="contactEmail"
+                        type="email"
+                        placeholder="volunteer@organization.org"
+                        value={opportunityData.contactEmail}
+                        onChange={(e) =>
+                          setOpportunityData((prev) => ({
+                            ...prev,
+                            contactEmail: e.target.value,
+                          }))
+                        }
+                        className="mt-1"
+                      />
+                    </div>
                   </div>
                 </CardContent>
               </Card>
+            </div>
+          )}
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Photos</CardTitle>
+          {/* Step 3: Media & Skills */}
+          {step === 3 && (
+            <div className="space-y-6 animate-in slide-in-from-right duration-300">
+              <div className="text-center mb-6">
+
+                <h3 className="text-lg sm:text-xl font-bold text-gray-900">Add photos and requirements</h3>
+                <p className="text-gray-600">Make your opportunity stand out with great photos and clear expectations</p>
+              </div>
+
+              <Card className="shadow-sm border-pink-200">
+                <CardHeader className="bg-white">
+                  <CardTitle className="flex items-center gap-2 text-pink-800">
+                    <ImageIcon className="h-5 w-5" />
+                    Photos & Media
+                  </CardTitle>
                   <CardDescription>
-                    Add photos to make your opportunity more appealing
+                    Add compelling photos to attract more volunteers (optional but recommended)
                   </CardDescription>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-4 pt-6">
                   <div>
                     <Label htmlFor="imageUpload" className="cursor-pointer">
-                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors">
-                        <Upload className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-                        <p className="text-gray-600 mb-1">
+                      <div className="border-2 border-dashed border-pink-300 rounded-lg p-6 text-center hover:border-pink-400 transition-colors bg-white">
+                        <Upload className="h-8 w-8 text-pink-400 mx-auto mb-2" />
+                        <p className="text-gray-600 mb-1 font-medium">
                           Click to upload photos
                         </p>
                         <p className="text-sm text-gray-500">
-                          PNG, JPG up to 5MB each
+                          PNG, JPG up to 5MB each. First image will be the main banner.
                         </p>
                       </div>
                     </Label>
@@ -769,21 +878,36 @@ export default function CreateOpportunityModal({
                   {/* Display uploaded images */}
                   {opportunityData.images.length > 0 && (
                     <div className="space-y-3">
-                      <Label className="text-sm font-medium">
-                        Uploaded Photos ({opportunityData.images.length})
-                      </Label>
-                      <div className="grid grid-cols-2 gap-3">
+                      <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium text-gray-700">
+                          Uploaded Photos ({opportunityData.images.length})
+                        </Label>
+                        {opportunityData.images.length > 0 && (
+                          <div className="flex items-center gap-1 text-green-600">
+                            <CheckCircle className="h-4 w-4" />
+                            <span className="text-sm">Looking good!</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                         {opportunityData.images.map((image, index) => (
                           <div key={index} className="relative group">
                             <img
                               src={image}
                               alt={`Upload ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg border"
+                              className="w-full h-24 object-cover rounded-lg border shadow-sm"
                             />
+                            {index === 0 && (
+                              <div className="absolute bottom-1 left-1">
+                                <Badge className="text-xs bg-pink-600 text-white">
+                                  Main
+                                </Badge>
+                              </div>
+                            )}
                             <button
                               type="button"
                               onClick={() => removeImage(index)}
-                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                              className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
                             >
                               <X className="h-3 w-3" />
                             </button>
@@ -795,20 +919,26 @@ export default function CreateOpportunityModal({
                 </CardContent>
               </Card>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Skills & Expectations</CardTitle>
+              <Card className="shadow-sm border-pink-200">
+                <CardHeader className="bg-white">
+                  <CardTitle className="flex items-center gap-2 text-pink-800">
+                    <Settings className="h-5 w-5" />
+                    Skills & Expectations
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
+                <CardContent className="space-y-6 pt-6">
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">
+                    <Label className="text-sm font-medium mb-3 block text-gray-700">
                       Skills Needed (optional)
                     </Label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <p className="text-xs text-gray-500 mb-3">
+                      Select skills that would be helpful for volunteers to have
+                    </p>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                       {skillOptions.map((skill) => (
                         <div
                           key={skill}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           <Checkbox
                             id={skill}
@@ -817,23 +947,38 @@ export default function CreateOpportunityModal({
                             )}
                             onCheckedChange={() => handleSkillToggle(skill)}
                           />
-                          <Label htmlFor={skill} className="text-sm">
+                          <Label htmlFor={skill} className="text-sm cursor-pointer">
                             {skill}
                           </Label>
                         </div>
                       ))}
                     </div>
+                    {opportunityData.skillsNeeded.length > 0 && (
+                      <div className="mt-3 p-3 bg-blue-50 rounded-lg">
+                        <p className="text-sm font-medium text-blue-800 mb-2">Selected skills:</p>
+                        <div className="flex flex-wrap gap-1">
+                          {opportunityData.skillsNeeded.map((skill) => (
+                            <Badge key={skill} variant="secondary" className="text-xs">
+                              {skill}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
 
                   <div>
-                    <Label className="text-sm font-medium mb-3 block">
+                    <Label className="text-sm font-medium mb-3 block text-gray-700">
                       What to Expect (optional)
                     </Label>
+                    <p className="text-xs text-gray-500 mb-3">
+                      Let volunteers know what they can expect from this opportunity
+                    </p>
                     <div className="space-y-2">
                       {expectationOptions.map((expectation) => (
                         <div
                           key={expectation}
-                          className="flex items-center space-x-2"
+                          className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-50 transition-colors"
                         >
                           <Checkbox
                             id={expectation}
@@ -844,12 +989,25 @@ export default function CreateOpportunityModal({
                               handleExpectationToggle(expectation)
                             }
                           />
-                          <Label htmlFor={expectation} className="text-sm">
+                          <Label htmlFor={expectation} className="text-sm cursor-pointer flex-1">
                             {expectation}
                           </Label>
                         </div>
                       ))}
                     </div>
+                    {opportunityData.whatToExpected.length > 0 && (
+                      <div className="mt-3 p-3 bg-green-50 rounded-lg">
+                        <p className="text-sm font-medium text-green-800 mb-2">What volunteers can expect:</p>
+                        <ul className="space-y-1">
+                          {opportunityData.whatToExpected.map((item, index) => (
+                            <li key={index} className="flex items-start gap-2 text-sm text-green-700">
+                              <div className="w-1.5 h-1.5 bg-green-600 rounded-full mt-1.5 flex-shrink-0" />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -857,38 +1015,70 @@ export default function CreateOpportunityModal({
           )}
         </div>
 
-        {/* Navigation */}
-        <div className="flex justify-between pt-6 border-t">
-          <div>
-            {step > 1 && (
-              <Button variant="outline" onClick={prevStep}>
-                Previous
-              </Button>
-            )}
-          </div>
-          <div className="flex space-x-2">
-            {step < 2 ? (
-              <Button onClick={nextStep} disabled={!isStepValid()}>
-                Next
-              </Button>
-            ) : (
-              <>
-                <Button variant="outline" onClick={() => setPreviewMode(true)}>
-                  <Eye className="h-4 w-4 mr-2" />
-                  Preview
+        {/* Enhanced Navigation */}
+        <div className="sticky bottom-0 bg-white border-t px-4 sm:px-6 py-4">
+          <div className="flex justify-between items-center">
+            <div>
+              {step > 1 && (
+                <Button variant="outline" onClick={prevStep} className="flex items-center gap-2">
+                  <ArrowLeft className="h-4 w-4" />
+                  Previous
                 </Button>
-                <Button
-                  onClick={handleSubmit}
-                  disabled={!isStepValid() || isSubmitting}
+              )}
+            </div>
+            
+            <div className="flex items-center gap-3">
+              {/* Step indicator for mobile */}
+              <div className="flex sm:hidden items-center gap-1">
+                {[1, 2, 3].map((stepNum) => (
+                  <div
+                    key={stepNum}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      step >= stepNum ? 'bg-pink-600' : 'bg-gray-300'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              {step < 3 ? (
+                <Button 
+                  onClick={nextStep} 
+                  disabled={!isStepValid()}
+                  className="flex items-center gap-2 bg-pink-800 hover:from-pink-700 hover:to-purple-700"
                 >
-                  {isSubmitting
-                    ? "Publishing..."
-                    : editingOpportunity
-                    ? "Update"
-                    : "Publish"}
+                  Next
+                  <ArrowRight className="h-4 w-4" />
                 </Button>
-              </>
-            )}
+              ) : (
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setPreviewMode(true)}
+                    className="flex items-center gap-2"
+                  >
+                    <Eye className="h-4 w-4" />
+                    <span className="hidden sm:inline">Preview</span>
+                  </Button>
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={!isStepValid() || isSubmitting}
+                    className="flex items-center gap-2 bg-pink-800 hover:from-pink-700 hover:to-purple-700 min-w-[100px]"
+                  >
+                    {isSubmitting ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                        <span className="hidden sm:inline">Publishing...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4" />
+                        {editingOpportunity ? "Update" : "Publish"}
+                      </>
+                    )}
+                  </Button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </DialogContent>

@@ -6,9 +6,9 @@ export default function LoginPage() {
       {/* Mobile Layout */}
       <div className="lg:hidden">
         {/* Mobile Header */}
-        <div className="bg-gradient-to-r from-pink-600 to-pink-800 px-6 py-8 text-center">
+        <div className="bg-pink-800 px-6 py-8 text-center">
           <div className="flex flex-col items-center space-y-4">
-            <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
+            <div className="w-20 h-20  rounded-full flex items-center justify-center backdrop-blur-sm">
               <img
                 src="/logo.png"
                 alt="Sabay Volunteer Logo"
