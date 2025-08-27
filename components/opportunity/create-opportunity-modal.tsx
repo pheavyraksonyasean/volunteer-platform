@@ -236,25 +236,28 @@ export default function CreateOpportunityModal({
         date: opportunityData.date
           ? opportunityData.date.toISOString().split("T")[0]
           : undefined,
-        postedDate: new Date(),
-        views: 0,
-        applications: 0,
-        currentRegistered: 0,
+        id: editingOpportunity?.id, // Only for PUT
       };
 
-      // Call your API route
+      const method = editingOpportunity ? "PUT" : "POST";
       const res = await fetch("/api/opportunities", {
-        method: "POST",
+        method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(finalData),
       });
 
-      if (!res.ok) throw new Error("Failed to create opportunity");
+      const result = await res.json();
 
-      await onSubmit(finalData); // Optionally update local state/UI
+      if (!res.ok) {
+        alert(result.error || "Failed to save opportunity");
+        return;
+      }
+
+      await onSubmit(result); // Optionally update local state/UI
       onClose();
     } catch (error) {
-      console.error("Error creating opportunity:", error);
+      alert("Unexpected error occurred.");
+      console.error(error);
     } finally {
       setIsSubmitting(false);
     }

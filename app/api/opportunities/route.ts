@@ -1,85 +1,262 @@
+// In app/api/opportunities/route.ts
+
+import { createClient } from "@/lib/supabase/server";
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { v4 as uuidv4 } from "uuid";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Helper function to decode a base64 image and return a buffer
+function decodeBase64Image(dataString: string) {
+  const matches = dataString.match(/^data:([A-Za-z-+\/]+);base64,(.+)$/);
+  if (matches?.length !== 3) {
+    throw new Error("Invalid input string");
+  }
 
-export async function POST(req: NextRequest) {
+  return {
+    type: matches[1],
+    data: Buffer.from(matches[2], "base64"),
+  };
+}
+
+function isUuid(v: string) {
+  return /^[0-9a-fA-F-]{36}$/.test(v);
+}
+
+export async function POST(request: NextRequest) {
+  const supabase = await createClient({ accessToken: undefined });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = await request.json();
+  const {
+    title,
+    organizationName,
+    categoryId,        // must be a UUID now (preferred)
+    category,          // optional plain-text name; will be resolved to UUID
+    description,
+    location,
+    date,              // matches schema column 'date'
+    startTime,         // time (HH:MM or HH:MM:SS)
+    endTime,
+    maxVolunteers,     // maps to maximum_volunteer
+    contactEmail,
+    images,            // array of base64 or existing URLs
+    skillsNeeded,      // NOT IN SCHEMA (ignored)
+    whatToExpected,    // NOT IN SCHEMA (ignored)
+  } = body;
+
+  // Validate required mapped fields
+  if (!title || !organizationName || (!categoryId && !category) || !date || !startTime || !endTime || !contactEmail) {
+    return NextResponse.json(
+      { error: "Missing required fields (title, organizationName, categoryId/category, date, startTime, endTime, contactEmail)" },
+      { status: 400 }
+    );
+  }
+
   try {
-    const data = await req.json();
-
-    // Get category ID from name
-    const { data: category, error: categoryError } = await supabase
-      .from("categories")
-      .select("id")
-      .eq("name", data.category)
-      .single();
-
-    if (categoryError || !category) {
-      console.error("Category error:", categoryError?.message);
-      return NextResponse.json({ error: "Invalid category" }, { status: 400 });
+    // Handle images => schema has single 'photo' (text). We store first image URL (if any).
+    let photoUrl: string | null = null;
+    if (images?.length) {
+      // Take first image only (others ignored due to schema limitation)
+      const first = images[0];
+      if (first.startsWith("http")) {
+        photoUrl = first;
+      } else {
+        const { type, data } = decodeBase64Image(first);
+        const filePath = `public/${user.id}/${uuidv4()}`;
+        const { error: uploadError } = await supabase.storage
+          .from("opportunity_images")
+          .upload(filePath, data, { contentType: type, upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from("opportunity_images")
+          .getPublicUrl(filePath);
+        photoUrl = urlData.publicUrl;
+      }
     }
 
-    // Insert into opportunities table
-    const { error, data: inserted } = await supabase
+    // Resolve category UUID
+    let finalCategoryId: string | null = null;
+    if (categoryId) {
+      if (!isUuid(categoryId)) {
+        return NextResponse.json(
+          { error: "categoryId must be a valid UUID" },
+          { status: 400 }
+        );
+      }
+      finalCategoryId = categoryId;
+    } else if (category) {
+      // Look up by name (case-insensitive) in categories table
+      const { data: catRow, error: catErr } = await supabase
+        .from("categories")
+        .select("id")
+        .ilike("name", category)
+        .limit(1)
+        .single();
+      if (catErr || !catRow) {
+        return NextResponse.json(
+          { error: `Category name '${category}' not found` },
+          { status: 400 }
+        );
+      }
+      finalCategoryId = catRow.id;
+    }
+    if (!finalCategoryId) {
+      return NextResponse.json(
+        { error: "Unable to resolve category UUID" },
+        { status: 400 }
+      );
+    }
+
+    const insertData = {
+      organization_name: organizationName,
+      opportunity_title: title,
+      category_id: finalCategoryId,
+      description,
+      location,
+      date,
+      start_time: startTime,
+      end_time: endTime,
+      maximum_volunteer: maxVolunteers ?? 1,
+      contact_email: contactEmail,
+      creator_id: user.id,
+      photo: photoUrl,
+    };
+
+    const { data: newOpportunity, error: insertError } = await supabase
       .from("opportunities")
-      .insert([
-        {
-          opportunity_title: data.title,
-          organization_name: data.organizationName,
-          category_id: category.id,
-          description: data.description,
-          location: data.location,
-          date: data.date,
-          start_time: data.startTime,
-          end_time: data.endTime,
-          maximum_volunteer: data.maxVolunteers,
-          contact_email: data.contactEmail,
-          photo: data.images?.[0] || null,
-        },
-      ])
+      .insert(insertData)
       .select()
       .single();
+    if (insertError) throw insertError;
 
-    if (error) {
-      console.error("Supabase insert error:", error.message, error.details);
-      return NextResponse.json({ error: error.message }, { status: 400 });
+    return NextResponse.json(newOpportunity, { status: 201 });
+  } catch (error: any) {
+    console.error("Error creating opportunity:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function PUT(request: NextRequest) {
+  const supabase = await createClient({ accessToken: undefined });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = await request.json();
+  const {
+    id: opportunityId,
+    title,
+    organizationName,
+    categoryId,
+    category,          // fallback
+    description,
+    location,
+    date,
+    startTime,
+    endTime,
+    maxVolunteers,
+    contactEmail,
+    images,
+    skillsNeeded,      // ignored
+    whatToExpected,    // ignored
+  } = body;
+  if (!opportunityId) {
+    return NextResponse.json(
+      { error: "Opportunity ID is required." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Ownership check (RLS should also enforce, but we keep local check)
+    const { data: existing, error: fetchError } = await supabase
+      .from("opportunities")
+      .select("creator_id")
+      .eq("id", opportunityId)
+      .single();
+    if (fetchError || existing?.creator_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
     }
 
-    // Insert skills if provided
-    if (data.skillsNeeded && data.skillsNeeded.length > 0) {
-      // Get skill IDs
-      const { data: skills, error: skillsError } = await supabase
-        .from("skill_expectations")
-        .select("id, name")
-        .in("name", data.skillsNeeded);
-
-      if (skillsError) {
-        console.error("Skill lookup error:", skillsError.message);
-        return NextResponse.json({ error: skillsError.message }, { status: 400 });
-      }
-
-      // Insert into opportunity_skill_expectations
-      const skillLinks = skills.map((skill: any) => ({
-        opportunity_id: inserted.id,
-        skill_expectation_id: skill.id,
-      }));
-
-      const { error: linkError } = await supabase
-        .from("opportunity_skill_expectations")
-        .insert(skillLinks);
-
-      if (linkError) {
-        console.error("Skill link error:", linkError.message);
-        return NextResponse.json({ error: linkError.message }, { status: 400 });
+    let photoUrl: string | undefined;
+    if (images?.length) {
+      const first = images[0];
+      if (first.startsWith("http")) {
+        photoUrl = first;
+      } else {
+        const { type, data } = decodeBase64Image(first);
+        const filePath = `public/${user.id}/${uuidv4()}`;
+        const { error: uploadError } = await supabase.storage
+          .from("opportunity_images")
+          .upload(filePath, data, { contentType: type, upsert: true });
+        if (uploadError) throw uploadError;
+        const { data: urlData } = supabase.storage
+          .from("opportunity_images")
+          .getPublicUrl(filePath);
+        photoUrl = urlData.publicUrl;
       }
     }
 
-    return NextResponse.json({ opportunity: inserted }, { status: 201 });
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    return NextResponse.json({ error: "Unexpected error" }, { status: 500 });
+    const updateData: Record<string, any> = {
+      organization_name: organizationName,
+      opportunity_title: title,
+      // Resolve category for update
+      category_id: undefined,
+      description,
+      location,
+      date,
+      start_time: startTime,
+      end_time: endTime,
+      maximum_volunteer: maxVolunteers,
+      contact_email: contactEmail,
+    };
+
+    if (categoryId) {
+      if (!isUuid(categoryId)) {
+        return NextResponse.json({ error: "categoryId must be a valid UUID" }, { status: 400 });
+      }
+      updateData.category_id = categoryId;
+    } else if (category) {
+      const { data: catRow, error: catErr } = await supabase
+        .from("categories")
+        .select("id")
+        .ilike("name", category)
+        .limit(1)
+        .single();
+      if (catErr || !catRow) {
+        return NextResponse.json(
+          { error: `Category name '${category}' not found` },
+          { status: 400 }
+        );
+      }
+      updateData.category_id = catRow.id;
+    } else {
+      delete updateData.category_id; // no category change
+    }
+    if (photoUrl !== undefined) updateData.photo = photoUrl;
+
+    const { data: updated, error: updateError } = await supabase
+      .from("opportunities")
+      .update(updateData)
+      .eq("id", opportunityId)
+      .select()
+      .single();
+    if (updateError) throw updateError;
+
+    return NextResponse.json(updated, { status: 200 });
+  } catch (error: any) {
+    console.error("Error updating opportunity:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
   }
 }
