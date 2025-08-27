@@ -25,7 +25,7 @@ import {
   Award,
   Target,
 } from "lucide-react";
-import OpportunityCard from "@/components/opportunity-card";
+import OpportunityCard from "@/components/opportunity/opportunity-card";
 
 // Mock data
 const mockOpportunities = [

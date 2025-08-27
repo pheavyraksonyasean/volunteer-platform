@@ -11,8 +11,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Clock, Users, Calendar, Eye, Heart, Share2, CheckCircle } from "lucide-react";
-import DetailedEventModal from "./DetailedEventModal";
-import ApplicationModal from "./application-modal";
+import DetailedEventModal from "../application/DetailedEventModal";
+import ApplicationModal from "../application/application-modal";
 
 interface Opportunity {
   id: number;

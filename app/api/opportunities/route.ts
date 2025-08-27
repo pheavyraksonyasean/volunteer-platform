@@ -260,3 +260,94 @@ export async function PUT(request: NextRequest) {
     );
   }
 }
+
+export async function GET(request: NextRequest) {
+  const supabase = await createClient({ accessToken: undefined });
+  try {
+    const url = new URL(request.url);
+    const id = url.searchParams.get("id");
+    const mine = url.searchParams.get("mine"); // pass ?mine=true to fetch current user's opportunities
+    const categoryId = url.searchParams.get("categoryId");
+    const limit = Math.min(Number(url.searchParams.get("limit") || 100), 1000);
+    const offset = Number(url.searchParams.get("offset") || 0);
+
+    // If requesting "mine", ensure user is authenticated
+    let userId: string | undefined;
+    if (mine === "true") {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      userId = user.id;
+    }
+
+    // If id provided, return single record
+    if (id) {
+      if (!isUuid(id)) {
+        return NextResponse.json({ error: "Invalid opportunity id" }, { status: 400 });
+      }
+      const { data, error } = await supabase
+        .from("opportunities")
+        .select(
+          [
+            "id",
+            "opportunity_title",
+            "organization_name",
+            "category_id",
+            "description",
+            "location",
+            "date",
+            "start_time",
+            "end_time",
+            "maximum_volunteer",
+            "contact_email",
+            "creator_id",
+            "photo",
+          ].join(",")
+        )
+        .eq("id", id)
+        .maybeSingle();
+      if (error) throw error;
+      if (!data) return NextResponse.json({ error: "Not found" }, { status: 404 });
+      return NextResponse.json(data, { status: 200 });
+    }
+
+    // Build list query
+    let query = supabase
+      .from("opportunities")
+      .select(
+        [
+          "id",
+          "opportunity_title",
+          "organization_name",
+          "category_id",
+          "description",
+          "location",
+          "date",
+          "start_time",
+          "end_time",
+          "maximum_volunteer",
+          "contact_email",
+          "creator_id",
+          "photo",
+        ].join(",")
+      )
+      .order("date", { ascending: true })
+      .range(offset, offset + Math.max(limit - 1, 0));
+
+    if (userId) query = query.eq("creator_id", userId);
+    if (categoryId) {
+      if (!isUuid(categoryId)) {
+        return NextResponse.json({ error: "Invalid categoryId" }, { status: 400 });
+      }
+      query = query.eq("category_id", categoryId);
+    }
+
+    const { data, error } = await query;
+    if (error) throw error;
+    return NextResponse.json(data ?? [], { status: 200 });
+  } catch (err: any) {
+    console.error("Error fetching opportunities:", err);
+    return NextResponse.json({ error: "Internal Server Error", details: err.message }, { status: 500 });
+  }
+}
