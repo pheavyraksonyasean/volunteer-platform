@@ -75,7 +75,6 @@ export default function ApplicationModal({
   const [applicationData, setApplicationData] = useState({
     motivation: "",
     experience: "",
-    availability: "",
     skills: [] as string[],
     emergencyContact: "",
     emergencyPhone: "",
@@ -113,27 +112,72 @@ export default function ApplicationModal({
     }));
   };
 
+  /* changed code */
   const handleSubmit = async () => {
     setIsSubmitting(true);
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
+    // Create a FormData object to send data + files
+    const formData = new FormData();
+    formData.append("opportunityId", opportunity.id.toString());
+    formData.append("motivation", applicationData.motivation);
+    formData.append("experience", applicationData.experience);
+    formData.append("emergencyContact", applicationData.emergencyContact);
+    formData.append("emergencyPhone", applicationData.emergencyPhone);
+    formData.append("skills", JSON.stringify(applicationData.skills));
+    formData.append("hasTransportation", String(applicationData.hasTransportation));
+    formData.append("agreeToBackground", String(applicationData.agreeToBackground));
+    formData.append("agreeToCommitment", String(applicationData.agreeToCommitment));
 
-    onSubmit({
-      opportunityId: opportunity.id,
-      ...applicationData,
-    });
+    if (applicationData.resume) {
+      formData.append("resume", applicationData.resume);
+    }
 
-    setIsSubmitting(false);
-    setIsSubmitted(true);
+    try {
+      const response = await fetch("/api/applications", {
+        method: "POST",
+        body: formData,
+        credentials: "same-origin", // <-- ensure cookies are sent so the API can read the auth cookie
+      });
 
-    // Close modal after showing success
-    setTimeout(() => {
-      setIsSubmitted(false);
-      setStep(1);
-      onClose();
-    }, 3000);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: "Unknown error" }));
+        console.error("Submission failed:", errorData.error);
+        alert(`Error: ${errorData.error}`);
+        setIsSubmitting(false);
+        return;
+      }
+
+      const submittedApplication = await response.json();
+      onSubmit(submittedApplication); // notify parent
+
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+
+      // Close modal after showing success message and reset form
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setStep(1);
+        setApplicationData({
+          motivation: "",
+          experience: "",
+          skills: [],
+          emergencyContact: "",
+          emergencyPhone: "",
+          hasTransportation: false,
+          agreeToBackground: false,
+          agreeToCommitment: false,
+          resume: null,
+          additionalDocuments: [],
+        });
+        onClose();
+      }, 3000);
+    } catch (error) {
+      console.error("An error occurred during submission:", error);
+      alert("An unexpected error occurred. Please try again.");
+      setIsSubmitting(false);
+    }
   };
+  /* changed code end */
 
   const nextStep = () => setStep(step + 1);
   const prevStep = () => setStep(step - 1);
@@ -146,9 +190,8 @@ export default function ApplicationModal({
           applicationData.experience.length > 20
         );
       case 2:
-        return (
-          applicationData.availability && applicationData.skills.length > 0
-        );
+        // Availability removed: require at least one selected skill
+        return applicationData.skills.length > 0;
       case 3:
         return (
           applicationData.emergencyContact &&
@@ -322,9 +365,9 @@ export default function ApplicationModal({
           {step === 2 && (
             <Card>
               <CardHeader>
-                <CardTitle>Skills & Availability</CardTitle>
+                <CardTitle>Skills</CardTitle>
                 <CardDescription>
-                  Let us know about your skills and when you're available
+                  Let us know which skills apply to you
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
@@ -335,18 +378,21 @@ export default function ApplicationModal({
                   </p>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
                     {[
-                      "Communication",
-                      "Leadership",
-                      "Teaching",
-                      "Customer Service",
-                      "Physical Work",
-                      "Technology",
-                      "Event Planning",
+                      "Healthcare",
+                      "Marketing",
                       "Fundraising",
-                      "Social Media",
-                      "Photography",
-                      "Writing",
+                      "Environmental",
                       "Translation",
+                      "Elder Care",
+                      "Technology",
+                      "Writing",
+                      "Teaching",
+                      "Construction",
+                      "Photography",
+                      "Childcare",
+                      "Event Planning",
+                      "Cooking",
+                      "Social Media",
                     ].map((skill) => (
                       <div key={skill} className="flex items-center space-x-2">
                         <Checkbox
@@ -374,34 +420,6 @@ export default function ApplicationModal({
                       </div>
                     </div>
                   )}
-                </div>
-
-                <div>
-                  <Label htmlFor="availability">Availability *</Label>
-                  <Select
-                    value={applicationData.availability}
-                    onValueChange={(value) =>
-                      setApplicationData((prev) => ({
-                        ...prev,
-                        availability: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select your availability" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="weekdays">Weekdays</SelectItem>
-                      <SelectItem value="weekends">Weekends</SelectItem>
-                      <SelectItem value="evenings">Evenings</SelectItem>
-                      <SelectItem value="flexible">Flexible</SelectItem>
-                      <SelectItem value="once-week">Once a week</SelectItem>
-                      <SelectItem value="multiple-week">
-                        Multiple times a week
-                      </SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
                 </div>
 
                 <div className="flex items-center space-x-2">

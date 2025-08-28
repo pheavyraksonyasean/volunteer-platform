@@ -1,6 +1,7 @@
 // In app/api/opportunities/route.ts
 
 import { createClient } from "@/lib/supabase/server";
+import { createClient as createSupabaseClient } from "@supabase/supabase-js";
 import { NextRequest, NextResponse } from "next/server";
 import { v4 as uuidv4 } from "uuid";
 
@@ -15,6 +16,40 @@ function decodeBase64Image(dataString: string) {
     type: matches[1],
     data: Buffer.from(matches[2], "base64"),
   };
+}
+
+// helper: upload base64 image and return a usable URL (public url if bucket public, fallback to signed url)
+async function uploadBase64ImageToBucket(supabase: any, userId: string, base64: string, BUCKET = "opportunity-photos") {
+  const { type, data } = decodeBase64Image(base64);
+  const ext = type.split("/")[1] ?? "jpg";
+  const filePath = `${userId}/${uuidv4()}.${ext}`;
+
+  // Use service-role (admin) client for storage operations to bypass storage RLS
+  const supabaseAdmin = createSupabaseClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  );
+
+  const { error: uploadError } = await supabaseAdmin.storage
+    .from(BUCKET)
+    .upload(filePath, data, { contentType: type, upsert: true });
+  if (uploadError) {
+    if (uploadError.message && uploadError.message.toLowerCase().includes("bucket not found")) {
+      throw new Error(`Storage bucket '${BUCKET}' not found. Check the bucket id and SUPABASE_URL / project configuration.`);
+    }
+    throw uploadError;
+  }
+
+  // Prefer public URL if bucket is public (use admin client)
+  const { data: publicData } = supabaseAdmin.storage.from(BUCKET).getPublicUrl(filePath);
+  if (publicData?.publicUrl) return publicData.publicUrl;
+
+  // Fallback to signed URL (requires service role / server credentials)
+  const { data: signedUrlData, error: signedErr } = await supabaseAdmin.storage
+    .from(BUCKET)
+    .createSignedUrl(filePath, 60 * 60);
+  if (signedErr) throw signedErr;
+  return signedUrlData.signedUrl;
 }
 
 function isUuid(v: string) {
@@ -64,16 +99,12 @@ export async function POST(request: NextRequest) {
       if (first.startsWith("http")) {
         photoUrl = first;
       } else {
-        const { type, data } = decodeBase64Image(first);
-        const filePath = `public/${user.id}/${uuidv4()}`;
-        const { error: uploadError } = await supabase.storage
-          .from("opportunity_images")
-          .upload(filePath, data, { contentType: type, upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage
-          .from("opportunity_images")
-          .getPublicUrl(filePath);
-        photoUrl = urlData.publicUrl;
+        try {
+          photoUrl = await uploadBase64ImageToBucket(supabase, user.id, first, "opportunity-photos");
+        } catch (e: any) {
+          console.error("Upload error:", e);
+          return NextResponse.json({ error: e.message || "Image upload failed" }, { status: 500 });
+        }
       }
     }
 
@@ -192,16 +223,12 @@ export async function PUT(request: NextRequest) {
       if (first.startsWith("http")) {
         photoUrl = first;
       } else {
-        const { type, data } = decodeBase64Image(first);
-        const filePath = `public/${user.id}/${uuidv4()}`;
-        const { error: uploadError } = await supabase.storage
-          .from("opportunity_images")
-          .upload(filePath, data, { contentType: type, upsert: true });
-        if (uploadError) throw uploadError;
-        const { data: urlData } = supabase.storage
-          .from("opportunity_images")
-          .getPublicUrl(filePath);
-        photoUrl = urlData.publicUrl;
+        try {
+          photoUrl = await uploadBase64ImageToBucket(supabase, user.id, first, "opportunity-photos");
+        } catch (e: any) {
+          console.error("Upload error:", e);
+          return NextResponse.json({ error: e.message || "Image upload failed" }, { status: 500 });
+        }
       }
     }
 
@@ -345,9 +372,57 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await query;
     if (error) throw error;
-    return NextResponse.json(data ?? [], { status: 200 });
-  } catch (err: any) {
-    console.error("Error fetching opportunities:", err);
-    return NextResponse.json({ error: "Internal Server Error", details: err.message }, { status: 500 });
+    return NextResponse.json(data, { status: 200 });
+  } catch (error: any) {
+    console.error("Error fetching opportunities:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const supabase = await createClient({ accessToken: undefined });
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user)
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const body = await request.json();
+  const { id: opportunityId } = body;
+  if (!opportunityId) {
+    return NextResponse.json(
+      { error: "Opportunity ID is required." },
+      { status: 400 }
+    );
+  }
+
+  try {
+    // Ownership check (RLS should also enforce, but we keep local check)
+    const { data: existing, error: fetchError } = await supabase
+      .from("opportunities")
+      .select("creator_id")
+      .eq("id", opportunityId)
+      .single();
+    if (fetchError || existing?.creator_id !== user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Delete the opportunity
+    const { error: deleteError } = await supabase
+      .from("opportunities")
+      .delete()
+      .eq("id", opportunityId);
+    if (deleteError) throw deleteError;
+
+    return NextResponse.json({ success: true }, { status: 204 });
+  } catch (error: any) {
+    console.error("Error deleting opportunity:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error", details: error.message },
+      { status: 500 }
+    );
   }
 }

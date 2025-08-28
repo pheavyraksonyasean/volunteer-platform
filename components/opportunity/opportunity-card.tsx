@@ -98,16 +98,7 @@ export default function OpportunityCard({
           
           {/* Action buttons overlay */}
           <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <button
-              onClick={handleLike}
-              className={`w-8 h-8 rounded-full backdrop-blur-sm border-0 shadow-sm transition-colors flex items-center justify-center ${
-                isLiked 
-                  ? 'bg-red-500 text-white' 
-                  : 'bg-white/90 text-gray-600 hover:bg-red-50 hover:text-red-500'
-              }`}
-            >
-              <Heart className={`h-4 w-4 ${isLiked ? 'fill-current' : ''}`} />
-            </button>
+
             <button
               onClick={handleShare}
               className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm text-gray-600 hover:bg-blue-50 hover:text-blue-500 border-0 shadow-sm transition-colors flex items-center justify-center"
