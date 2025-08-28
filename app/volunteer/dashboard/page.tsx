@@ -24,6 +24,13 @@ import {
   Bell,
   Award,
   Target,
+  MapPin,
+  CheckCircle,
+  XCircle,
+  AlertCircle,
+  Building2,
+  CalendarDays,
+  MessageSquare,
 } from "lucide-react";
 import OpportunityCard from "@/components/opportunity/opportunity-card";
 
@@ -805,68 +812,146 @@ export default function VolunteerDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-4 md:space-y-6">
-            <Card className="border-pink-200">
+            <Card className="border-pink-200 bg-gradient-to-r from-pink-50 to-white">
               <CardHeader className="pb-3 md:pb-6">
-                <CardTitle className="text-lg md:text-xl">
-                  My Applications
-                </CardTitle>
-                <CardDescription className="text-sm md:text-base">
-                  Track all your volunteer applications
-                </CardDescription>
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-pink-100 rounded-lg">
+                    <MessageSquare className="h-6 w-6 text-pink-700" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg md:text-xl text-gray-900">
+                      My Applications
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
+                      Track all your volunteer applications and their status
+                    </CardDescription>
+                  </div>
+                </div>
               </CardHeader>
               <CardContent>
                 {applications.length === 0 ? (
-                  <div className="text-center py-6 md:py-8">
-                    <p className="text-gray-500 mb-4 text-sm md:text-base">
+                  <div className="text-center py-12">
+                    <div className="mx-auto w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+                      <MessageSquare className="h-12 w-12 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 mb-4 text-lg font-medium">
                       No applications yet
                     </p>
+                    <p className="text-gray-400 mb-6 text-sm">
+                      Start your volunteer journey by applying to opportunities that match your interests
+                    </p>
                     <Button
-                      variant="outline"
                       onClick={() => setActiveTab("opportunities")}
-                      className="text-sm md:text-base"
+                      className="bg-pink-600 hover:bg-pink-700 text-white px-8 py-3"
                     >
+                      <Search className="h-4 w-4 mr-2" />
                       Browse Opportunities
                     </Button>
                   </div>
                 ) : (
-                  <div className="space-y-3 md:space-y-4">
-                    {applications.map((application) => (
-                      <Card key={application.id}>
-                        <CardContent className="p-3 md:p-4">
-                          <div className="flex items-start justify-between">
-                            <div className="flex items-center space-x-3 md:space-x-4 flex-1 min-w-0">
+                  <div className="space-y-4">
+                    {applications.map((application) => {
+                      const getStatusConfig = (status: string) => {
+                        switch (status) {
+                          case "approved":
+                            return {
+                              icon: CheckCircle,
+                              color: "text-green-600",
+                              bgColor: "bg-green-50",
+                              borderColor: "border-green-200",
+                              badgeVariant: "default" as const,
+                              badgeClass: "bg-green-100 text-green-800 border-green-200"
+                            };
+                          case "rejected":
+                            return {
+                              icon: XCircle,
+                              color: "text-red-600",
+                              bgColor: "bg-red-50",
+                              borderColor: "border-red-200",
+                              badgeVariant: "destructive" as const,
+                              badgeClass: "bg-red-100 text-red-800 border-red-200"
+                            };
+                          default: // pending
+                            return {
+                              icon: AlertCircle,
+                              color: "text-yellow-600",
+                              bgColor: "bg-yellow-50",
+                              borderColor: "border-yellow-200",
+                              badgeVariant: "secondary" as const,
+                              badgeClass: "bg-yellow-100 text-yellow-800 border-yellow-200"
+                            };
+                        }
+                      };
+
+                      const statusConfig = getStatusConfig(application.status);
+                      const StatusIcon = statusConfig.icon;
+
+                      return (
+                        <Card key={application.id} className={`${statusConfig.borderColor} hover:shadow-md transition-shadow duration-200`}>
+                          <CardContent className="p-6">
+                            <div className="flex items-start space-x-4">
+                              {/* Status Icon */}
+                              <div className={`p-3 rounded-full ${statusConfig.bgColor} flex-shrink-0`}>
+                                <StatusIcon className={`h-6 w-6 ${statusConfig.color}`} />
+                              </div>
+
+                              {/* Main Content */}
                               <div className="flex-1 min-w-0">
-                                <h4 className="font-semibold text-gray-900 text-sm md:text-base">
-                                  {application.title}
-                                </h4>
-                                <p className="text-sm text-pink-800">
-                                  {application.organization}
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1">
-                                  Applied: {application.appliedDate} • Event:{" "}
-                                  {application.eventDate}
-                                </p>
-                                <p className="text-sm text-gray-700 mt-2">
-                                  {application.message}
-                                </p>
+                                <div className="flex items-start justify-between mb-3">
+                                  <div>
+                                    <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                                      {application.title}
+                                    </h3>
+                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                      <div className="flex items-center space-x-1">
+                                        <Building2 className="h-4 w-4" />
+                                        <span>{application.organization}</span>
+                                      </div>
+                                    </div>
+                                  </div>
+                                  <Badge className={`${statusConfig.badgeClass} font-medium px-3 py-1`}>
+                                    {application.status.charAt(0).toUpperCase() + application.status.slice(1)}
+                                  </Badge>
+                                </div>
+
+                                {/* Date Information */}
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                    <CalendarDays className="h-4 w-4 text-gray-400" />
+                                    <span>Applied: <span className="font-medium">{application.appliedDate}</span></span>
+                                  </div>
+                                  <div className="flex items-center space-x-2 text-sm text-gray-600">
+                                    <Calendar className="h-4 w-4 text-gray-400" />
+                                    <span>Event: <span className="font-medium">{application.eventDate}</span></span>
+                                  </div>
+                                </div>
+
+                                {/* Status Message */}
+                                <div className={`p-3 rounded-lg ${statusConfig.bgColor} border ${statusConfig.borderColor}`}>
+                                  <p className="text-sm text-gray-700">
+                                    {application.message}
+                                  </p>
+                                </div>
+
+                                {/* Only show Withdraw button for pending applications */}
+                                {application.status === "pending" && (
+                                  <div className="mt-4">
+                                    <Button 
+                                      variant="outline" 
+                                      size="sm"
+                                      className="text-red-600 border-red-200 hover:bg-red-50"
+                                    >
+                                      <XCircle className="h-4 w-4 mr-2" />
+                                      Withdraw Application
+                                    </Button>
+                                  </div>
+                                )}
                               </div>
                             </div>
-                            <Badge
-                              variant={
-                                application.status === "approved"
-                                  ? "default"
-                                  : application.status === "pending"
-                                  ? "secondary"
-                                  : "destructive"
-                              }
-                              className="ml-2 text-xs"
-                            >
-                              {application.status}
-                            </Badge>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    ))}
+                          </CardContent>
+                        </Card>
+                      );
+                    })}
                   </div>
                 )}
               </CardContent>

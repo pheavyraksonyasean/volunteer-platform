@@ -1,6 +1,5 @@
 "use client";
-
-import { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +23,15 @@ import {
   CheckCircle,
   XCircle,
   Clock,
+  ChevronDown,
+  ChevronUp,
+  Mail,
+  Phone,
+  FileText,
+  User,
+  MessageSquare,
+  Award,
+  CalendarDays,
 } from "lucide-react";
 
 import CreateOpportunityModal from "@/components/opportunity/create-opportunity-modal";
@@ -44,6 +52,35 @@ interface Opportunity {
   isPublic?: boolean;
 }
 
+interface Application {
+  id: string;
+  volunteer_id: string;
+  opportunity_id: string;
+  motivation: string;
+  relevant_experience: string;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  resume_file_url?: string;
+  status: 'pending' | 'approved' | 'rejected';
+  applied_at: string;
+  volunteer?: {
+    first_name: string;
+    last_name: string;
+    email: string;
+    profile_image_url?: string;
+  };
+  opportunity?: {
+    id: string;
+    opportunity_title: string;
+    organization_name: string;
+    date: string;
+    start_time: string;
+    end_time: string;
+    location: string;
+  };
+  skills?: string[];
+}
+
 export default function OrganizationDashboard() {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [activeTab, setActiveTab] = useState("overview");
@@ -54,6 +91,9 @@ export default function OrganizationDashboard() {
     useState<Opportunity | null>(null);
   const [user, setUser] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
+  const [applications, setApplications] = useState<Application[]>([]);
+  const [isLoadingApplications, setIsLoadingApplications] = useState(false);
+  const [expandedApplications, setExpandedApplications] = useState<Set<string>>(new Set());
 
   // New: fetch organizer's opportunities from backend
   const fetchOpportunities = async () => {
@@ -97,6 +137,31 @@ export default function OrganizationDashboard() {
     }
   };
 
+  // New: fetch applications for organizer's opportunities
+  const fetchApplications = async () => {
+    console.debug("[DEBUG] fetchApplications called");
+    setIsLoadingApplications(true);
+    try {
+      const res = await fetch("/api/applications/organization", {
+        method: "GET",
+        credentials: "same-origin",
+      });
+      console.debug("[DEBUG] /api/applications/organization status:", res.status);
+      if (!res.ok) {
+        const text = await res.text().catch(() => "");
+        console.warn("Failed to fetch applications for organization", res.status, text);
+        return;
+      }
+      const data = await res.json();
+      console.debug("[DEBUG] applications payload:", data);
+      setApplications(data || []);
+    } catch (err) {
+      console.error("Error fetching applications:", err);
+    } finally {
+      setIsLoadingApplications(false);
+    }
+  };
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -120,6 +185,8 @@ export default function OrganizationDashboard() {
           }
           // fetch opportunities once profile (and auth cookie) is ready
           fetchOpportunities();
+          // fetch applications for this organization
+          fetchApplications();
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -130,6 +197,17 @@ export default function OrganizationDashboard() {
 
     fetchUserProfile();
   }, []);
+
+  // When user is available, load organizer data
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      console.debug("[DEBUG] user available, loading organizer data");
+      await fetchOpportunities();
+      // explicitly await so opportunities finish before applications
+      await fetchApplications();
+    })();
+  }, [user]);
 
   const [opportunities, setOpportunities] = useState<Opportunity[]>([
     {
@@ -207,6 +285,8 @@ export default function OrganizationDashboard() {
 
       // refresh list from server to ensure authoritative data
       await fetchOpportunities();
+      // refresh applications as well
+      await fetchApplications();
 
       // switch to opportunities tab if creating a live one
       if (!opportunityData.isDraft) setActiveTab("opportunities");
@@ -245,57 +325,71 @@ export default function OrganizationDashboard() {
     setEditingOpportunity(null);
   };
 
-  const handleApplicationAction = (
-    applicationId: number,
+  const handleApplicationAction = async (
+    applicationId: string,
     action: "approve" | "reject"
   ) => {
-    setMockApplications((prev) =>
-      prev.map((app) =>
-        app.id === applicationId
-          ? { ...app, status: action === "approve" ? "approved" : "rejected" }
-          : app
-      )
-    );
-    console.log(`${action}d application ${applicationId}`);
+    try {
+      const response = await fetch(`/api/applications/organization`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          applicationId,
+          status: action === "approve" ? "approved" : "rejected",
+        }),
+        credentials: "same-origin",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update application status");
+      }
+
+      // Update local state
+      setApplications((prev) =>
+        prev.map((app) =>
+          app.id === applicationId
+            ? { ...app, status: action === "approve" ? "approved" : "rejected" }
+            : app
+        )
+      );
+
+      console.log(`${action}d application ${applicationId}`);
+    } catch (error) {
+      console.error("Error updating application:", error);
+      alert("Failed to update application status. Please try again.");
+    }
   };
 
-  const mockOpportunities = [
-    {
-      id: 1,
-      title: "Food Bank Volunteer",
-      date: "Dec 15, 2024",
-      time: "9:00 AM - 1:00 PM",
-      volunteers: 12,
-      maxVolunteers: 20,
-      applications: 25,
-      status: "active",
-      category: "Community Outreach",
-      description: "Help distribute food to those in need.",
-      location: "San Francisco, CA",
-      isPublic: true,
-    },
-  ];
+  const toggleApplicationExpansion = (applicationId: string) => {
+    setExpandedApplications(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(applicationId)) {
+        newSet.delete(applicationId);
+      } else {
+        newSet.add(applicationId);
+      }
+      return newSet;
+    });
+  };
 
-  const [mockApplications, setMockApplications] = useState([
-    {
-      id: 1,
-      volunteerName: "Sean Pheavyraksonya",
-      opportunity: "Food Bank Volunteer",
-      appliedDate: "Dec 1, 2025",
-      status: "pending",
-      skills: ["Customer Service", "Physical Work"],
-      experience: "2 years volunteering at local shelter",
-    },
-    {
-      id: 2,
-      volunteerName: "John Doe",
-      opportunity: "Food Bank Volunteer",
-      appliedDate: "Dec 2, 2025",
-      status: "pending",
-      skills: ["Organization", "Communication"],
-      experience: "1 year volunteering at community center",
-    },
-  ]);
+  // Helper function to format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  // Helper function to get volunteer's full name
+  const getVolunteerName = (application: Application) => {
+    if (application.volunteer) {
+      return `${application.volunteer.first_name || ""} ${application.volunteer.last_name || ""}`.trim();
+    }
+    return "Unknown Volunteer";
+  };
 
   if (isLoadingProfile) {
     return (
@@ -376,7 +470,7 @@ export default function OrganizationDashboard() {
                     Active Volunteers
                   </p>
                   <p className="text-lg md:text-2xl font-bold text-gray-900">
-                    40
+                    {opportunities.reduce((total, opp) => total + opp.volunteers, 0)}
                   </p>
                 </div>
               </div>
@@ -394,7 +488,7 @@ export default function OrganizationDashboard() {
                     Active Opportunities
                   </p>
                   <p className="text-lg md:text-2xl font-bold text-gray-900">
-                    3
+                    {opportunities.filter(opp => opp.status === "active").length}
                   </p>
                 </div>
               </div>
@@ -412,7 +506,7 @@ export default function OrganizationDashboard() {
                     Pending Applications
                   </p>
                   <p className="text-lg md:text-2xl font-bold text-gray-900">
-                    12
+                    {applications.filter(app => app.status === "pending").length}
                   </p>
                 </div>
               </div>
@@ -427,10 +521,10 @@ export default function OrganizationDashboard() {
                 </div>
                 <div className="ml-2 md:ml-4">
                   <p className="text-xs md:text-sm font-medium text-gray-600">
-                    This Month's Hours
+                    Total Applications
                   </p>
                   <p className="text-lg md:text-2xl font-bold text-gray-900">
-                    320
+                    {applications.length}
                   </p>
                 </div>
               </div>
@@ -479,39 +573,21 @@ export default function OrganizationDashboard() {
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-3 md:space-y-4">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          New volunteer application
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          PHEANU applied for Food Bank Volunteer
-                        </p>
+                    {applications.slice(0, 3).map((application) => (
+                      <div key={application.id} className="p-3 bg-white rounded-md shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-medium">{getVolunteerName(application)}</p>
+                            <p className="text-xs text-gray-500">{application.volunteer?.email}</p>
+                          </div>
+                          <p className="text-xs px-2 py-1 rounded-md bg-gray-100">{application.status}</p>
+                        </div>
+                        <div className="mt-2 text-sm text-gray-700">{application.motivation || ""}</div>
                       </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          Opportunity filled
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Holiday Gift Wrapping reached maximum capacity
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-3">
-                      <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                      <div>
-                        <p className="text-sm font-medium">
-                          Volunteer confirmed
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          Nu confirmed for Community Garden Helper
-                        </p>
-                      </div>
-                    </div>
+                    ))}
+                    {applications.length === 0 && (
+                      <p className="text-sm text-gray-500">No recent applications</p>
+                    )}
                   </div>
                 </CardContent>
               </Card>
@@ -528,32 +604,15 @@ export default function OrganizationDashboard() {
                 <CardContent>
                   <div className="space-y-3 md:space-y-4">
                     {opportunities.slice(0, 3).map((opportunity) => (
-                      <div
-                        key={opportunity.id}
-                        className="flex items-center justify-between p-3 border rounded-lg"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm md:text-base">
-                            {opportunity.title}
-                          </h4>
-                          <p className="text-sm text-gray-600">
-                            {opportunity.date} • {opportunity.time}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            {opportunity.volunteers}/{opportunity.maxVolunteers}{" "}
-                            volunteers
-                          </p>
+                      <div key={opportunity.id} className="p-3 bg-white rounded-md shadow-sm">
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-sm font-semibold">{opportunity.title}</p>
+                            <p className="text-xs text-gray-500">{opportunity.date} · {opportunity.time}</p>
+                          </div>
+                          <div className="text-sm text-gray-600">{opportunity.volunteers}/{opportunity.maxVolunteers} volunteers</div>
                         </div>
-                        <Badge
-                          variant={
-                            opportunity.status === "full"
-                              ? "default"
-                              : "secondary"
-                          }
-                          className="text-xs"
-                        >
-                          {opportunity.status}
-                        </Badge>
+                        {opportunity.location && <div className="mt-2 text-sm text-gray-700">{opportunity.location}</div>}
                       </div>
                     ))}
                   </div>
@@ -677,126 +736,95 @@ export default function OrganizationDashboard() {
           </TabsContent>
 
           <TabsContent value="applications" className="space-y-4 md:space-y-6">
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl md:text-2xl font-bold">
-                Volunteer Applications
-              </h2>
-            </div>
+            <Card className="border-pink-200 bg-gradient-to-r from-pink-50 to-white">
+              <CardHeader className="pb-3 md:pb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-2 bg-pink-100 rounded-lg">
+                    <Users className="h-6 w-6 text-pink-700" />
+                  </div>
+                  <div>
+                    <CardTitle className="text-lg md:text-xl text-gray-900">
+                      Volunteer Applications
+                    </CardTitle>
+                    <CardDescription className="text-sm md:text-base">
+                      Review and manage applications for your opportunities
+                    </CardDescription>
+                  </div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                {isLoadingApplications ? (
+                  <div className="flex justify-center items-center py-12">Loading applications...</div>
+                ) : applications.length === 0 ? (
+                  <div className="text-center py-12">No applications yet.</div>
+                ) : (
+                  <div className="space-y-4">
+                    {applications.map((application) => (
+                      <div key={application.id} className="p-4 bg-white rounded-md shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between">
+                              <div>
+                                <p className="font-medium">{getVolunteerName(application)}</p>
+                                <p className="text-xs text-gray-500">{application.volunteer?.email}</p>
+                                <p className="text-xs text-gray-500">{application.opportunity?.opportunity_title}</p>
+                              </div>
+                              <div className="text-sm">
+                                <span className={`px-2 py-1 rounded text-xs ${application.status === "pending" ? "bg-yellow-100 text-yellow-800" : application.status === "approved" ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}`}>
+                                  {application.status}
+                                </span>
+                              </div>
+                            </div>
+                            {expandedApplications.has(application.id) && (
+                              <div className="mt-3 text-sm text-gray-700">
+                                <p className="font-semibold">Motivation</p>
+                                <p>{application.motivation || "—"}</p>
+                                {application.relevant_experience && (
+                                  <>
+                                    <p className="mt-2 font-semibold">Experience</p>
+                                    <p>{application.relevant_experience}</p>
+                                  </>
+                                )}
+                                {application.resume_file_url && (
+                                  <p className="mt-2">
+                                    <a href={application.resume_file_url} target="_blank" rel="noreferrer" className="text-pink-700 underline">View resume</a>
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        </div>
 
-            <div className="grid gap-4 md:gap-6">
-              {mockApplications.map((application) => (
-                <Card key={application.id}>
-                  <CardContent className="p-4 md:p-6">
-                    <div className="flex flex-col sm:flex-row justify-between items-start mb-4 gap-4">
-                      <div className="flex items-center space-x-3 md:space-x-4 flex-1">
-                        <Avatar className="h-8 w-8 md:h-10 md:w-10">
-                          <AvatarImage
-                            src={`/abstract-geometric-shapes.png?height=40&width=40&query=${application.volunteerName}`}
-                          />
-                          <AvatarFallback className="text-xs md:text-sm">
-                            {application.volunteerName
-                              .split(" ")
-                              .map((n) => n[0])
-                              .join("")}
-                          </AvatarFallback>
-                        </Avatar>
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-sm md:text-base">
-                            {application.volunteerName}
-                          </h3>
-                          <p className="text-sm text-gray-600">
-                            {application.opportunity}
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            Applied on {application.appliedDate}
-                          </p>
+                        <div className="mt-3 flex items-center gap-2">
+                          <button
+                            onClick={() => toggleApplicationExpansion(application.id)}
+                            className="text-sm text-gray-600 hover:text-gray-800"
+                          >
+                            {expandedApplications.has(application.id) ? "Hide details" : "View details"}
+                          </button>
+                          {application.status === "pending" && (
+                            <>
+                              <button
+                                onClick={() => handleApplicationAction(application.id, "approve")}
+                                className="ml-auto bg-green-600 text-white px-3 py-1 rounded text-sm"
+                              >
+                                Approve
+                              </button>
+                              <button
+                                onClick={() => handleApplicationAction(application.id, "reject")}
+                                className="bg-red-600 text-white px-3 py-1 rounded text-sm"
+                              >
+                                Reject
+                              </button>
+                            </>
+                          )}
                         </div>
                       </div>
-                      <Badge
-                        variant={
-                          application.status === "approved"
-                            ? "default"
-                            : "secondary"
-                        }
-                        className="text-xs"
-                      >
-                        {application.status}
-                      </Badge>
-                    </div>
-
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-2 text-sm md:text-base">
-                        Skills
-                      </h4>
-                      <div className="flex flex-wrap gap-2">
-                        {application.skills.map((skill) => (
-                          <Badge
-                            key={skill}
-                            variant="outline"
-                            className="text-xs"
-                          >
-                            {skill}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="mb-4">
-                      <h4 className="font-medium mb-2 text-sm md:text-base">
-                        Experience
-                      </h4>
-                      <p className="text-sm text-gray-700">
-                        {application.experience}
-                      </p>
-                    </div>
-
-                    {application.status === "pending" && (
-                      <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
-                        <Button
-                          size="sm"
-                          onClick={() =>
-                            handleApplicationAction(application.id, "approve")
-                          }
-                          className="text-xs md:text-sm"
-                        >
-                          <CheckCircle className="h-3 w-3 md:h-4 md:w-4 mr-2" />
-                          Approve
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() =>
-                            handleApplicationAction(application.id, "reject")
-                          }
-                          className="text-xs md:text-sm"
-                        >
-                          <XCircle className="h-3 w-3 md:h-4 md:w-4 mr-2" />
-                          Reject
-                        </Button>
-                      </div>
-                    )}
-
-                    {application.status === "approved" && (
-                      <div className="flex items-center space-x-2 text-green-600">
-                        <CheckCircle className="h-3 w-3 md:h-4 md:w-4" />
-                        <span className="text-xs md:text-sm font-medium">
-                          Approved
-                        </span>
-                      </div>
-                    )}
-
-                    {application.status === "rejected" && (
-                      <div className="flex items-center space-x-2 text-red-600">
-                        <XCircle className="h-3 w-3 md:h-4 md:w-4" />
-                        <span className="text-xs md:text-sm font-medium">
-                          Rejected
-                        </span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
           </TabsContent>
         </Tabs>
       </div>
