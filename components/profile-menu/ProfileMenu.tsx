@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Edit, LogOut, ChevronDown } from "lucide-react";
-import EditProfileModal from "./EditProfileModal";
+import EditProfileModal from "../profile-menu/EditProfileModal";
 
 interface ProfileMenuProps {
   profileImage: string;

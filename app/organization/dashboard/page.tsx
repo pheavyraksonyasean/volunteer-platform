@@ -30,7 +30,7 @@ import CreateOpportunityModal from "@/components/opportunity/create-opportunity-
 import ProfileMenu from "@/components/profile-menu/ProfileMenu";
 
 interface Opportunity {
-  id: number;
+  id: string;
   title: string;
   date: string;
   time: string;
@@ -55,6 +55,48 @@ export default function OrganizationDashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
+  // New: fetch organizer's opportunities from backend
+  const fetchOpportunities = async () => {
+    try {
+      const res = await fetch("/api/opportunities?mine=true", {
+        method: "GET",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        console.warn("Failed to fetch opportunities for dashboard");
+        return;
+      }
+      const data = await res.json();
+      // transform server opportunity rows -> local Opportunity shape
+      const transformed: Opportunity[] = (data || []).map((r: any) => {
+        const dateStr = r.date ? new Date(r.date).toLocaleDateString("en-US", {
+          month: "short",
+          day: "numeric",
+          year: "numeric",
+        }) : "TBD";
+        const timeStr =
+          r.start_time && r.end_time ? `${r.start_time} - ${r.end_time}` : "TBD";
+        return {
+          id: r.id,
+          title: r.opportunity_title || "Untitled",
+          date: dateStr,
+          time: timeStr,
+          volunteers: r.confirmed_volunteers ?? 0, // if not present, default 0
+          maxVolunteers: r.maximum_volunteer ?? 1,
+          applications: r.applications_count ?? 0,
+          status: r.status ?? "active",
+          category: r.category_name,
+          description: r.description,
+          location: r.location,
+          isPublic: true,
+        };
+      });
+      setOpportunities(transformed);
+    } catch (err) {
+      console.error("Error fetching opportunities:", err);
+    }
+  };
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -76,6 +118,8 @@ export default function OrganizationDashboard() {
           if (userData.profile_image_url) {
             setProfileImage(userData.profile_image_url);
           }
+          // fetch opportunities once profile (and auth cookie) is ready
+          fetchOpportunities();
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
@@ -89,7 +133,7 @@ export default function OrganizationDashboard() {
 
   const [opportunities, setOpportunities] = useState<Opportunity[]>([
     {
-      id: 1,
+      id: "1",
       title: "Food Bank Volunteer",
       date: "Dec 15, 2024",
       time: "9:00 AM - 1:00 PM",
@@ -101,76 +145,93 @@ export default function OrganizationDashboard() {
     },
   ]);
 
-  const handleCreateOpportunity = (opportunityData: any) => {
+  const handleCreateOpportunity = async (opportunityData: any) => {
     console.log("New opportunity created:", opportunityData);
 
-    if (editingOpportunity) {
-      const updatedOpportunity: Opportunity = {
-        ...editingOpportunity,
-        title: opportunityData.title,
-        date: opportunityData.date
-          ? new Date(opportunityData.date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })
-          : "TBD",
-        time:
-          opportunityData.startTime && opportunityData.endTime
-            ? `${opportunityData.startTime} - ${opportunityData.endTime}`
+    // If editing existing opportunity => call PUT, else POST
+    try {
+      if (editingOpportunity) {
+        // optimistic local update (keeps UI snappy)
+        const updatedOpportunity: Opportunity = {
+          ...editingOpportunity,
+          title: opportunityData.title,
+          date: opportunityData.date
+            ? new Date(opportunityData.date).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })
             : "TBD",
-        maxVolunteers: opportunityData.maxVolunteers || 10,
-        category: opportunityData.category,
-        description: opportunityData.description,
-        location: opportunityData.location,
-        isPublic: !opportunityData.isDraft,
-      };
+          time:
+            opportunityData.startTime && opportunityData.endTime
+              ? `${opportunityData.startTime} - ${opportunityData.endTime}`
+              : "TBD",
+          maxVolunteers: opportunityData.maxVolunteers || 10,
+          category: opportunityData.category,
+          description: opportunityData.description,
+          location: opportunityData.location,
+          isPublic: !opportunityData.isDraft,
+          volunteers: editingOpportunity.volunteers ?? 0,
+          applications: editingOpportunity.applications ?? 0,
+          status: editingOpportunity.status ?? "active",
+        };
 
-      setOpportunities((prev) =>
-        prev.map((opp) =>
-          opp.id === editingOpportunity.id ? updatedOpportunity : opp
-        )
-      );
-      setEditingOpportunity(null);
-    } else {
-      const newOpportunity: Opportunity = {
-        id: opportunities.length + 1,
-        title: opportunityData.title,
-        date: opportunityData.date
-          ? new Date(opportunityData.date).toLocaleDateString("en-US", {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            })
-          : "TBD",
-        time:
-          opportunityData.startTime && opportunityData.endTime
-            ? `${opportunityData.startTime} - ${opportunityData.endTime}`
-            : "TBD",
-        volunteers: 0,
-        maxVolunteers: opportunityData.maxVolunteers || 10,
-        applications: 0,
-        status: "active",
-        category: opportunityData.category,
-        description: opportunityData.description,
-        location: opportunityData.location,
-        isPublic: !opportunityData.isDraft,
-      };
+        setOpportunities((prev) =>
+          prev.map((opp) =>
+            opp.id === editingOpportunity.id ? updatedOpportunity : opp
+          )
+        );
 
-      if (!opportunityData.isDraft) {
-        setOpportunities((prev) => [...prev, newOpportunity]);
-        setActiveTab("opportunities");
+        // send update to API
+        await fetch("/api/opportunities", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: editingOpportunity.id, ...opportunityData }),
+          credentials: "same-origin",
+        });
+
+        setEditingOpportunity(null);
+      } else {
+        // create new opportunity via API
+        const payload = { ...opportunityData };
+        const res = await fetch("/api/opportunities", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+          credentials: "same-origin",
+        });
+        if (!res.ok) {
+          console.error("Failed to create opportunity:", await res.text());
+        }
       }
-    }
 
-    setShowCreateModal(false);
+      // refresh list from server to ensure authoritative data
+      await fetchOpportunities();
+
+      // switch to opportunities tab if creating a live one
+      if (!opportunityData.isDraft) setActiveTab("opportunities");
+    } catch (err) {
+      console.error("Error creating/updating opportunity:", err);
+    } finally {
+      setShowCreateModal(false);
+    }
   };
 
-  const handleDeleteOpportunity = (opportunityId: number) => {
+  const handleDeleteOpportunity = (opportunityId: string | number) => {
     if (confirm("Are you sure you want to delete this opportunity?")) {
-      setOpportunities((prev) =>
-        prev.filter((opp) => opp.id !== opportunityId)
-      );
+      // optimistic local remove
+      setOpportunities((prev) => prev.filter((opp) => opp.id !== opportunityId));
+      // request delete on backend (assuming route supports DELETE by id)
+      fetch(`/api/opportunities?id=${opportunityId}`, {
+        method: "DELETE",
+        credentials: "same-origin",
+      }).then((res) => {
+        if (!res.ok) {
+          console.warn("Failed to delete opportunity on server");
+          // optionally re-fetch authoritative list
+          fetchOpportunities();
+        }
+      });
     }
   };
 
