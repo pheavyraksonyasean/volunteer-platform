@@ -39,7 +39,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid role" }, { status: 400 });
     }
 
-    const supabase = await createClient();
+    const supabase = await createClient({ accessToken: undefined });
 
     console.log("[v0] Creating auth user");
     const { data: authData, error: authError } = await supabase.auth.signUp({

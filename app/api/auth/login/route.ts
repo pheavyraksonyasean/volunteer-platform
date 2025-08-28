@@ -11,7 +11,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const supabase = await createClient();
+  const supabase = await createClient({ accessToken: undefined });
 
   const { data: authData, error: authError } =
     await supabase.auth.signInWithPassword({

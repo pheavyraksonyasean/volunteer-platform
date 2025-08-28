@@ -38,7 +38,7 @@ import {
   Upload,
   CheckCircle,
 } from "lucide-react";
-import FileUpload from "./file-upload";
+import FileUpload from "../file-upload";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface Opportunity {

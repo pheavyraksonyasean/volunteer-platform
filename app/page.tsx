@@ -25,30 +25,31 @@ export default function HomePage() {
               <span className="text-lg md:text-2xl font-bold text-white font-serif">
                 Sabay Volunteer
               </span>
+
+              <span>
+                {/* Desktop Navigation */}
+                <nav className="hidden md:flex space-x-8 lg:space-x-20 ml-10">
+                  <Link
+                    href="#impact"
+                    className="text-white hover:text-pink-950 transition-colors font-sans"
+                  >
+                    Our Impact
+                  </Link>
+                  <Link
+                    href="#testimonials"
+                    className="text-white hover:text-pink-950 transition-colors font-sans"
+                  >
+                    Stories
+                  </Link>
+                  <Link
+                    href="#about"
+                    className="text-white hover:text-pink-950 transition-colors font-sans"
+                  >
+                    About
+                  </Link>
+                </nav>
+              </span>
             </div>
-
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex space-x-8 lg:space-x-20">
-              <Link
-                href="#impact"
-                className="text-white hover:text-pink-950 transition-colors font-sans"
-              >
-                Our Impact
-              </Link>
-              <Link
-                href="#testimonials"
-                className="text-white hover:text-pink-950 transition-colors font-sans"
-              >
-                Stories
-              </Link>
-              <Link
-                href="#about"
-                className="text-white hover:text-pink-950 transition-colors font-sans"
-              >
-                About
-              </Link>
-            </nav>
-
             {/* Desktop Buttons */}
             <div className="hidden md:flex space-x-4">
               <Link href="/login">
@@ -158,7 +159,7 @@ export default function HomePage() {
                   variant="outline"
                   className="w-full sm:w-auto border-pink-900 text-pink-900 hover:bg-pink-900 hover:text-white hover:scale-105 transition-all duration-300 px-6 md:px-8 py-3 md:py-4 text-base md:text-lg font-sans font-semibold bg-transparent"
                 >
-                  I'm an Organization
+                  I'm an Organizer
                 </Button>
               </Link>
             </div>

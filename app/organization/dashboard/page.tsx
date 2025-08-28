@@ -26,8 +26,8 @@ import {
   Clock,
 } from "lucide-react";
 
-import CreateOpportunityModal from "@/components/create-opportunity-modal";
-import ProfileMenu from "@/components/ProfileMenu";
+import CreateOpportunityModal from "@/components/opportunity/create-opportunity-modal";
+import ProfileMenu from "@/components/profile-menu/ProfileMenu";
 
 interface Opportunity {
   id: number;
