@@ -74,6 +74,52 @@ async function uploadFileToBucket(
   }
 }
 
+export async function GET(request: NextRequest) {
+  try {
+    // Read the user's access token from cookies (same as POST route)
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
+
+    // Create supabase client that is authenticated as the user
+    const supabase = await createClient({ accessToken: token });
+    
+    // Get the current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    
+    if (userError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Fetch applications with joined opportunity data
+    const { data: applications, error } = await supabase
+      .from("applications")
+      .select(`
+        *,
+        opportunity:opportunities (
+          id,
+          opportunity_title,
+          organization_name,
+          date,
+          start_time,
+          end_time,
+          location
+        )
+      `)
+      .eq("volunteer_id", user.id)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("Error fetching applications:", error);
+      return NextResponse.json({ error: "Failed to fetch applications" }, { status: 500 });
+    }
+
+    return NextResponse.json(applications || []);
+  } catch (error) {
+    console.error("Error in applications GET route:", error);
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
+
 export async function POST(request: NextRequest) {
   // Read the user's access token from cookies (common names used by Supabase)
   const cookieStore = await cookies(); // resolve the Promise<ReadonlyRequestCookies>
@@ -133,7 +179,8 @@ export async function POST(request: NextRequest) {
         emergency_contact_name: emergencyContact,
         emergency_contact_phone: emergencyPhone,
         resume_file_url: resumeUrl,
-        // status defaults to 'pending' in the database
+        status: 'pending', // Set default status to 'pending'
+        applied_at: new Date().toISOString(), // Set applied_at to current timestamp
       })
       .select()
       .single();

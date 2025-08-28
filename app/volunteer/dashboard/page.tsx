@@ -238,31 +238,41 @@ export default function VolunteerDashboard() {
           return;
         }
         const data = await res.json();
-        const mapped = (data || []).map((a: any) => ({
-          id: a.id,
-          opportunityId: a.opportunity_id ?? a.opportunityId ?? a.opportunity?.id,
-          title:
-            a.opportunity_title ||
-            a.title ||
-            a.opportunity?.title ||
-            (a.opportunity ? a.opportunity.title : "Untitled"),
-          organization: a.organization_name || a.organization || "",
-          status: a.status || "pending",
-          appliedDate: a.created_at
-            ? new Date(a.created_at).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              })
-            : new Date().toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "numeric",
-              }),
-          eventDate: a.event_date || a.eventDate || "",
-          message: a.message || "Application submitted successfully. You'll hear back within 2-3 business days.",
-          applicationData: a,
-        }));
+        console.log("Raw applications data from API:", data); // Debug log
+        
+        const mapped = (data || []).map((a: any) => {
+          // Map the database fields to the UI format
+          const mappedApp = {
+            id: a.id,
+            opportunityId: a.opportunity_id,
+            title: a.opportunity?.opportunity_title || a.opportunity?.title || "Untitled",
+            organization: a.opportunity?.organization_name || a.opportunity?.organization || "Unknown Organization",
+            status: a.status || "pending",
+            appliedDate: a.applied_at || a.created_at
+              ? new Date(a.applied_at || a.created_at).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : new Date().toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                }),
+            eventDate: a.opportunity?.date
+              ? new Date(a.opportunity.date).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })
+              : "TBD",
+            message: getStatusMessage(a.status),
+            applicationData: a,
+          };
+          console.log("Mapped application:", mappedApp); // Debug log
+          return mappedApp;
+        });
+        
         setApplications(mapped);
       } catch (e) {
         console.error("Error fetching saved applications:", e);
@@ -272,64 +282,97 @@ export default function VolunteerDashboard() {
     fetchApplications();
   }, []);
 
-  const handleApply = (opportunityIdOrApp: number | any, applicationData?: any) => {
+  // Helper function to get appropriate message based on status
+  const getStatusMessage = (status: string) => {
+    switch (status) {
+      case "pending":
+        return "Application submitted successfully. You'll hear back within 2-3 business days.";
+      case "approved":
+        return "Congratulations! Your application has been approved.";
+      case "rejected":
+        return "Unfortunately, your application was not selected this time.";
+      case "withdrawn":
+        return "You have withdrawn your application.";
+      default:
+        return "Application submitted successfully.";
+    }
+  };
+
+  // Single fetchApplications function
+  const fetchApplications = async () => {
+    try {
+      const res = await fetch("/api/applications", {
+        method: "GET",
+        credentials: "same-origin",
+      });
+      if (!res.ok) {
+        console.warn("Failed to fetch applications");
+        return;
+      }
+      const data = await res.json();
+      console.log("Raw applications data from API:", data);
+      
+      const mapped = (data || []).map((a: any) => {
+        const mappedApp = {
+          id: a.id,
+          opportunityId: a.opportunity_id,
+          title: a.opportunity?.opportunity_title || a.opportunity?.title || "Untitled",
+          organization: a.opportunity?.organization_name || a.opportunity?.organization || "Unknown Organization",
+          status: a.status || "pending",
+          appliedDate: a.applied_at || a.created_at
+            ? new Date(a.applied_at || a.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+          eventDate: a.opportunity?.date
+            ? new Date(a.opportunity.date).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : "TBD",
+          message: getStatusMessage(a.status),
+          applicationData: a,
+        };
+        return mappedApp;
+      });
+      
+      setApplications(mapped);
+    } catch (e) {
+      console.error("Error fetching saved applications:", e);
+    }
+  };
+
+  // Remove the duplicate useEffect and keep only this one
+  useEffect(() => {
+    fetchApplications();
+  }, []);
+
+  // Remove the other useEffect that has the inline fetchApplications function
+
+  // ...existing useEffect hooks for profile and opportunities...
+
+  // Updated handleApply function
+  const handleApply = async (opportunityIdOrApp: number | any, applicationData?: any) => {
     // If the first arg is an object, assume it's the application returned from the backend
     if (opportunityIdOrApp && typeof opportunityIdOrApp === "object") {
       const appFromServer = opportunityIdOrApp;
-      const oppId =
-        appFromServer.opportunity_id ??
-        appFromServer.opportunityId ??
-        appFromServer.opportunity?.id ??
-        appFromServer.opportunityId;
-
-      const opportunity = opportunities.find((opp) => String(opp.id) === String(oppId));
-
-      const newApplication = {
-        id: appFromServer.id || Date.now(),
-        opportunityId: oppId,
-        title: opportunity?.title || appFromServer.title || "Untitled",
-        organization: opportunity?.organization || appFromServer.organization || "",
-        status: (appFromServer.status as any) || "pending",
-        appliedDate: new Date().toLocaleDateString("en-US", {
-          year: "numeric",
-          month: "short",
-          day: "numeric",
-        }),
-        eventDate: opportunity?.date || appFromServer.eventDate || "",
-        message:
-          "Application submitted successfully. You'll hear back within 2-3 business days.",
-        applicationData: appFromServer,
-      };
-
-      setApplications((prev) => [newApplication, ...prev]);
-      console.log("Application submitted (from server):", newApplication);
+      console.log("Application submitted (from server):", appFromServer);
+      
+      // Refetch applications to get the latest data from backend
+      await fetchApplications();
       return;
     }
 
-    // Fallback: old style call with (opportunityId, applicationData)
-    const opportunityId = opportunityIdOrApp as number;
-    const opportunity = opportunities.find((opp) => opp.id === opportunityId);
-    if (!opportunity) return;
-
-    const newApplication = {
-      id: Date.now(), // Simple client-side ID
-      opportunityId,
-      title: opportunity.title,
-      organization: opportunity.organization,
-      status: "pending" as const,
-      appliedDate: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "short",
-        day: "numeric",
-      }),
-      eventDate: opportunity.date,
-      message:
-        "Application submitted successfully. You'll hear back within 2-3 business days.",
-      applicationData: applicationData || {},
-    };
-
-    setApplications((prev) => [newApplication, ...prev]);
-    console.log("Application submitted (client):", newApplication);
+    // Remove the fallback client-side application creation
+    // This was causing duplicate applications that disappear on refresh
+    console.log("Application submission should go through OpportunityCard component, not this fallback");
   };
 
   const filteredOpportunities = opportunities.filter((opportunity) => {
