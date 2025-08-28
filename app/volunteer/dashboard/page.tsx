@@ -140,6 +140,10 @@ export default function VolunteerDashboard() {
   const [user, setUser] = useState<any>(null);
   const [isLoadingProfile, setIsLoadingProfile] = useState(true);
 
+  // New: opportunities loaded from the backend (replaces previous mockOpportunities)
+  const [opportunities, setOpportunities] = useState<any[]>([]);
+  const [isLoadingOpportunities, setIsLoadingOpportunities] = useState(true);
+
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
@@ -152,9 +156,7 @@ export default function VolunteerDashboard() {
           const userData = data.user;
           const transformedUser = {
             ...userData,
-            name: `${userData.first_name || ""} ${
-              userData.last_name || ""
-            }`.trim(),
+            name: `${userData.first_name || ""} ${userData.last_name || ""}`.trim(),
             phone: userData.phone_number,
           };
           setUser(transformedUser);
@@ -164,7 +166,6 @@ export default function VolunteerDashboard() {
         }
       } catch (error) {
         console.error("Failed to fetch profile:", error);
-        // Optionally, redirect to login or show an error message
       } finally {
         setIsLoadingProfile(false);
       }
@@ -173,10 +174,59 @@ export default function VolunteerDashboard() {
     fetchUserProfile();
   }, []);
 
+  // Fetch opportunities from the API and map to the shape used by OpportunityCard
+  useEffect(() => {
+    const fetchOpportunities = async () => {
+      setIsLoadingOpportunities(true);
+      try {
+        const res = await fetch("/api/opportunities");
+        if (!res.ok) {
+          throw new Error("Failed to fetch opportunities");
+        }
+        const data = await res.json();
+        // Map backend fields (snake_case) into the UI-friendly shape expected by OpportunityCard
+        const mapped = (data || []).map((op: any) => {
+          const date = op.date ? new Date(op.date) : null;
+          const formattedDate = date
+            ? date.toLocaleDateString("en-US", {
+                month: "short",
+                day: "2-digit",
+                year: "numeric",
+              })
+            : "";
+          const time =
+            (op.start_time || "") && (op.end_time || "")
+              ? `${op.start_time} – ${op.end_time}`
+              : op.start_time || op.end_time || "";
+          return {
+            id: op.id,
+            title: op.opportunity_title || op.title || "Untitled",
+            organization: op.organization_name || "",
+            location: op.location || "",
+            date: formattedDate,
+            time,
+            volunteers: op.registered_count ?? 0, // backend may provide, fallback 0
+            maxVolunteers: op.maximum_volunteer ?? op.maxVolunteers ?? 0,
+            skills: op.skills || [], // optional
+            category: op.category_name || "",
+            description: op.description || "",
+            image: op.photo || "/placeholder-event.jpg",
+            raw: op, // keep raw for any further actions
+          };
+        });
+        setOpportunities(mapped);
+      } catch (err) {
+        console.error("Error loading opportunities:", err);
+      } finally {
+        setIsLoadingOpportunities(false);
+      }
+    };
+
+    fetchOpportunities();
+  }, []);
+
   const handleApply = (opportunityId: number, applicationData: any) => {
-    const opportunity = mockOpportunities.find(
-      (opp) => opp.id === opportunityId
-    );
+    const opportunity = opportunities.find((opp) => opp.id === opportunityId);
     if (!opportunity) return;
 
     const newApplication = {
@@ -200,7 +250,7 @@ export default function VolunteerDashboard() {
     console.log("Application submitted:", newApplication);
   };
 
-  const filteredOpportunities = mockOpportunities.filter((opportunity) => {
+  const filteredOpportunities = opportunities.filter((opportunity) => {
     const matchesSearch =
       opportunity.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       opportunity.organization.toLowerCase().includes(searchTerm.toLowerCase());
@@ -458,13 +508,18 @@ export default function VolunteerDashboard() {
                   </CardHeader>
                   <CardContent>
                     <div className="grid gap-3 md:gap-4">
-                      {mockOpportunities.slice(0, 3).map((opportunity) => (
-                        <OpportunityCard
-                          key={opportunity.id}
-                          opportunity={opportunity}
-                          onApply={handleApply}
-                        />
-                      ))}
+                      {/* show first 3 opportunities from backend */}
+                      {isLoadingOpportunities ? (
+                        <div>Loading opportunities...</div>
+                      ) : (
+                        opportunities.slice(0, 3).map((opportunity) => (
+                          <OpportunityCard
+                            key={opportunity.id}
+                            opportunity={opportunity}
+                            onApply={handleApply}
+                          />
+                        ))
+                      )}
                     </div>
                     <div className="mt-4">
                       <Button
@@ -606,13 +661,21 @@ export default function VolunteerDashboard() {
 
             {/* Opportunities List */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
-              {filteredOpportunities.map((opportunity) => (
-                <OpportunityCard
-                  key={opportunity.id}
-                  opportunity={opportunity}
-                  onApply={handleApply}
-                />
-              ))}
+              {isLoadingOpportunities ? (
+                <div>Loading opportunities...</div>
+              ) : filteredOpportunities.length === 0 ? (
+                <div className="col-span-full text-center py-6">
+                  No opportunities found.
+                </div>
+              ) : (
+                filteredOpportunities.map((opportunity) => (
+                  <OpportunityCard
+                    key={opportunity.id}
+                    opportunity={opportunity}
+                    onApply={handleApply}
+                  />
+                ))
+              )}
             </div>
           </TabsContent>
 
