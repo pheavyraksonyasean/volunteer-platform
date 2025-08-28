@@ -225,12 +225,94 @@ export default function VolunteerDashboard() {
     fetchOpportunities();
   }, []);
 
-  const handleApply = (opportunityId: number, applicationData: any) => {
+  // <-- NEW: fetch saved applications on mount so they persist across refresh
+  useEffect(() => {
+    const fetchApplications = async () => {
+      try {
+        const res = await fetch("/api/applications", {
+          method: "GET",
+          credentials: "same-origin",
+        });
+        if (!res.ok) {
+          console.warn("Failed to fetch applications");
+          return;
+        }
+        const data = await res.json();
+        const mapped = (data || []).map((a: any) => ({
+          id: a.id,
+          opportunityId: a.opportunity_id ?? a.opportunityId ?? a.opportunity?.id,
+          title:
+            a.opportunity_title ||
+            a.title ||
+            a.opportunity?.title ||
+            (a.opportunity ? a.opportunity.title : "Untitled"),
+          organization: a.organization_name || a.organization || "",
+          status: a.status || "pending",
+          appliedDate: a.created_at
+            ? new Date(a.created_at).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              })
+            : new Date().toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+              }),
+          eventDate: a.event_date || a.eventDate || "",
+          message: a.message || "Application submitted successfully. You'll hear back within 2-3 business days.",
+          applicationData: a,
+        }));
+        setApplications(mapped);
+      } catch (e) {
+        console.error("Error fetching saved applications:", e);
+      }
+    };
+
+    fetchApplications();
+  }, []);
+
+  const handleApply = (opportunityIdOrApp: number | any, applicationData?: any) => {
+    // If the first arg is an object, assume it's the application returned from the backend
+    if (opportunityIdOrApp && typeof opportunityIdOrApp === "object") {
+      const appFromServer = opportunityIdOrApp;
+      const oppId =
+        appFromServer.opportunity_id ??
+        appFromServer.opportunityId ??
+        appFromServer.opportunity?.id ??
+        appFromServer.opportunityId;
+
+      const opportunity = opportunities.find((opp) => String(opp.id) === String(oppId));
+
+      const newApplication = {
+        id: appFromServer.id || Date.now(),
+        opportunityId: oppId,
+        title: opportunity?.title || appFromServer.title || "Untitled",
+        organization: opportunity?.organization || appFromServer.organization || "",
+        status: (appFromServer.status as any) || "pending",
+        appliedDate: new Date().toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        }),
+        eventDate: opportunity?.date || appFromServer.eventDate || "",
+        message:
+          "Application submitted successfully. You'll hear back within 2-3 business days.",
+        applicationData: appFromServer,
+      };
+
+      setApplications((prev) => [newApplication, ...prev]);
+      console.log("Application submitted (from server):", newApplication);
+      return;
+    }
+
+    // Fallback: old style call with (opportunityId, applicationData)
+    const opportunityId = opportunityIdOrApp as number;
     const opportunity = opportunities.find((opp) => opp.id === opportunityId);
     if (!opportunity) return;
 
     const newApplication = {
-      id: Date.now(), // Simple ID generation
+      id: Date.now(), // Simple client-side ID
       opportunityId,
       title: opportunity.title,
       organization: opportunity.organization,
@@ -243,11 +325,11 @@ export default function VolunteerDashboard() {
       eventDate: opportunity.date,
       message:
         "Application submitted successfully. You'll hear back within 2-3 business days.",
-      applicationData,
+      applicationData: applicationData || {},
     };
 
     setApplications((prev) => [newApplication, ...prev]);
-    console.log("Application submitted:", newApplication);
+    console.log("Application submitted (client):", newApplication);
   };
 
   const filteredOpportunities = opportunities.filter((opportunity) => {

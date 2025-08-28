@@ -127,21 +127,16 @@ export default function ApplicationModal({
     formData.append("hasTransportation", String(applicationData.hasTransportation));
     formData.append("agreeToBackground", String(applicationData.agreeToBackground));
     formData.append("agreeToCommitment", String(applicationData.agreeToCommitment));
-    // formData.append("availability", applicationData.availability || "");
 
     if (applicationData.resume) {
       formData.append("resume", applicationData.resume);
     }
 
-    // If you want to send additional documents as separate entries:
-    // for (let i = 0; i < applicationData.additionalDocuments.length; i++) {
-    //   formData.append("additionalDocuments", applicationData.additionalDocuments[i]);
-    // }
-
     try {
       const response = await fetch("/api/applications", {
         method: "POST",
         body: formData,
+        credentials: "same-origin", // <-- ensure cookies are sent so the API can read the auth cookie
       });
 
       if (!response.ok) {

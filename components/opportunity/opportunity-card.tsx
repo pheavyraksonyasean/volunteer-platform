@@ -99,7 +99,12 @@ export default function OpportunityCard({
           {/* Action buttons overlay */}
           <div className="absolute top-3 right-3 flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
 
-
+            <button
+              onClick={handleShare}
+              className="w-8 h-8 rounded-full bg-white/90 backdrop-blur-sm text-gray-600 hover:bg-blue-50 hover:text-blue-500 border-0 shadow-sm transition-colors flex items-center justify-center"
+            >
+              <Share2 className="h-4 w-4" />
+            </button>
           </div>
           
           {/* Gradient overlay for better text readability */}
